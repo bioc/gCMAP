@@ -1,0 +1,517 @@
+% \VignetteIndexEntry{main}
+% \VignetteDepends{}
+% \VignetteKeywords{gCMAP}
+% \VignettePackage{gCMAP}
+\documentclass[10pt]{article}
+
+\usepackage{times}
+\usepackage{hyperref}
+\usepackage{Sweave}
+
+\textwidth=6.5in
+\textheight=8.5in
+\oddsidemargin=-.1in
+\evensidemargin=-.1in
+\headheight=-.3in
+
+\title{Gene set analyses with the gCMAP package}
+\author{Thomas Sandmann and Richard Bourgon}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+\newpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Introduction}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+<<echo=FALSE, results=hide>>=
+options(warn=-1)
+@ 
+The \tt gCMAP \rm package offers unified access to a number of
+different algorithms to compare a sets of genes across expression
+profiling experiments. It extends the functionality of the \tt
+GSEABase \rm package, which provides functions to generate and combine
+GeneSets from various sources.
+
+\section{CMAPCollection, SignedGeneSet and CMAPResults classes}
+Them \tt gCMAP\rm package introduces three new classes:
+\itemize{
+\item{SignedGeneSet: }{ Extends the \tt GeneSet \rm class, with an
+  additional \tt geneSign \rm slot to distinguish up- and downregulated
+  set members.}
+\item{CMAPCollection: }{ Is derived from the \tt eSet \rm class for
+  efficient storage of large numbers of gene sets and related
+  annotations.}
+\item{CMAPResults: }{ Provides a unified output class for different
+  gene set enrichment analysis methods.}  }
+
+\subsection{CMAPCollections}
+
+To evaluate large gene sets collections containing thousands of gene
+sets, the \tt gCMAP \rm package introduces a new class \tt
+CMAPCollections \rm, to store gene sets and their relationships with
+each other in the form of a (sparse) incidence matrix. A derivative
+of the \tt eSet \rm class, a \tt CMAPCollection \rm also stores gene
+and gene set annotations in its featureData and phenoData slots.
+
+CMAPCollections can be created de novo, e.g. with the \tt
+newCMAPCollection \rm function, or by coercing existing \tt GeneSet,
+SignedGeneSet \rm or \tt GeneSetCollection \rm objects. Often, large
+data matrices e.g. containing differential expression data from many
+different experiments, are available. The \tt induceCMAPCollection \rm
+function can be used to define gene sets from any \tt eSet \rm object
+by applying a user-defined threshold.
+
+The \tt gCMAPData NChannelSet \rm object stores the results of three
+perturbation experiments, stimulation of tissue culture cells with
+drug1, drug2 or drug3. For each experiment, log2 fold change, z-scores
+and p-values (from differential expression analysis with the \tt limma
+\rm package) are available.
+
+<<gCMAPData>>=
+library(gCMAP)
+data( gCMAPData ) ## example NChannelSet
+
+sampleNames( gCMAPData )
+channelNames( gCMAPData )
+@ 
+
+To induce gene sets of interest, a data slot and thresholds must be
+chosen.
+
+<<induceCMAPCollection>>=
+## select all genes with z-scores > 2 or < -2
+cmap <- induceCMAPCollection( gCMAPData, element="z", lower=-2, higher=2)
+cmap
+pData( cmap )
+@ 
+
+The sign of the differential expression (e.g. the sign of the z-score
+or log2 fold change) is stored in the sparseMatrix stored as \tt
+assayData \rm in the \tt CMAPCollection \rm. Up-regulated gene set
+members are indicated by +1, down-regulated members by -1.
+
+<<membership>>=
+head( members( cmap ) )
+@ 
+
+Sometimes, e.g. when selecting gene sets based on p-values, no sign
+information is available and all set members will simply be indicated
+with +1. To distinguish sets without sign information from those only
+containing up-regulated members, the \tt signed \rm column of the
+phenoData slot indicates how the information should be interpreted.
+
+<<signs>>=
+signed( cmap )
+@ 
+
+As for other eSet-like objects, CMAPCollections can be subset to
+extract specific genes or gene sets.
+
+<<subsetting>>=
+dim( cmap )
+cmap[,1] ## the first gene set
+@ 
+\section{Comparing GeneSets} 
+
+To compare the list of geneIds present in different \tt
+CMAPCollections \rm, \tt GeneSets \rm or \tt GeneSetCollections \rm,
+the Fisher test can be used. In addition to the \tt GeneSets \rm of
+interest, we also need to provide information about the gene
+'universe', the complete ensemble of genes that could potentially be
+included in any set, e.g. all genes for which probes are available on
+a microarray, etc. Here, we will use all identifiers present in the
+gCMAPData dataset to define the gene identifier universe.
+
+The following example compares the first gene set in our \tt
+CMAPCollecttion \rm to all three included sets. (In this vignette, we
+will refer to 'query' and 'target' objects. Every query object is
+compared individually to all targets and the results are returned in a
+single object.)
+
+<<fisher_test>>=
+universe <- featureNames( gCMAPData )
+results <- fisher_score(cmap[,1], cmap, universe)
+results
+@ 
+
+The fisher\_score method returns a \tt CMAPResults \rm object, used by
+all analysis methods supported by the \tt gCMAP \rm package.
+
+\subsection{CMAPResults}
+
+Each CMAPResults object contains three elements
+\itemize{
+\item{An \tt AnnotatedDataFrame \rm called 'table', storing the
+  results of comparing one query to all of the targets. Additional
+  columns can be used to store information about the target gene
+  sets. The supported gene set enrichment analysis methods return
+  various scores, effect sizes and p-values, documented in the
+  \tt varMetadata \rm slot of the 'table'. They can be accessed with the
+  \tt labels \rm method.}
+\item{A 'docs' \tt character \rm vector to record information about the
+  analysis run as a whole.}  
+\item{A \tt list \rm 'errors', where
+  potential warnings and error messages can be stored.}  }
+
+To \tt cmapTable \rm method returns the full result table, including
+annotation columns (if present) and labels. Individual accessors have
+been to return the p-value columns (\tt pval \rm or \tt padj \rm), effect
+size (\tt effect \rm) or to transform the adjusted p-values to z-scores
+on a standard normal scale (\tt zscores \rm).
+
+<<cmapresults>>=
+cmapTable( results )
+labels( results )
+pval( results )
+zscores( results )
+@ 
+
+Several gene set enrichment analyses support many-to-many comparisons,
+including fisher\_score.  In this case, we receive a list of multiple
+\tt CMAPResults \rm objects, one for each element of the query.
+
+<<fisher_multiple>>=
+result.list <- fisher_score( cmap, cmap, universe )
+class( result.list )
+length( result.list )
+class( result.list[[1]] )
+## all pairwise adjusted p-values
+sapply(result.list, padj)
+@ 
+
+\section{Differential expression analysis with gene sets}
+
+Frequently, we are interested in differential expression of gene sets
+across two or more conditions. The \tt gCMAP \rm package currently
+provides unified access to the sample-label permutation strategy
+implemented in the \tt GSEAlm \rm package, as well as multiple
+functions from the \tt limma \rm package: \tt camera \rm, \tt romer \rm and
+\tt mroast \rm. (For a detailed explanation oft the different methods,
+please consult the help entries of the original packages directly.)
+
+For all methods, pre-processed expression data can be supplied as a
+data matrix, an \tt ExpressionSet \rm or any other \tt eSet \rm
+derivative. To perform a differential expression analysis, the
+experimental design must be specified, either by providing a design
+matrix directly or, for \tt eSet \rm or \tt ExpressionSet \rm objects, as
+a character string matching a phenoData column name.
+
+Let's generate an \tt matrix \rm with random expression values,
+three treated and three control samples:
+
+<<sampleexpressionset>>=
+## random score matrix
+y <- matrix(rnorm(1000*6),1000,6,
+            dimnames=list( featureNames( gCMAPData ), 1:6 ))
+
+predictor <- c( rep("Control", 3), rep("Case", 3))
+@ 
+
+along with a \tt CMAPCollection \rm containg four unsigned gene sets, the first
+of which is actually differentially up-regulated in the 'Case' group.  
+
+<<sampleexpressionset>>=
+m <-replicate(4, {
+  s <- rep(0,1000)
+  s[ sample(1:1000, 20)] <-  1
+  s[ sample(1:1000, 20)] <- -1
+  s
+  })
+dimnames(m) <- list(row.names( y ),
+                     paste("set", 1:4, sep=""))
+
+## Set1 is up-regulated
+y[,c(4:6)] <- y[,c(4:6)] + m[,1]*2
+
+## create CMAPCollection
+cmap <- CMAPCollection(m, signed=rep(TRUE,4))
+@ 
+
+The gCMAP package offers four different algorithms to test for
+differential expression between the 'control' and 'treatment' samples:
+
+<<gsealmScoreExample>>=   
+gsealm_score(y, cmap, predictor=predictor, nPerm=100)
+@
+
+<<self_contained, include=FALSE>>=
+mroast_score(y, cmap, predictor=predictor)
+@ 
+
+Both gsealm\_score and mroast perform self-contained test. (Goeman and
+Buhlmann, 2007). (Please note that we only run 100 \tt gsealm\_score
+\rm permutations to obtain a p-value in this example - in a real
+analysis, increasing this number, e.g. to 1000, is recommended.) In
+case a competitive hypothesis needs to be tested, the camera\_score
+and romer\_score methods (calling the \tt romer \rm and \tt camera \rm
+functions from the limma package, respectively) can be used instead.
+
+<<competitive, include=FALSE>>=
+camera_score(y, cmap, predictor=predictor)
+romer_score(y, cmap, predictor=predictor)
+@ 
+
+Currently, only gsealm\_score takes the sign of the gene set members
+(indicating whether a gene had originally be identified as up- or
+down-regulated) into account. 
+
+\section{Analysis of individual score profiles}
+
+In addition to analyzing complete experiments, other approaches to
+gene set enrichment testing evaluate whether a given statistic for the
+members of a gene set ranked highly relative to random sets.
+
+The wilcox\_score method calculates the Wilcox-rank sum statistic,
+assessing whether the ranked scores of a gene set are enriched at the
+top or bottom of the complete list of scores.
+
+The gsealm\_jg\_score calculates the mean score for all gene set
+members and provides a p-value based on the standard normal
+distribution (Jiang and Gentleman, 2007).
+
+The connectivity\_score is calculated according to Lamb, J. et
+al. (2006) and corresponds to the scaled score described in this
+publication. (It does not provide a p-value.)
+
+For illustration, we compare the first column of z-scores stored in
+the gCMAPData \tt NChannelSet \rm to the three gene sets induced from
+the same dataset in the first section of this vignette..
+
+<<geneSet_to_profile>>=
+profile <- assayDataElement(gCMAPData[,1], "z") ## extract first column
+head(profile)
+sampleNames(cmap) ## three gene sets
+
+gsealm_jg_score(profile, cmap)
+@ 
+
+As expected the first gene set, which was derived from the same
+experiment as the profile, receives highly significant
+p-values. 
+
+Alternatively, the Wilcox Rank sum test or the original Connectivity
+Score can be calculated. (Please note that the \tt connectivity\_score
+\rm does not return a p-value and is hard to interpret for a single
+profile.)
+
+<<geneSet_to_profile_others>>=
+wilcox_score(profile, cmap)
+connectivity_score(profile, cmap)
+@
+
+\section{Overview plots}
+
+When comparing a set of genes, a profile or a complete experiment to a
+large gene set collection, e.g. induced from the original Connectivity
+map data generated at the Broad institute (Lamb et al, Science, 2006),
+high level diagnostic plots can provide a first overview of the
+results.  
+
+For illustration purposes, we generate a random profile of z-scores
+for 1000 genes as well as CMAPCollection with a random set of 1000
+gene sets. One of them, set1, is actually differentially regulated.
+
+<<plot_example>>=
+## create random score profile
+set.seed(123)
+z <- rnorm(1000)
+names(z) <- paste("g", 1:1000, sep="")
+
+## generate random incidence matrix of gene sets
+n <-replicate(1000, {
+  s <- rep(0,1000)
+  s[ sample(1:1000, 20)] <-  1
+  s[ sample(1:1000, 20)] <- -1
+  s
+  })
+dimnames(n) <- list(names(z), paste("set",
+                                    1:1000,
+                                    sep=""))
+
+## Set1 is up-regulated
+z <- z + n[,1]*2
+
+## create CMAPCollection
+cmap.2 <- CMAPCollection(n, signed=rep(TRUE,1000))
+@ 
+
+<<gsealm_score_plot>>=
+## gene-set enrichment test
+res <- gsealm_jg_score(z, cmap.2)
+class(res)
+res
+@
+
+\setkeys{Gin}{width=.85\linewidth}
+<<Defaultplot, fig=TRUE, width=10, height=5, include=TRUE>>=
+plot(res, strip.subset=1:5, pch=19)
+@ 
+
+A call to the \tt plot \rm method on a \tt CMAPResults \rm object
+yields three graphical overviews: on the left, a density of all 1000
+reported effect sizes, in this case JG-scores, is shown. In the
+absence of correlation between genes, this distribution follows a
+normal distribution. ( While this is true for this set of randomly
+generated scores, the distribution of JG scores observed in practice
+is actually broader than expected, testament to the non-random
+patterns of gene expression.) As expected, set1 is the only set
+reported with an adjusted p-value of less than 0.05.
+
+In the centre, a heatmap of the rank-ordered scores is displayed, with
+low and high scores displayed as blue and red stripes,
+respectively. By default, scores between -2 and 2 are shown in
+grey. To display scores above 2 or below -2, a color gradient from
+white to red or from white to blue is applied, respectively. (Both the
+choice of colors and thresholds of the color gradients can be
+configured, please see the \tt CMAPResults \rm help page for details.)
+
+On the right, the ranks of the top five gene sets are
+highlighted. (The same set is also indicatd in the rug of the density
+distribution on the left.) The strip.subset parameter can be used to
+focus on specific sets of interest, e.g. by matching keywords in their
+annotation columns or by applying a threshold to any of the score
+columns. For example, we can highlight those sets with JG-scores of
+less than -3.
+
+\setkeys{Gin}{width=.85\linewidth}
+<<CMAPplots1, fig=TRUE, width=10, height=5, include=TRUE>>=
+sets.down <- effect( res ) < -3
+plot(res, strip.subset=sets.down, pch=18)
+@
+
+In addition, we can group by shared annotation entries by specifying a
+column of the CMAPResults object with the 'strip.anno' parameter. To
+demonstrate, we add a column of 10 class annotations to the 'res'
+CMAPResults object. Now, we can for example highlight the distribution
+of scores from two particular classes (e.g. 'a' and 'b'), or investigate the class membership
+of the top 100 sets.
+
+(Please note that any annotation columns present in a queried
+CMAPCollection will be included in the CMAPResults object
+automatically.) 
+
+\setkeys{Gin}{width=.85\linewidth}
+<<CMAPplots2, fig=TRUE, width=10, height=5, include=TRUE>>=
+res$class <- sample(letters[1:10], 1000, replace=TRUE)
+plot(res, strip.anno="class", strip.subset=which(res$class %in% c("a", "b")))
+@ 
+
+\setkeys{Gin}{width=.85\linewidth}
+<<CMAPplots3, fig=TRUE, width=10, height=5, include=TRUE>>=
+plot(res, strip.anno="class", strip.subset=1:100)
+@ 
+
+\section{Retrieving gene-level information}
+
+Once significantly enriched gene sets have been identified, we may
+want to take a closer look at the behavior of individual genes. Are
+expression changes associated with many gene set members or do
+specific genes respond particularly strongly ? 
+
+All methods implemented in the \tt gCMAP \rm package, with the
+exception of \tt fisher\_score \rm, return gene-level scores when the
+optional 'keep.scores' parameter is set to 'TRUE'. To demonstrate, we
+repeat the \tt gsealm\_score \rm call from above.
+
+<<geneLevelScores>>=
+res <- gsealm_score(y, cmap, predictor=predictor, nPerm=100, keep.scores=TRUE)
+res
+set1.expr <- geneScores(res)[["set1"]]
+head(set1.expr)
+@
+
+Expression scores for each gene set are now available in the
+geneScores \tt cmapResults \rm colum, which can be accessed through a
+method with the same name. Each matrix of expression scores is
+accompanied by an additional 'sign' attribute to remind us whether
+gene set members were annotated as up- or down-regulated.
+
+For example, we can now visualize the expression scores of set1 member
+genes in a heatmap. As expected, genes annotated as 'up-regulated'
+(red sidebar) show higher expression in Cases than Controls and the
+reverse is true for genes annotated as 'down-regulated' (blue
+sidebar).
+
+\setkeys{Gin}{width=.65\linewidth}
+<<geneScores, fig=TRUE, width=10, height=10, include=TRUE>>=
+heatmap(set1.expr, scale="none", Colv=NA, labCol=predictor,
+        RowSideColors=ifelse( attr(set1.expr, "sign") == "up", "red", "blue"),
+        margin=c(7,5))
+legend(0.35,0,legend=c("up", "down"), 
+       fill=c("red", "blue"), 
+       title="Annotated sign", horiz=TRUE, xpd=TRUE)
+@
+
+Each row in the \tt CMAPResults \rm objects features an subset of the
+original query ExpressionSet. As genes can be part of many different
+genes sets, querying large gene set collections may result in storing
+duplicate data rows over and over again, considerably increasing the
+memory footprint of the \tt CMAPResults \rm object.
+
+Alternatively, we can extract the scores from the original data
+source. For example, we can obtain a nested list of scores for all
+sets and data columns by passing the \tt CMAPCollection \rm (cmap) and
+the score matrix (y) to the \tt featureScores \rm method. The element
+for 'set1' corresponds to the score matrix we obtained above.
+
+<<featureScores>>=
+res <- featureScores(cmap, y)
+class(res)
+names(res)
+identical( res[["set1"]], set1.expr )
+@
+
+Different scores for the same gene set can be handled conveniently as
+matrices, because all score vectors are of the same length. In a
+different scenario, we might want to compare expression changes for
+different gene sets, likely containing different numbers of
+genes. Reversing the order of the arguments passed to the \tt
+featureScores \rm function returns a list of score vectors for each
+perturbation.
+
+The \tt melt \rm function from the \tt reshape \rm package offers a
+simple way to convert it into a data.frame as input e.g. for plot
+functions from the \tt lattice \rm or \tt ggplot2 \rm package. (For
+more on handling of nested lists, you may want to take a look at the
+\tt plyr \rm package.)
+
+To demonstrate, we return to the z-score vector 'z' and the associated
+\tt CMAPCollection \rm 'cmap.2' we generated in the section 'Overview
+plots'.
+
+\setkeys{Gin}{width=.65\linewidth}
+\centering
+<<violinPlot, fig=TRUE, width=7.5, height=7.5, include=TRUE>>=
+## retrieve scores for the first three sets
+res <- featureScores(z, cmap.2[,1:3]) ## reversed argument order
+res <- res[[1]]
+
+## transform into data.frame
+require( reshape )
+df <- melt( res )
+
+## collect gene signs
+signs <- as.vector(sapply(res, attr, "sign"))
+
+require( lattice )
+bwplot(value ~ L1, data=df, 
+    xlab="Gene set", ylab="z-score",
+    main="Exciting perturbation",    
+    panel = function(..., box.ratio) {
+    panel.violin(..., col = "transparent",
+    varwidth = FALSE, box.ratio = box.ratio)
+    panel.xyplot(..., jitter.x=TRUE, fill = NULL,
+    col=ifelse( signs == "up", "red", "blue"))
+    })
+@
+
+<<sessionInfo>>=
+  sessionInfo()
+@  
+\end{document}

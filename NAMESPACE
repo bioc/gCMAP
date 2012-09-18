@@ -1,0 +1,81 @@
+importFrom("Matrix","sparseMatrix", "Matrix", "t")
+importFrom("GSEAlm","lmPerGene")
+importFrom("parallel", "mclapply")
+importFrom("limma", "symbols2indices", "romer", "mroast", "camera", "eBayes", "lmFit", 
+           "topTable")
+importFrom("BigMatrix", "BigMatrix")
+importFrom("DESeq", "newCountDataSet", "getVarianceStabilizedData", "nbinomTest")
+importFrom("genefilter", "rowttests")
+importFrom("RColorBrewer","brewer.pal")
+importFrom("lattice", "levelplot", "densityplot", "stripplot", "trellis.par.get", 
+           "panel.densityplot", "panel.rug")
+importFrom("latticeExtra", "panel.key")
+
+export(
+       "eSetOnDisk",
+       "generate_gCMAP_NChannelSet",
+       "mapNmerge",
+       "memorize",
+       "signedRankSumTest",
+       "zScores"
+       )
+
+exportClasses(
+              "SignedGeneSet",
+              "CMAPCollection",
+              "CMAPResults"
+              )
+
+exportMethods(
+              "camera_score",
+              "CMAPCollection",
+              "cmapTable",
+              "connectivity_score",
+              "downIds",
+              "docs",
+              "docs<-",
+              "effect",
+              "effect<-",
+              "errors",
+              "errors<-",
+              "featureScores",
+              "fisher_score",
+              "gsealm_score",
+              "gsealm_jg_score",
+              "geneIds",
+              "geneIndex",
+              "geneScores",
+              "geneSign",
+              "geneSign<-",
+              "incidence",
+              "induceCMAPCollection",
+              "initialize",
+              "labels",
+              "labels<-",
+              "mapIdentifiers",
+              "mergeCollections",
+              "members",
+              "minSetSize",
+              "plot",
+              "padj",
+              "padj<-",
+              "pval",
+              "pval<-",
+              "mroast_score",
+              "romer_score",
+              "set",
+              "set<-",
+              "show",
+              "signed",
+              "signed<-",
+              "SignedGeneSet",
+              "nFound",
+              "nFound<-",
+              "trend",
+              "trend<-",
+              "upIds",
+              "nSet",
+              "nSet<-",
+              "wilcox_score",
+              "zscores"
+              )

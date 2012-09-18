@@ -1,0 +1,138 @@
+% \VignetteIndexEntry{main}
+% \VignetteDepends{}
+% \VignetteKeywords{gCMAP}
+% \VignettePackage{gCMAP}
+\documentclass[10pt]{article}
+
+\usepackage{times}
+\usepackage{hyperref}
+\usepackage{Sweave}
+
+\textwidth=6.5in
+\textheight=8.5in
+\oddsidemargin=-.1in
+\evensidemargin=-.1in
+\headheight=-.3in
+
+\title{Primer: CMAPCollections from Bioconductor annotation packages}
+
+\begin{document}
+
+\maketitle
+
+\section{reactome}
+
+<<echo=FALSE, results=hide>>=
+options(warn=-1)
+@ 
+
+The \tt reactome.db \rm package offers access to pathway annotations
+from the reactome database \url{http://www.reactome.org/}. This primer
+demonstrates how to use this annotaiton to generate a species-specific
+\tt CMAPCollection \rm with Entrez gene identifiers.
+
+First, we access the genes identifiers associated with each
+pathway. In a second step, we retrieve the names of the pathways and
+perform some basic filtering to remove duplicated or un-named sets.
+
+<<load.annotation>>=
+library(reactome.db)
+library(gCMAP)
+library(Matrix)
+
+## use multiple cores if available
+options(mc.cores=2)
+
+## retrieve entrez ids of pathway members
+pathways <- as.list(reactomePATHID2EXTID)
+
+## retrieve names
+pathway.names <- unlist(mget(names(pathways), reactomePATHID2NAME))
+pathway.names <- pathway.names[ match(names( pathways),
+                                      names( pathway.names )) ]
+
+## remove categories with duplicated or missing names
+filtered.names <- duplicated( names( pathway.names)) | is.na(pathway.names)
+pathways <- pathways[ ! filtered.names ]
+pathway.names <- pathway.names[ ! filtered.names]
+@ 
+
+Each pathway name contains the name of the respective species. We can
+use this information to generate species-specific reactome
+collections:
+
+<<subset.collections>>=
+head( pathway.names )
+human <- grepl( "^Homo sapiens", pathway.names)
+@ 
+
+Next, we create new CMAPCollection, providing pathway names in the phenoData slot.
+
+<<reactome.human>>=
+pheno.data <- as(
+    data.frame(name=pathway.names[ human ],
+               row.names=names(pathways[ human ])
+              ),
+              "AnnotatedDataFrame")
+
+i.matrix <- Matrix::t( incidence( pathways[ human ] ) )
+reactome.hs <- CMAPCollection( i.matrix,
+                              phenoData=pheno.data,
+                              annotation='org.Hs.eg',
+                              signed=rep( FALSE, ncol(i.matrix)) )
+@ 
+
+To simplify this process in the future, we can define a helper function.
+
+<<pathway2cmap>>=
+pathway2cmap <- function(pathways, pathway.names, selected, anno){  
+  pheno.data <- as(
+                   data.frame(name=pathway.names[ selected ],
+                              row.names=names(pathways[ selected ])
+                              ),
+                   "AnnotatedDataFrame")
+  i.matrix <- Matrix::t( incidence(pathways[ selected ]) )
+  CMAPCollection(i.matrix,
+                 phenoData=pheno.data,
+                 annotation=anno,
+                 signed=rep(FALSE, ncol(i.matrix)))
+}
+@ 
+
+Now, generating \tt CMAPCollections \rm for other species is straightforward:
+
+<<reactome.mouse>>=
+mouse <- grepl( "^Mus musculus", pathway.names)
+reactome.mm <- pathway2cmap( pathways, pathway.names, 
+                             selected=mouse, "org.Mm.eg")
+@ 
+
+\section{KEGG}
+
+Similarly, the \tt KEGG.db \rm package offers the last public release
+of the KEGG gene annotation database \url{http://www.genome.jp/kegg/}.
+Analogous to the \tt reactome.db \rm package, species are identified
+by specific prefixes in the pathway identfiers. For example, human
+gene sets start with 'hsa', mouse sets begin with 'mmu' instead.'
+
+<<kegg>>=
+library(KEGG.db)
+
+## retrieve entrez ids of pathway members
+pathways <- as.list(KEGGPATHID2EXTID)
+
+## retrieve names
+pathway.names <- unlist(mget(sub("^...", "",names(pathways)), KEGGPATHID2NAME))
+
+## species-specific CMAPCollections
+human <- grepl( "^hsa", names( pathways ))
+KEGG.hs <- pathway2cmap( pathways, pathway.names, selected=human, "org.Hs.eg")
+
+mouse <-  grepl( "^mmu", names( pathways ))
+KEGG.mm <- pathway2cmap( pathways, pathway.names, selected=mouse, "org.Mm.eg")
+@ 
+
+<<sessionInfo>>=
+  sessionInfo()
+@  
+\end{document}

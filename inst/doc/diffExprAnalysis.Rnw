@@ -1,0 +1,186 @@
+% \VignetteIndexEntry{main}
+% \VignetteDepends{}
+% \VignetteKeywords{gCMAP}
+% \VignettePackage{gCMAP}
+\documentclass[10pt]{article}
+
+\usepackage{times}
+\usepackage{hyperref}
+\usepackage{Sweave}
+
+\textwidth=6.5in
+\textheight=8.5in
+\oddsidemargin=-.1in
+\evensidemargin=-.1in
+\headheight=-.3in
+
+\title{Primer: Preparing NChannelSet objects with differential expression scores}
+
+\begin{document}
+
+\maketitle
+
+\section{Differential expression analysis}
+
+<<echo=FALSE, results=hide>>=
+options(warn=-1)
+@ 
+
+The \tt gCMAP \rm package offers a the \tt generate\_gCMAP\_NChannelSet
+\rm function to process multiple instances differential expression
+experiments with two classes (e.g. cases vs controls).  For microarray
+data, the \tt limma \rm package is used to calculate a moderated
+t-statistic (default). Optionally, a standard t-test can be computed
+instead. For RNAseq data, the \tt DESeq \rm package is used instead.
+
+Data preprocessing differs considerably between different technologies
+and array platforms and needs to be performed beforehand. Normalized
+microarray data and accompanying annotation is passed to \tt
+generate\_gCMAP\_NChannelSet \rm as a list of \tt ExpressionSet \rm
+objects, RNAseq data can be passed as a list of \tt CountDataSet \rm
+objects instead.
+
+To generate a set of 3 example \tt CountDataSets \rm, we use the \tt
+makeExampleCountDataSet \rm function from the \tt DESeq \rm package.
+
+<<makeExampleCountDataSet>>=
+library(gCMAP)
+
+set.seed( 123 )
+cds.list <- lapply( 1:3, function(n) {
+   cds <- makeExampleCountDataSet()
+   featureNames(cds) <- paste("gene",1:10000, sep="_")
+   cds
+})
+names(cds.list) <- paste("Instance", 1:3, sep="")
+
+sapply(cds.list, dim)
+
+sapply(cds.list, function(n) pData(n)$condition )
+@ 
+
+By default, each \tt CountDataset \rm object contains counts for 10000
+genes from five samples. Each sample is assigned to one of two
+conditions, A or B, in the phenoData slot of the \tt CountDataSet \rm.
+The pData column containing group membership information (
+e.g. "condition" ) is provided as the control\_perturb\_col
+parameter. The levels associated with control and treatment groups are
+specified as "control" and "perturb" character strings.
+
+Each of the three \tt CountDataSet \rm instances is analyzed
+individually by \tt generate\_gCMAP\_NChannelSet \rm. To assemble the
+results into a single NChannelSet, the input \tt ExpressionSet \rm or
+\tt CountDataSet \rm objects must contain measurements for the same
+features (e.g. the vectors returned by "featureNames" must be
+identical across all instances).
+
+To include information about the instances in the NChannelSet, a
+'sample.annotation' data.frame can be provided, containing exactly one
+row for each element of the input list of \tt ExpressionSet /
+CountDataSet \rm objects.
+
+<<generate_gCMAP_NChannelSet>>=
+## this step takes a little time
+cde <- generate_gCMAP_NChannelSet(cds.list,
+                           uids=1:3,
+                           sample.annotation=NULL,
+                           platform.annotation="Entrez",
+                           control_perturb_col="condition",
+                           control="A",
+                           perturb="B")
+channelNames(cde)
+@ 
+
+For array data, a \tt NChannelSet \rm with slots "exprs","z", "p",
+and "log\_fc" is returned, containing the average intenstity across all
+samples within the instance, z-scores, (raw) p-values and log2 fold
+changes, respectively. If count data is processed, an additional
+"mod\_fc" channel is returned, providing the moderated fold change,
+calculated after performing variance-stabilising transformation across
+all input instances. (Please consult the \tt DESeq \rm vignette for
+details.)
+
+\subsection{Storing assayData as BigMatrix objects on disk}
+
+When large numbers of instances are processed, the resulting \tt
+NChannelSet \rm objects can require large amounts of memory. If a file
+name is provided via the "big.matrix" parameter, \tt
+generate\_gCMAP\_NChannelSet \rm uses the \tt BigMatrix \rm package to
+store data from each channel on disk. In the future, individual
+channels and / or subsets of the datasets can then be loaded without
+requiring the full object to be read into memory again.
+
+To highlight this functionality, we derive three (arbitrary) instances
+from the sample.ExpressionSet object available from tbe \tt Biobase
+\rm package, process them and store the results in a temporary
+directory.
+
+<<big.matrix>>=
+## list of ExpressionSets
+data("sample.ExpressionSet") ## from Biobase
+
+es.list <- list( sample.ExpressionSet[,1:4],
+                sample.ExpressionSet[,5:8],
+                sample.ExpressionSet[,9:12])
+
+## three instances
+names(es.list) <- paste( "Instance", 1:3, sep=".")
+
+storage.file <- tempfile()
+storage.file ## filename prefix for BigMatrices
+
+de <- generate_gCMAP_NChannelSet(
+    es.list,
+    1:3,
+    platform.annotation = annotation(es.list[[1]]),
+    control_perturb_col="type",
+    control="Control",
+    perturb="Case",
+    big.matrix=storage.file) 
+
+channelNames(de)
+head( assayDataElement(de, "z") ) 
+
+dir(dirname( storage.file ))
+@ 
+
+For each channel, three files were generated in the temporary
+directory, identified by their suffices. To demonstrate the use of
+these disk-based \tt NChannelSet \rm objects, we will first delete the
+object from the current R session and reload it from disk.
+
+Accessing the complete matrix in the assayData slots, e.g. for the "z"
+channel, returns a BigMatrix object - a pointer to the associated file
+on disk. Upon subsetting, only the requested part of the dataset is
+loaded into memory.
+
+<<subsettingBigMatrices>>=
+## remove de object from R session and reload
+rm( de )
+
+de <-get( load( paste( storage.file, "rdata", sep=".")) )
+class( assayDataElement(de, "z") ) ## Bigmatrix
+assayDataElement(de, "z")[1:10,] ## load subset
+@
+
+The \tt memorize \rm function reads the complete \tt NChannelSet \rm
+into memory. Alternatively, one or more selected channels can be
+specified with the 'name' parameter.
+
+<<memorize>>=
+## read z-score channel into memory
+dem <- memorize( de, name="z" )
+channelNames(dem)
+
+class( assayDataElement(dem, "z") ) ## matrix
+@ 
+
+<<cleanup, echo=FALSE>>=
+## remove tempfiles
+unlink(paste(storage.file,"*", sep=""))  
+@ 
+
+<<sessionInfo>>=
+  sessionInfo()
+@  
+\end{document}
