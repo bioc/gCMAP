@@ -174,15 +174,22 @@ zscores( results )
 
 Several gene set enrichment analyses support many-to-many comparisons,
 including fisher\_score.  In this case, we receive a list of multiple
-\tt CMAPResults \rm objects, one for each element of the query.
+\tt CMAPResults \rm objects, one for each element of the query. Each
+CMAPResults object contains the results for all query gene sets
+ordered by p-value. To extract individual slots from all CMAPResult
+objects in the list, e.g. with \tt sapply \rm, we must ensure that all
+results are returned in the same order, e.g. ordered by sampleNames.
 
 <<fisher_multiple>>=
 result.list <- fisher_score( cmap, cmap, universe )
 class( result.list )
 length( result.list )
 class( result.list[[1]] )
+
 ## all pairwise adjusted p-values
-sapply(result.list, padj)
+sapply(result.list, function( x ) {
+       padj( x )[ sampleNames( cmap )]
+       })
 @ 
 
 \section{Differential expression analysis with gene sets}

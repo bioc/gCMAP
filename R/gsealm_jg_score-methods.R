@@ -8,6 +8,8 @@ setMethod(
     if( respect.sign == FALSE) {
       signed(sets) <- rep(FALSE, ncol(sets))
     }
+
+    query[ is.na( query ) ] <- 0 ## set missing values to 0
     score <- .jg( query, sets, removeShift=removeShift, respect.sign=respect.sign)
     
     ## replace NaN values produced for empty sets
@@ -169,6 +171,8 @@ setMethod(
     }
     
     set.matrix <- as( assayDataElement(sets, element), "matrix" )
+    set.matrix[ is.na( set.matrix ) ] <- 0 ## set missing values to 0
+
     score <- .jg( set.matrix, query, removeShift=removeShift, ## rows=query, columns=set
                   respect.sign=respect.sign)
     
@@ -178,6 +182,7 @@ setMethod(
     } else{
       gene.scores <- NA
     }
+    
     ## create separate CMAPResults object for each sample in the eSet
     results <- mclapply( seq( ncol( query )), function( n) {
       
