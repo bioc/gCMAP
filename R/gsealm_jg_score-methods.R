@@ -4,7 +4,7 @@ setMethod(
   "gsealm_jg_score",
   signature( query = "matrix", sets="CMAPCollection"),
   function( query, sets, removeShift=TRUE, respect.sign=TRUE,keep.scores=FALSE, ...) {
-    
+   
     if( respect.sign == FALSE) {
       signed(sets) <- rep(FALSE, ncol(sets))
     }
@@ -33,7 +33,7 @@ setMethod(
           trend <- ifelse(score[["t"]][set.name,n] >=0, "correlated", "anticorrelated")
         }
       })
-      
+
       if(! all(is.na( gene.scores ))) { 
         geneScores <- I(gene.scores[[n]])
       } else {
@@ -175,7 +175,7 @@ setMethod(
 
     score <- .jg( set.matrix, query, removeShift=removeShift, ## rows=query, columns=set
                   respect.sign=respect.sign)
-    
+
     ## store per-gene scores as gene-set:data-column list-of-list
     if( keep.scores == TRUE) {
       gene.scores <- featureScores( query, sets, element=element)
@@ -192,13 +192,19 @@ setMethod(
       } else {
         trend <- ifelse(score[["t"]][n,] >=0, "correlated", "anticorrelated")
       }
-      
+
       if( !is.na( gene.scores )) { 
-        geneScores <- I(gene.scores[[n]])
+        geneScores <- lapply( seq(ncol( gene.scores[[n]]) ), function( m ) {
+                          g <- gene.scores[[n]][,m]
+                          attr( g, "sign") <- attr( gene.scores[[n]], "sign")
+                          g
+                        })
+        names( geneScores ) <- sampleNames(sets)
+        geneScores <- I( geneScores )
       } else {
-        geneScores <- NA
+        geneScores <-  NA
       }
-      
+                        
       res <- CMAPResults( 
         data = data.frame(
           set = sampleNames(sets),
@@ -206,9 +212,9 @@ setMethod(
           pval = score[["pval"]][n,],
           padj =  p.adjust( score[["pval"]][n,], method="BH"),
           effect = score[["t"]][n,],
-          nSet = rep( Matrix::colSums( abs( members (query) ) )[n], ncol(query)),
+          nSet = rep( Matrix::colSums( abs( members (query) ) )[n], ncol(sets)),
           nFound = score[["setSize"]][n,],
-          geneScores = geneScores,                          
+          geneScores = geneScores, 
           pData(sets)),
         docs="\n Parametric 'JG' score summary.\n P-values were adjusted with the 'p-adjust' function using method 'BH'."
       )

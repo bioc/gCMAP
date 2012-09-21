@@ -188,8 +188,8 @@ setAs("GeneSetCollection", "CMAPCollection",
         } else {
           annotation(cmap) <- annotation(from.anno[[1]])
         }
-        desc <- lapply( from, description)
-        if( ! all( sapply( desc, is.null))) {
+        desc <- sapply( from, description)
+        if( ! all( desc == "")) {
           pData(cmap)$description <- desc
         }
         cmap

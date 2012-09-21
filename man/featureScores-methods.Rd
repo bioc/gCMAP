@@ -5,8 +5,10 @@
 
 \alias{featureScores,CMAPCollection,eSet-method}
 \alias{featureScores,CMAPCollection,matrix-method}
+\alias{featureScores,CMAPCollection,BigMatrix-method}
 \alias{featureScores,eSet,CMAPCollection-method}
 \alias{featureScores,matrix,CMAPCollection-method}
+\alias{featureScores,BigMatrix,CMAPCollection-method}
 \alias{featureScores,CMAPCollection,numeric-method}
 \alias{featureScores,numeric,CMAPCollection-method}
 
@@ -21,9 +23,13 @@ These methods extract the scores for CMAPCollection gene set members from eSet o
 
 \item{\code{signature(query = "CMAPCollection", dat = "matrix")}}{\}}
 
+\item{\code{signature(query = "CMAPCollection", dat = "BigMatrix")}}{\}}
+
 \item{\code{signature(query = "eSet", dat = "CMAPCollection")}}{\}}
 
 \item{\code{signature(query = "matrix", dat = "CMAPCollection")}}{\}}
+
+\item{\code{signature(query = "BigMatrix", dat = "CMAPCollection")}}{\}}
 
 \item{\code{signature(query = "CMAPCollection", dat = "numeric")}}{\}}
 
@@ -33,13 +39,17 @@ These methods extract the scores for CMAPCollection gene set members from eSet o
 
 \usage{
 
-\S4method{featureScores}{CMAPCollection,eSet}(query, dat,element="z",simplify=TRUE)
+\S4method{featureScores}{CMAPCollection,eSet}(query, dat, element="z",simplify=TRUE)
 
-\S4method{featureScores}{CMAPCollection,matrix}(query, dat,simplify=TRUE)
+\S4method{featureScores}{CMAPCollection,matrix}(query,dat, simplify=TRUE)
 
-\S4method{featureScores}{eSet,CMAPCollection}(query, dat,element="z")
+\S4method{featureScores}{CMAPCollection,BigMatrix}(query, dat, simplify=TRUE)
+
+\S4method{featureScores}{eSet,CMAPCollection}(query, dat, element="z")
 
 \S4method{featureScores}{matrix,CMAPCollection}(query, dat)
+
+\S4method{featureScores}{BigMatrix,CMAPCollection}(query, dat)
 
 \S4method{featureScores}{CMAPCollection,numeric}(query, dat)
 
@@ -54,7 +64,7 @@ These methods extract the scores for CMAPCollection gene set members from eSet o
 
   \item{element}{Character string specifying which assayDataElement to extract from eSet objects.}
 
-  \item{simplify}{Logical: when possible, should score columns for each gene set collected in a matrix ? This optoin is only available if the results are organized by }
+  \item{simplify}{Logical: when possible, should score columns for each gene set collected in a matrix ?}
 
 }
 \keyword{methods}

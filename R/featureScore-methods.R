@@ -75,6 +75,20 @@ setMethod(
 
 setMethod(
   "featureScores",
+  signature( query = "CMAPCollection", dat="BigMatrix"),
+  function( query, dat, simplify=TRUE){
+    featureScores( query, as( dat, "matrix" ), simplify=simplify )
+  })
+
+setMethod(
+  "featureScores",
+  signature( query = "BigMatrix", dat="CMAPCollection"),
+  function( query, dat ){
+    featureScores( as( query, "matrix"),  dat )
+  })
+
+setMethod(
+  "featureScores",
   signature( query = "CMAPCollection", dat="eSet"),
   function( query, dat, element="z",simplify=TRUE ){
     if( ! element %in% assayDataElementNames(dat)) {
