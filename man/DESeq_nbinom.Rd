@@ -14,7 +14,8 @@ estimated for differential expression between treatment and control
 groups.  }
 
 \usage{
-.DESeq_nbinom(cds, control = "control", perturb = "perturbation", try.hard = FALSE, ...)
+.DESeq_nbinom(cds, control = "control", perturb = "perturbation",
+try.hard = FALSE, control_perturb_col = "cmap",...)
 }
 
 \arguments{
@@ -36,6 +37,10 @@ groups.  }
   the function exits with an error. If TRUE, a non-parametric (loess)
   esimation is attempted instead. 
 }
+\item{control_perturb_col}{ Column name in \code{phenoData} of
+  \code{cds} where control/perturbation designations are stored.
+}
+  
   \item{\dots}{
     Any additional parameters passed on to \link[DESeq]{estimateDispersions}
 }

@@ -1,6 +1,6 @@
 eSetOnDisk <- function(eset, out.file=NULL) {
   if( is.null(out.file)) {
-    stop("Please provide path/basename of the output file(s).")
+   stop("Please provide path/basename of the output file(s).")
   }
   
   storageMode(assayData( eset )) <- "list" ## unlock
@@ -326,7 +326,8 @@ pairwise_DESeq <- function( cds,
   res <- try( .DESeq_nbinom(cds,
                            control,
                            perturb,
-                           try.hard)
+                           try.hard,
+                           control_perturb_col=control_perturb_col)
              )
   
   if( class(res) != "try-error" ) {
@@ -387,12 +388,14 @@ pairwise_DESeq <- function( cds,
                          control="control",
                          perturb="perturbation",
                          try.hard=FALSE,
+                         control_perturb_col="cmap",
                          ...) {
-  
-  cds <- estimateSizeFactors( cds )
 
+  conditions(cds) <- pData(cds)[, control_perturb_col]
+  cds <- estimateSizeFactors( cds )
+  
   ## can we use replicates to estimate dispersions ?
-  if ( max( table( conditions( cds ) )[ c( control, perturb )] ) > 1 ) {
+  if ( max( table( conditions(cds ) )[ c( control, perturb )] ) > 1 ) {
     
     ## yay, replicates for at least one condition !
     cds <- try( estimateDispersions( cds ) )
@@ -455,6 +458,7 @@ generate_gCMAP_NChannelSet <- function(
   feature.number <- nrow(data.list[[1]])
 
   ## Check unique ids are really unique
+  uids <- as.character( uids )
   if( any( duplicated( uids ) ) )  {
     stop("uids must be a vector of unique ids")
   }
@@ -584,6 +588,7 @@ generate_gCMAP_NChannelSet <- function(
                             big.matrix
                             )
 {
+
   vst <- .vst_transform( data.list ) ## variance-stabilizing transformation
   res <- lapply( data.list, function( x )
                 try(
@@ -611,7 +616,7 @@ generate_gCMAP_NChannelSet <- function(
       sample.annotation <- sample.annotation[ which( ! bad.instances ), ]
     }
   }
-  
+
   ## collect results from all instances
   AveExpr = sapply( res, "[[", "exprs" )
   z = sapply( res, "[[", "z" )
