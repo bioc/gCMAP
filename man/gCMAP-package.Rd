@@ -22,7 +22,7 @@ Type: \tab Package\cr
 Version: \tab 0.1\cr
 Date: \tab 2012-08-13\cr
 Depends: \tab methods, GSEABase, DESeq\cr
-Imports: \tab Biobase, limma (>= 3.12.1), GSEAlm, Category, BigMatrix, Matrix, parallel, annotate, genefilter, RColorBrewer\cr
+Imports: \tab Biobase, limma (>= 3.12.1), GSEAlm, Category, bigmemoryExtras, Matrix, parallel, annotate, genefilter, RColorBrewer\cr
 Suggests: \tab KEGG.db, reactome.db\cr
 License: \tab GPL-2\cr
 LazyLoad: \tab yes\cr

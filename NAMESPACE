@@ -3,7 +3,7 @@ importFrom("GSEAlm","lmPerGene")
 importFrom("parallel", "mclapply")
 importFrom("limma", "symbols2indices", "romer", "mroast", "camera", "eBayes", "lmFit", 
            "topTable")
-importFrom("BigMatrix", "BigMatrix")
+importFrom("bigmemoryExtras", "BigMatrix")
 importFrom("DESeq", "newCountDataSet", "getVarianceStabilizedData", "nbinomTest")
 importFrom("genefilter", "rowttests")
 importFrom("RColorBrewer","brewer.pal")

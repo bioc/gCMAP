@@ -1,0 +1,12 @@
+\name{NEWS}
+\title{NEWS file for the gCMAP}
+\section{Changes in version 0.99.5}{
+  \itemize{
+    \item{NEW}{ The BigMatrix package changed its name to bigmemoryExtras. Currently, bigmemoryExtras only supports Mac and Unix platforms, thus gCMAP does not support Windows, either.}
+  }
+}	
+\section{Changes in version 0.99.1}{	
+ \itemize{		
+    \item{NEW}{ First release of the gCMAP package to Bioconductor.}
+  }
+}
