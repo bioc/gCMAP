@@ -3,35 +3,36 @@ setMethod(
           signature( what = "SignedGeneSet", to="GeneIdentifierType", from="GeneIdentifierType"),
           function (what, to, from, ... ) 
           {
-            if (to@type != "EntrezId")
-              {
-                stop("Currently, only conversion to EntrezIds is supported for SignedGeneSets")
-              }
+            if( to@type == from@type) return( what )
 
-            ## map identifiers
-            if (grepl("IGIS", annotation(geneIdType(what)), ignore.case = TRUE)) { ## Genentech IGIS gene annotation
-              ids <- sub("GeneID:", "", geneIds(what))
-              geneIds(what) <- ids
-              return(what)
+            ## split SignedGenSet into two separate GeneSets for each sign
+            split.ids <- split(geneIds( what), geneSign(what))
+            split.sets <- lapply( split.ids, function( ids ){
+              GeneSet( ids, geneIdType=from)
+            })
+            split.sets.new <- lapply( split.sets, mapIdentifiers, to)
+            new.ids <- do.call( c, lapply( split.sets.new, geneIds))
+            names( new.ids ) <- ifelse( grepl( "down", names( new.ids)), "down","up")
 
-            } else { ## other platform annotation
-              ids <- .lookupAnno(geneIds(what), annotation(from))
-              message(sprintf("Successfully mapped gene set members to %s Entrez id(s).", length(unique(ids))))
-              
-              
-              ## remove multi-mapping probes with inconsistent signs
-              sign <- as.character(geneSign(what))
-              id.sign <- unique(cbind(ids, sign))
-              consistent <- id.sign[,1] %in%  names(which(table(id.sign[,1]) == 1))
-              message(sprintf("Discarded %s Entrez id(s) because of sign inconsistency.",
-                              length(unique(ids))-length(id.sign[consistent,1])))
+            ## remove duplicates ( same id & same sign)
+            id.sign <- cbind( as.character( new.ids ), names( new.ids))
+            id.sign <- id.sign[!duplicated(id.sign, MARGIN=1),]
+            new.ids <- id.sign[,1]
+            names(new.ids) <- id.sign[,2]
+
+            ## remove genes appearing both up- and down-regulated
+            inconsistent <- sum(duplicated( new.ids))
+            if( inconsistent != 0){
+              message(paste("Removed", inconsistent, "gene(s) that appeared both up- and downregulated."))
             }
+            new.ids <- new.ids[ !duplicated( new.ids) ]
 
             ## return new SignedGeneSet
-            SignedGeneSet(id.sign[consistent,1],
-                          geneSign=id.sign[consistent,2],
+            SignedGeneSet(new.ids,
+                          geneSign=names(new.ids),
                           setName=setName(what),
-                          geneIdType=to)
+                          geneIdType=geneIdType( split.sets.new[[1]])
+                          )
           }
           )
 

@@ -1,8 +1,8 @@
 Package: gCMAP
 Type: Package
 Title: Tools for Connectivity Map-like analyses
-Version: 0.99.5
-Date: 2012-09-26
+Version: 0.99.6
+Date: 2012-09-28
 Depends: methods, GSEABase, DESeq
 Imports: Biobase, limma (>= 3.12.1), GSEAlm, Category, bigmemoryExtras (>=
         0.99.3), Matrix (>= 1.0.9), parallel, annotate, genefilter, 

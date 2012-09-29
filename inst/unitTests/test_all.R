@@ -168,3 +168,16 @@ test_featureScores <- function() {
   res <- res[[1]][,1] ## vector for first data column 
   checkTrue( all( res == assayDataElement(gCMAPData, "z")[names(res),1]), "correct scores were extracted")
 }
+
+test_mapIdentifiers <- function(){
+  if( is.element("org.Hs.eg.db", installed.packages()[,1])){
+    require( org.Hs.eg.db )
+    gene.ids <- c("TP53", "GAPDH")
+    gene.signs <- c("up","down")
+    s <- SignedGeneSet(gene.ids, geneSign=gene.signs, setName="set1", geneIdType=SymbolIdentifier("org.Hs.eg"))
+    checkTrue( identical( s, mapIdentifiers( s, SymbolIdentifier()) ), "does not try to convert geneIdTypes into themselves.")
+    checkTrue( length( geneIds( mapIdentifiers( s, EntrezIdentifier()) ) ) == 2, "returned two EntrezIds for TP53 and GAPDH." )
+  } else {
+    checkTrue( TRUE, "noticed that annotation package org.Hs.eg.db is not available and skipped this test.")
+  }
+}
