@@ -304,7 +304,6 @@ setMethod(
             }
             
             if(! element %in% assayDataElementNames(eset) ) stop(paste( "AssayDataElement", element, "not found."))
-            eset <- memorize( eset, element)
             ade <- assayDataElement( eset, element )
 
             gss <- lapply(

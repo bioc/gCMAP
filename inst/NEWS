@@ -1,11 +1,24 @@
 \name{NEWS}
 \title{NEWS file for the gCMAP}
+
+\section{Changes in version 1.1.1}{
+  \itemize{
+    \item{IMPROVED}{ Reduced memory footprint of induceCMAPCollection method for bigmemory-backed eSet objects.}
+  }
+}	
+
+\section{Changes in version 1.1.0}{
+  \itemize{
+    \item{NEW}{ Version number was increased for the Bioconductor release.}
+  }
+}	
+
 \section{Changes in version 0.99.6}{
   \itemize{
     \item{IMPROVED}{ Updated mapIdentifiers method for SignedGeneSet class now handles more different annotation types.}
   }
 }	
-\title{NEWS file for the gCMAP}
+
 \section{Changes in version 0.99.5}{
   \itemize{
     \item{NEW}{ The BigMatrix package changed its name to bigmemoryExtras. Currently, bigmemoryExtras only supports Mac and Unix platforms, thus gCMAP does not support Windows, either.}
