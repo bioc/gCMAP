@@ -58,7 +58,7 @@ setMethod(
             lor <- log( ( query.and.sets * neither) / (query.not.sets * sets.not.query ) )
             lor[query.not.sets == 0] <- Inf
             lor[sets.not.query == 0] <- -Inf
-            lor[query.and.sets == 0] <- 1
+            lor[query.and.sets == 0] <- 0
 
             ## store results
             results <- mclapply( seq( ncol( query) ), function( g ) {

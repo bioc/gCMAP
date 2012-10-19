@@ -1,6 +1,12 @@
 \name{NEWS}
 \title{NEWS file for the gCMAP}
 
+\section{Changes in version 1.1.2}{
+  \itemize{
+    \item{BUGFIX}{ Fixed log-odds calculation in fisher_score: non-overlapping sets now get a log odds ratio of 0}
+  }
+}	
+
 \section{Changes in version 1.1.1}{
   \itemize{
     \item{IMPROVED}{ Reduced memory footprint of induceCMAPCollection method for bigmemory-backed eSet objects.}
