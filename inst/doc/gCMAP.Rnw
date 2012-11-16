@@ -357,62 +357,31 @@ res
 
 \setkeys{Gin}{width=.85\linewidth}
 <<Defaultplot, fig=TRUE, width=10, height=5, include=TRUE>>=
-plot(res, strip.subset=1:5, pch=19)
+plot(res)
 @ 
 
 A call to the \tt plot \rm method on a \tt CMAPResults \rm object
-yields three graphical overviews: on the left, a density of all 1000
+yields two graphical overviews: on the left, a density of all 1000
 reported effect sizes, in this case JG-scores, is shown. In the
 absence of correlation between genes, this distribution follows a
 normal distribution. ( While this is true for this set of randomly
 generated scores, the distribution of JG scores observed in practice
 is actually broader than expected, testament to the non-random
-patterns of gene expression.) As expected, set1 is the only set
-reported with an adjusted p-value of less than 0.05.
+patterns of gene expression.) 
 
-In the centre, a heatmap of the rank-ordered scores is displayed, with
+On the right, a heatmap of the rank-ordered scores is displayed, with
 low and high scores displayed as blue and red stripes,
-respectively. By default, scores between -2 and 2 are shown in
-grey. To display scores above 2 or below -2, a color gradient from
+respectively. By default, scores between -3 and 3 are hidden.
+To display scores above 3 or below -3, a color gradient from
 white to red or from white to blue is applied, respectively. (Both the
 choice of colors and thresholds of the color gradients can be
 configured, please see the \tt CMAPResults \rm help page for details.)
 
-On the right, the ranks of the top five gene sets are
-highlighted. (The same set is also indicatd in the rug of the density
-distribution on the left.) The strip.subset parameter can be used to
-focus on specific sets of interest, e.g. by matching keywords in their
-annotation columns or by applying a threshold to any of the score
-columns. For example, we can highlight those sets with JG-scores of
-less than -3.
-
 \setkeys{Gin}{width=.85\linewidth}
 <<CMAPplots1, fig=TRUE, width=10, height=5, include=TRUE>>=
 sets.down <- effect( res ) < -3
-plot(res, strip.subset=sets.down, pch=18)
+plot(res)
 @
-
-In addition, we can group by shared annotation entries by specifying a
-column of the CMAPResults object with the 'strip.anno' parameter. To
-demonstrate, we add a column of 10 class annotations to the 'res'
-CMAPResults object. Now, we can for example highlight the distribution
-of scores from two particular classes (e.g. 'a' and 'b'), or investigate the class membership
-of the top 100 sets.
-
-(Please note that any annotation columns present in a queried
-CMAPCollection will be included in the CMAPResults object
-automatically.) 
-
-\setkeys{Gin}{width=.85\linewidth}
-<<CMAPplots2, fig=TRUE, width=10, height=5, include=TRUE>>=
-res$class <- sample(letters[1:10], 1000, replace=TRUE)
-plot(res, strip.anno="class", strip.subset=which(res$class %in% c("a", "b")))
-@ 
-
-\setkeys{Gin}{width=.85\linewidth}
-<<CMAPplots3, fig=TRUE, width=10, height=5, include=TRUE>>=
-plot(res, strip.anno="class", strip.subset=1:100)
-@ 
 
 \section{Retrieving gene-level information}
 

@@ -151,24 +151,20 @@ accessor function.
       Replacement method for the 'padj' column of the 'table' slot.}
     
     \item{plot}{\code{signature(x = "CMAPResults", y = "ANY")}: Returns
-      a plot with three-columns: 1. the distribution of scores
-      across all results in the CMAPResults object. 2. a heatmap of
-      rank-ordered effect sizes, 3. a stripplot of ranks for selected
-      gene sets (by default, the top 5 These plots are most meaningful
-      when relatively large sets of gene sets were evaluated.
+      an overview of the results stored in a CMAPResults object: 1. the distribution of scores
+      across all results and 2. a heatmap of
+      rank-ordered effect sizes.
         \itemize{
     \item{strip.effect: }{String specifying the CMAPResults column to retrieve scores from. Default:"effect"}
     \item{strip.pval: }{String specifying the CMAPResults column to transform into unsigned z-scores. Only evaluated if 'density.effect' column is not present or is set to 'NULL'.Default:"padj"}
-    \item{strip.cutoffs: }{Numeric vector of length 2. Scores between strip.cutoffs[1] and strip.cutoffs[2] will be displayed in strip.col[2]. Default:c(-2,2)}
-    \item{strip.bounds: }{Numeric vector of length 2 specifying the end points of the color gradient. Scores < strip.cutoffs[1] or > strip.cutoffs[2] will not be distinguishable.Default:c(-4,4)}
+    \item{strip.cutoffs: }{Numeric vector of length 2. Scores between strip.cutoffs[1] and strip.cutoffs[2] will be displayed in strip.col[2]. Default:c(-3,3)}
+    \item{strip.bounds: }{Numeric vector of length 2 specifying the end points of the color gradient. Scores < strip.cutoffs[1] or > strip.cutoffs[2] will not be distinguishable.Default:c(-6,6)}
     \item{strip.col: }{Vector of length 3, specifying the colors used in the heatmap strip: strip.col[1] = low scores, strip.col[2] = medium score (excluded from gradient), strip.col[3] = high scores. Default:c("blue","white","red")}
-    \item{strip.anno: }{Character string identifying the CMAPResults columns used to group samples in the stripplot. For example, strip.anno="trend" plots all sets showing the same direction of regulation together. Default:"set"}
-    \item{strip.subset: }{Index vector specifying a subset of rows to consider as input. Default:c(1:5)}
-    \item{strip.labels: }{Character vector with alternative labels for the groups defined by the 'strip.anno' parameter. Default:NULL}
-    \item{strip.layout: }{Vector specifying the fraction of the plot occoputied by the densityplot, the levelplot and the stripplot components. Defaultc(0.45, 0.1, 0.45)}
-    \item{set.inf: }{Numerical replacing Inf/-Inf scores in the density plot (default:+/-20)}
-    \item{\dots: }{Further arguments passed on to lattice plot functions.}
-    } 
+    \item{set.inf: }{Numerical replacing Inf/-Inf scores in the density
+      plot (default:+/-20)}
+    \item{col.up}{Rug plot color for positively correlated instances}
+    \item{col.down}{Rug plot color for negatively correlated instances}    
+  } 
  }
       \item{pval}{\code{signature(object = "CMAPResults")}:
 	Accessor method for the 'pval' column of the 'table' slot.}
@@ -242,7 +238,7 @@ class(res)
 res
 
 ## overview plot
-plot(res, strip.subset=1:5)
+plot(res)
 
 ## rerun, this time store gene-level scores
 res <- gsealm_jg_score(z, cmap, keep.scores=TRUE)

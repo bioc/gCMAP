@@ -3,13 +3,11 @@ importFrom("GSEAlm","lmPerGene")
 importFrom("parallel", "mclapply")
 importFrom("limma", "symbols2indices", "romer", "mroast", "camera", "eBayes", "lmFit", 
            "topTable")
+importClassFrom("bigmemory", "big.matrix")
+importFrom("bigmemory", "mwhich")
 importFrom("bigmemoryExtras", "BigMatrix")
 importFrom("DESeq", "newCountDataSet", "getVarianceStabilizedData", "nbinomTest")
 importFrom("genefilter", "rowttests")
-importFrom("RColorBrewer","brewer.pal")
-importFrom("lattice", "levelplot", "densityplot", "stripplot", "trellis.par.get", 
-           "panel.densityplot", "panel.rug")
-importFrom("latticeExtra", "panel.key")
 
 export(
        "eSetOnDisk",

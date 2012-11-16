@@ -10,7 +10,10 @@
 \alias{featureScores,matrix,CMAPCollection-method}
 \alias{featureScores,BigMatrix,CMAPCollection-method}
 \alias{featureScores,CMAPCollection,numeric-method}
+\alias{featureScores,CMAPCollection,CMAPCollection-method}
 \alias{featureScores,numeric,CMAPCollection-method}
+\alias{featureScores,CMAPCollection,matrix_or_big.matrix-method}
+\alias{featureScores,matrix_or_big.matrix,CMAPCollection-method}
 
 \title{ Methods to obtain scores for CMAPCollection gene sets from a matrix or eSet}
 \description{
@@ -33,7 +36,13 @@ These methods extract the scores for CMAPCollection gene set members from eSet o
 
 \item{\code{signature(query = "CMAPCollection", dat = "numeric")}}{\}}
 
+\item{\code{signature(query = "CMAPCollection", dat = "CMAPCollection")}}{\}}
+
 \item{\code{signature(query = "numeric", dat = "CMAPCollection")}}{\}}
+
+\item{\code{signature(query = "matrix_or_big.matrix", dat =  "CMAPCollection")}}{\}}
+
+\item{\code{signature(query = "CMAPCollection", dat = "matrix_or_big.matrix")}}{\}}
 
 }}
 
@@ -53,7 +62,13 @@ These methods extract the scores for CMAPCollection gene set members from eSet o
 
 \S4method{featureScores}{CMAPCollection,numeric}(query, dat)
 
+\S4method{featureScores}{CMAPCollection,CMAPCollection}(query, dat)
+
 \S4method{featureScores}{numeric,CMAPCollection}(query, dat)
+
+\S4method{featureScores}{CMAPCollection,matrix_or_big.matrix}(query, dat, simplify = TRUE)
+
+\S4method{featureScores}{matrix_or_big.matrix,CMAPCollection}(query, dat)
 
 }
 \arguments{

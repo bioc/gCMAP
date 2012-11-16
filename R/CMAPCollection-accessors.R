@@ -277,54 +277,66 @@ setAs("CMAPCollection", "GeneSet",
                   setName=sampleNames(from),
                   geneIdType = AnnoOrEntrezIdentifier(annotation(from)),
                   shortDescription = experimentData(from)@title, 
-                  longDescription = abstract(from), organism = organism, 
-                  pubMedIds = pubMedIds(experimentData(from)), urls = experimentData(from)@url, 
-                  contributor = experimentData(from)@name 
-                  )
-        } else {
-          geneSign <- ifelse( dat[dat[,1] != 0, 1] == 1, "up", "down")
-          SignedGeneSet(ids,
-                        geneSign = geneSign, 
-                        setName=sampleNames(from),
-                        geneIdType = AnnoOrEntrezIdentifier(annotation(from)),
-                        shortDescription = experimentData(from)@title, 
-                        longDescription = abstract(from), organism = organism, 
-                        pubMedIds = pubMedIds(experimentData(from)), urls = experimentData(from)@url, 
-                        contributor = experimentData(from)@name 
-                        )
-        }
-      })
+                   longDescription = abstract(from), organism = organism, 
+                   pubMedIds = pubMedIds(experimentData(from)), urls = experimentData(from)@url, 
+                   contributor = experimentData(from)@name 
+                   )
+         } else {
+           geneSign <- ifelse( dat[dat[,1] != 0, 1] == 1, "up", "down")
+           SignedGeneSet(ids,
+                         geneSign = geneSign, 
+                         setName=sampleNames(from),
+                         geneIdType = AnnoOrEntrezIdentifier(annotation(from)),
+                         shortDescription = experimentData(from)@title, 
+                         longDescription = abstract(from), organism = organism, 
+                         pubMedIds = pubMedIds(experimentData(from)), urls = experimentData(from)@url, 
+                         contributor = experimentData(from)@name 
+                         )
+         }
+       })
 
-setMethod(
-          "induceCMAPCollection",
-          signature( "eSet" ),
-          function( eset, element, lower=NULL, higher=NULL, sign.sets=TRUE) {
-            if( ! is.null(lower) && ! is.null(higher) && higher == lower) {
-              stop("Please specify two different cutoffs as 'higher' and 'lower' parameters.")
-            }
-            
-            if(! element %in% assayDataElementNames(eset) ) stop(paste( "AssayDataElement", element, "not found."))
-            ade <- assayDataElement( eset, element )
+ setMethod(
+           "induceCMAPCollection",
+           signature( "eSet" ),
+           function( eset, element, lower=NULL, higher=NULL, sign.sets=TRUE) {
 
-            gss <- lapply(
-                          seq(1:ncol(eset)),
-                          function( n ) {
-                            if (! is.null( lower )) {
-                              down <- which( ade[,n] < lower )
-                            } else {
-                              down <- NULL
-                            }                            
-                            if (! is.null( higher )) {
-                              up   <- which( ade[,n] > higher )
-                            } else {
-                              up <- NULL
-                            }                            
-                            list( j = c(down, up),
-                                 x = c(rep(-1, length(down)), rep(1, length(up)))
-                                 )
-                          })
-            
-            i <- unlist(
+             if( ! is.null(lower) && ! is.null(higher) && higher == lower) {
+               stop("Please specify two different cutoffs as 'higher' and 'lower' parameters.")
+             }
+
+             if(! element %in% assayDataElementNames(eset) ) stop(paste( "AssayDataElement", element, "not found."))
+             ade <- assayDataElement( eset, element )
+
+             if( inherits( ade, "BigMatrix")){
+               ade <- ade$bigmat
+             }
+
+             gss <- mclapply( 1:ncol( ade ),
+                             function( n ) {
+                               if (! is.null( lower )) {
+                                 if( require( bigmemory) ){
+                                   down <- as.vector( mwhich( ade, n, lower, "lt" ))
+                                 } else {
+                                   down <- as.vector( which( ade[,n] < lower ))
+                                 }
+                               } else {
+                                 down <- NULL
+                               }                            
+                               if (! is.null( higher )) {
+                                 if( require( bigmemory) ){
+                                   up <- as.vector( mwhich( ade, n, higher, "gt"))
+                                 } else {
+                                   up <- as.vector( which( ade[,n] > higher ))
+                                 }
+                               } else {
+                                 up <- NULL
+                               }                            
+                               list( j = c(down, up),
+                                    x = c(rep(-1, length(down)), rep(1, length(up)))
+                                    )
+                             })
+             
+             i <- unlist(
                         sapply( seq( length( gss ) ), function( m ) {
                           rep( m, length( gss[[ m ]]$j ) )
                         }))

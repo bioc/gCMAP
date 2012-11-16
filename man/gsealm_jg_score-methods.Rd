@@ -15,7 +15,7 @@
 \alias{gsealm_jg_score,GeneSetCollection,eSet-method}
 \alias{gsealm_jg_score,GeneSetCollection,matrix-method}
 \alias{gsealm_jg_score,GeneSetCollection,numeric-method}
-\alias{gsealm_jg_score,matrix,CMAPCollection-method}
+\alias{gsealm_jg_score,matrix_or_big.matrix,CMAPCollection-method}
 \alias{gsealm_jg_score,matrix,GeneSet-method}
 \alias{gsealm_jg_score,matrix,GeneSetCollection-method}
 \alias{gsealm_jg_score,numeric,CMAPCollection-method}
@@ -77,7 +77,7 @@
 \item{\code{signature(query = "GeneSetCollection", sets = "numeric")}}{
 }
 
-\item{\code{signature(query = "matrix", sets = "CMAPCollection")}}{
+\item{\code{signature(query = "matrix_or_big.matrix", sets = "CMAPCollection")}}{
 }
 
 \item{\code{signature(query = "matrix", sets = "GeneSet")}}{
@@ -110,7 +110,8 @@
   \item{sets}{ See 'query'}
     
   \item{removeShift}{ Optional parameter indicating that the aggregated
-  test statistic should be centered by subtracting the column means (default=TRUE).}
+  test statistic should be centered by subtracting the column means (default=FALSE).Note: this option is not
+  available for analysis of big.matrix backed eSet objects.}
 
   \item{element}{ For \code{\linkS4class{eSet}} objects, which
     assayDataElement should be extracted ?

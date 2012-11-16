@@ -24,7 +24,7 @@
 \usage{
 
 \S4method{gsealm_score}{ExpressionSet,CMAPCollection}(query, set,
-removeShift=TRUE, predictor=NULL, formula=NULL, nPerm=1000, parametric=FALSE,respect.sign=TRUE, keep.scores=FALSE,...)
+removeShift=FALSE, predictor=NULL, formula=NULL, nPerm=1000, parametric=FALSE,respect.sign=TRUE, keep.scores=FALSE,...)
 
 \S4method{gsealm_score}{eSet,CMAPCollection}(query, set, element="exprs", ... )
 
@@ -53,7 +53,8 @@ removeShift=TRUE, predictor=NULL, formula=NULL, nPerm=1000, parametric=FALSE,res
   object containing gene sets. Gene ids must match those of the 'query'}
 
 \item{removeShift}{ logical: should normalization begin with a
-  column-wise removal of the mean shift? }
+  column-wise removal of the mean shift? Note: this option is not
+  available for analysis of big.matrix backed eSet objects.}
 
 \item{predictor}{ A character string identifying one column in the pData
   slot of a 'query' ExpressionSet from which to construct the formula

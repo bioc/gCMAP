@@ -111,6 +111,6 @@ setMethod(
           "romer_score",
           signature( experiment = "eSet", sets = "GeneSetCollection"),
           function( experiment, sets, ...) {
-            romer_score(experiment, as(sets, "CMAPCollection"), predictor=predictor, ...) 
+            romer_score(experiment, as(sets, "CMAPCollection"), ...) 
           }
           )

@@ -2,14 +2,13 @@
 
 setMethod(
   "gsealm_jg_score",
-  signature( query = "matrix", sets="CMAPCollection"),
-  function( query, sets, removeShift=TRUE, respect.sign=TRUE,keep.scores=FALSE, ...) {
+  signature( query = "matrix_or_big.matrix", sets="CMAPCollection"),
+  function( query, sets, removeShift=FALSE, respect.sign=TRUE,keep.scores=FALSE, ...) {
    
     if( respect.sign == FALSE) {
       signed(sets) <- rep(FALSE, ncol(sets))
     }
 
-    query[ is.na( query ) ] <- 0 ## set missing values to 0
     score <- .jg( query, sets, removeShift=removeShift, respect.sign=respect.sign)
     
     ## replace NaN values produced for empty sets
@@ -164,14 +163,13 @@ setMethod(
 setMethod(
   "gsealm_jg_score",
   signature( query = "CMAPCollection", sets="eSet"),
-  function( query, sets, element="z", removeShift=TRUE, respect.sign=TRUE, keep.scores=FALSE,...) {
+  function( query, sets, element="z", removeShift=FALSE, respect.sign=TRUE, keep.scores=FALSE,...) {
     
     if( respect.sign == FALSE) {
       signed(query) <- rep(FALSE, ncol(query))
     }
     
-    set.matrix <- as( assayDataElement(sets, element), "matrix" )
-    set.matrix[ is.na( set.matrix ) ] <- 0 ## set missing values to 0
+    set.matrix <- assayDataElement(sets, element)
 
     score <- .jg( set.matrix, query, removeShift=removeShift, ## rows=query, columns=set
                   respect.sign=respect.sign)
@@ -333,7 +331,7 @@ setMethod(
 
 ###
 
-.jg <- function(query, sets, removeShift=TRUE, respect.sign=TRUE) {
+.jg <- function(query, sets, removeShift=FALSE, respect.sign=TRUE) {
   
   ## intersect query gene ids with gene ids in the collection
   a.matrix <- Matrix::t( members (sets) )
@@ -352,14 +350,30 @@ setMethod(
     a.matrix <- abs( a.matrix )
     signed(sets) <- rep(FALSE, ncol(sets))
   }
+
+  ## preprocess query matrix / BigMatrix
+  ## extract big.matrix component
+  if( inherits( query, "BigMatrix")){
+    query <- query$bigmat
+  }
   
-  if( removeShift) {
-    query <- scale(query, center=TRUE, scale=FALSE)
+  if( inherits( query, "matrix")){
+    ## set missing values to 0
+    if( removeShift == TRUE){
+      query[ is.na( query ) ] <- 0
+      query <- scale(query, center=TRUE, scale=FALSE)
+    }
+
+  } else if( inherits( query, "big.matrix")){
+    if( removeShift == TRUE){
+      stop( "The 'removeShift' option is currently not supported for eSets containing 'BigMatrix' or 'big.matrix' assayData objects.")
+    }
   }
   
   rttStats <- matrix( query[ common.genes,], nrow=length( common.genes),
                       dimnames=list(common.genes, colnames(query)))
-  
+  rttStats[ is.na( rttStats ) ] <- 0
+
   ## compute aggregated statistic for each GeneSet
   tA <- matrix( a.matrix %*% rttStats,
                 ncol=ncol(query),

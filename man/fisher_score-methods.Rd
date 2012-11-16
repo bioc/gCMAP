@@ -60,6 +60,13 @@
   \item{universe}{ A character string of gene ids for
     all genes that could potentially be of interest, e.g. all genes
     represented on a microarray, all annotated genes, etc.}
+  
+  \item{keep.scores}{ Logical: store the identifiers for the genes
+    detected in 'query' and 'sets' ? (Default: FALSE)
+    The size of the generated CMAPResults object increases with the
+    number of contained gene sets. For very large collections,
+    setting this parameter to 'TRUE' may require large amounts
+    of memory.}
 }
 
 \keyword{methods}

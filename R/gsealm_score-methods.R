@@ -2,7 +2,7 @@
 setMethod(
           "gsealm_score",
           signature( query = "ExpressionSet", set="CMAPCollection"),
-          function( query, set, removeShift=TRUE, predictor=NULL,
+          function( query, set, removeShift=FALSE, predictor=NULL,
                    formula=NULL, nPerm=1000, parametric=FALSE, respect.sign=TRUE,
                    keep.scores=FALSE, ...) {
 

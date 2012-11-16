@@ -1,6 +1,23 @@
 \name{NEWS}
 \title{NEWS file for the gCMAP}
 
+\section{Changes in version 1.2.0}{
+  \itemize{
+    \item{NEW}{ featureScores method now return list of matched identfiers when dispatched on two CMAPCollection. }
+    \item{NEW}{ Added 'density.only', 'level.only' and 'strip.only' parameters to the CMAPResults plot method to selectively return only one plot component.}
+    \item{IMPROVED}{ Reduced memory footprint of gsealm_jg_score and induceCMAPCollection methods.}
+    \item{CHANGED}{ By default, 'removeShift' option for gsealm_jg_score and gsealm_score methods is now set to FALSE.}
+    \item{BUGFIX}{ Corrected sign of effect size for fisher_score for perfect overlap between set and query.}
+    \item{IMPROVED}{ Improved plot method for CMAPResults objects, lattice package is no longer required.}
+  }
+}	
+
+\section{Changes in version 1.1.2}{
+  \itemize{
+    \item{BUGFIX}{ Fixed log-odds calculation in fisher_score: non-overlapping sets now get a log odds ratio of 0}
+  }
+}	
+
 \section{Changes in version 1.1.1}{
   \itemize{
     \item{IMPROVED}{ Reduced memory footprint of induceCMAPCollection method for bigmemory-backed eSet objects.}

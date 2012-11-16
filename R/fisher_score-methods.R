@@ -1,8 +1,7 @@
-
 setMethod(
           "fisher_score",
           signature( query = "CMAPCollection", sets = "CMAPCollection", universe = "character" ),
-          function( query, sets, universe) {
+          function( query, sets, universe, keep.scores=FALSE) {
             signed(sets) <- rep(FALSE, ncol(sets)) ## fisher test does not consider gene signs
             
             query  <- query[intersect(featureNames( query), universe),]
@@ -11,7 +10,7 @@ setMethod(
             common.genes <- intersect( featureNames(query), featureNames(sets))
 
             if( length( common.genes) == 0 ) {
-              stop( "fisher_score: No overlap between query and sets found in the specified universe.",
+              stop( "None of the query gene identifiers could be found in the reference dataset.",
                    call. = FALSE)
             }
 
@@ -57,11 +56,25 @@ setMethod(
 
             lor <- log( ( query.and.sets * neither) / (query.not.sets * sets.not.query ) )
             lor[query.not.sets == 0] <- Inf
-            lor[sets.not.query == 0] <- -Inf
-            lor[query.and.sets == 0] <- 1
+            lor[sets.not.query == 0] <- Inf
+            lor[query.and.sets == 0] <- 0
 
+            ## store per-gene scores as data-column:gene-set list-of-list
+            if( keep.scores == TRUE) {
+              gene.scores <- featureScores( query, sets)
+            } else {
+              gene.scores <- NA
+            }
+            
             ## store results
             results <- mclapply( seq( ncol( query) ), function( g ) {
+
+              if(! all(is.na( gene.scores ))) { 
+                geneScores <- I(gene.scores[[g]])
+              } else {
+                geneScores <- NA
+              }
+              
               res <- CMAPResults(
                                  data=data.frame(
                                    set = sampleNames(sets),
@@ -71,6 +84,7 @@ setMethod(
                                    effect = lor[,g],
                                    nSet = Matrix::colSums( abs( members ( sets ) ) ),
                                    nFound = query.and.sets[,g ],
+                                   geneScores = geneScores,
                                    pData(sets)),
                          docs ="\n Results from Fisher exact tests.\n P-values were adjusted using the 'p.adjust' function with method 'BH'."
                          )
@@ -83,6 +97,7 @@ setMethod(
                 "Log-odds",
                 "Number of genes annotated in the query set",
                 "Number of query genes found in target set",
+                "Identifiers of genes found in query and target sets",
                 colnames(pData(sets)))
 
               res
