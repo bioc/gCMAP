@@ -19,6 +19,7 @@
 \alias{incidence,list-method}
 \alias{mergeCollections,CMAPCollection,CMAPCollection-method}
 
+\alias{setSizes}
 \alias{members}
 \alias{signed}
 \alias{signed<-}
@@ -139,6 +140,7 @@ assayDataElementNames( gCMAPData )
 
 cmap <- induceCMAPCollection(gCMAPData, "z", lower=-2, higher=2)
 cmap
+setSizes( cmap )
 pData(cmap)
 signed(cmap) <- c(TRUE, FALSE, TRUE)
 signed(cmap)

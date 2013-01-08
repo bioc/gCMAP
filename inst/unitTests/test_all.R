@@ -40,7 +40,7 @@ test_fisher <- function() {
   universe = featureNames(gCMAPData)
   res <-  fisher_score(gene.set.collection[,1], gene.set.collection, universe = universe)
   checkTrue( inherits(res, "CMAPResults"))
-  checkEqualsNumeric( effect( res )[1], Inf)
+  checkEqualsNumeric( res@data$LOR[1], Inf)
 }
 
 test_geneIndex <- function() {

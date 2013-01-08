@@ -904,12 +904,12 @@ pickChannels <- function (object, names, ...) {
   }
 
 
-eset_instances <- function( instance.matrix, 
-                            eset, 
-                            control_perturb_col="cmap", 
+eset_instances <- function(instance.matrix, 
+                           eset, 
+                           control_perturb_col="cmap", 
                            control="control", 
                            perturb="perturbation") {
-  stopifnot(row.names( instance.matrix == sampleNames( eset )))
+  stopifnot(row.names( instance.matrix) %in% sampleNames( eset ))
   stopifnot(all( instance.matrix %in% c(-1,0,1)))
   
   apply( instance.matrix, 2, function( x ){

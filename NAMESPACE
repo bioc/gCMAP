@@ -12,6 +12,7 @@ importFrom("genefilter", "rowttests")
 export(
        "eSetOnDisk",
        "generate_gCMAP_NChannelSet",
+       "eset_instances",
        "mapNmerge",
        "memorize",
        "signedRankSumTest",
@@ -63,6 +64,7 @@ exportMethods(
               "romer_score",
               "set",
               "set<-",
+              "setSizes",
               "show",
               "signed",
               "signed<-",
