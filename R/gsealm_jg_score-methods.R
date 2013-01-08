@@ -343,8 +343,7 @@ setMethod(
   
   if (class(a.matrix) == "numeric") a.matrix <- matrix(a.matrix, nrow=1) ## single gene.sets
   if (class(a.matrix) == "try-error" | sum( abs ( a.matrix) ) == 0) {
-    stop( "None of the user-provided gene ids were found in the gene set collection.",
-          call. = FALSE)
+    stop( "None of the user-provided gene ids were found in the gene set collection.", call. = FALSE)
   }
   
   if( respect.sign == FALSE) {

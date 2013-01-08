@@ -23,7 +23,7 @@ setMethod(
 
             shared.genes <- intersect(featureNames(query), colnames(mat))
             mat <- try(
-                       mat[,shared.genes]
+                       mat[,shared.genes, drop=FALSE]
                        )
 
             if( respect.sign == FALSE) {
@@ -36,29 +36,33 @@ setMethod(
             }
 
             query <- query[shared.genes,]
-
+            if( any( is.na( exprs( query )))){
+              stop( "Query ExpressionSet contains NA values. Please replace (e.g. impute) these missing values or remove genes with missing values from the ExpressionSet/")
+            }
+            
             ## store raw per-gene expression scores
             if( keep.scores == TRUE) {
-            gene.scores <- featureScores(set, query, element="exprs" )
-            gene.scores <- I(gene.scores)
-} else {
-  gene.scores <- NA
-}
+              gene.scores <- featureScores(set, query, element="exprs" )
+              gene.scores <- I(gene.scores)
+
+            } else {
+              gene.scores <- NA
+            }
             ## fit user-specified linear model
             lm <- lmPerGene(query, formula, na.rm=TRUE)
             notNAN <- sapply(lm$tstat[2,],function(x) !is.nan(x))
-
-            GSNorm <- .gsNormalize( lm$tstat[2,][notNAN], mat[,notNAN], removeShift=removeShift)
+            
+            GSNorm <- .gsNormalize( lm$tstat[2,,drop=FALSE][notNAN], mat[,notNAN, drop=FALSE], removeShift=removeShift)
             GSNorm <- as.numeric( GSNorm )
-
+            
             if (parametric == TRUE) {
               bestPval <- 1-sapply( abs( GSNorm ), pnorm )
-                            
+              
             } else {
               pVals  <- .gsealmPerm( query[notNAN,], formula, mat[,notNAN], nperm=nPerm)
               bestPval <- ifelse(GSNorm < 0, pVals[,"Lower"], pVals[,"Upper"]) ## only test in the direction of sign(t)
             }
-
+            
             ## return different 'trend' descriptors for signed and unsigned sets
             trend <- sapply(seq( ncol(set) ), function( n ){
               if( signed(set)[n] == FALSE ) {
@@ -116,8 +120,8 @@ setMethod(
             }
             query <- ExpressionSet( query,
                                    phenoData=as( data.frame(predictor=factor( predictor ), 
-				   		 row.names=colnames( query )), 
-						 "AnnotatedDataFrame"))
+                                     row.names=colnames( query )), 
+                                     "AnnotatedDataFrame"))
             
             gsealm_score( query, set, predictor="predictor", ...)
           }
@@ -195,7 +199,7 @@ setMethod(
 
 ## functions duplicated from the GSEAlm package, modified to work on sparce matrices
 .gsNormalize <- function (dataset, incidence, fun1 = "/", 
-                          fun2 = sqrt, removeShift = FALSE, removeStat = mean, ...) 
+                          fun2 = sqrt, removeShift = FALSE, removeStat = function( x) { mean(x, na.rm=TRUE)} , ...) 
   {
     dataset = as.matrix(dataset)
     if (removeShift) {
