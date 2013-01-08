@@ -387,6 +387,31 @@ setMethod(
           )
 
 setMethod(
+  "setSizes",
+  signature( "CMAPCollection" ),
+  function( object ) {
+    n.total <- Matrix::colSums(abs(members( object )))
+    n.up <- sapply( 1:ncol( object), function( n ) { 
+      if( signed( object )[ n ] == TRUE){
+        x <- members( object )[,n]
+        abs( sum(x[ x > 0]) )
+      } else {
+        NA
+      }
+    })
+    n.down <- sapply( 1:ncol( object), function( n ) { 
+      if( signed( object )[ n ] == TRUE){
+        x <- members( object )[,n]
+        abs( sum(x[ x < 0]) )
+      } else {
+        NA
+      }
+    })
+    data.frame( n.up, n.down, n.total, row.names=sampleNames( object ))
+  }
+)
+
+setMethod(
           "members",
           signature( "CMAPCollection" ),
           function( object) {

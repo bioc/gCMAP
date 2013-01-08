@@ -58,7 +58,7 @@ setMethod(
             lor[query.not.sets == 0] <- Inf
             lor[sets.not.query == 0] <- Inf
             lor[query.and.sets == 0] <- 0
-
+            
             ## store per-gene scores as data-column:gene-set list-of-list
             if( keep.scores == TRUE) {
               gene.scores <- featureScores( query, sets)
@@ -81,7 +81,8 @@ setMethod(
                                    trend = ifelse(lor[,g] <= 0, "under", "over"),
                                    pval = p.values[,g ],
                                    padj = p.adjust( p.values[,g ], method="BH"),
-                                   effect = lor[,g],
+                                   effect = round(zScores( p.values[,g], direction=lor[,g]),2),
+                                   LOR = lor[,g],
                                    nSet = Matrix::colSums( abs( members ( sets ) ) ),
                                    nFound = query.and.sets[,g ],
                                    geneScores = geneScores,
@@ -94,7 +95,8 @@ setMethod(
                 "Deviation from random expectation",
                 "Fisher's exact test p-value",
                 "Adjusted p-value (BH)",
-                "Log-odds",
+                "z-score based on the standard normal distribution",
+                "Log Odds Ratio",
                 "Number of genes annotated in the query set",
                 "Number of query genes found in target set",
                 "Identifiers of genes found in query and target sets",

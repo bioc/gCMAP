@@ -11,6 +11,7 @@
 
 \alias{initialize,CMAPCollection-method}
 \alias{geneIds,CMAPCollection-method}
+\alias{setSizes,CMAPCollection-method}
 \alias{members,CMAPCollection-method}
 \alias{signed,CMAPCollection-method}
 \alias{signed<-,CMAPCollection-method}
@@ -87,6 +88,9 @@ Class \code{"\linkS4class{Versioned}"}, by class "eSet", distance 3.
     \item{geneIds}{\code{signature(object = "CMAPCollection")}:
       Returns a list of gene identifiers, with one list entry for each
       column of the assayDataSlot 'members'. }
+    \item{members}{\code{signature(object = "CMAPCollection")}:
+      Returns the number of gene members in each gene set stored in the collection.
+      For signed sets, also the number of up-/down-regulated members is returned.}
     \item{members}{\code{signature(object = "CMAPCollection")}:
       Returns the coincidence matrix as stored in the assayData slot of the
       CMAPCollection as a sparseMatrix object (rows=genes, columns=gene sets). }

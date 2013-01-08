@@ -18,6 +18,9 @@ setGeneric("CMAPResults", function(data, varMetadata, ...)
            standardGeneric("CMAPResults")
            )
 
+setGeneric("setSizes",
+           def = function( object) standardGeneric( "setSizes" )
+)
 
 setGeneric("members",
            def = function( object) standardGeneric( "members" )

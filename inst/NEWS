@@ -3,6 +3,9 @@
 
 \section{Changes in version 1.2.0}{
   \itemize{
+    \item{NEW}{ New eset_instances function to generate lists eSets from larger datasets by specifying an instance.matrix. }
+    \item{NEW}{ New setSizes methods for CMAPCollections returns a data.frame with the number of members for each gene set stored in the Collection. }
+    \item{NEW}{ fisher_score method now reports z-scores in the effect column instead of log-odds-ratio. The latter are returned in the new, separate LOR column. }
     \item{NEW}{ featureScores method now return list of matched identfiers when dispatched on two CMAPCollection. }
     \item{NEW}{ Added 'density.only', 'level.only' and 'strip.only' parameters to the CMAPResults plot method to selectively return only one plot component.}
     \item{IMPROVED}{ Reduced memory footprint of gsealm_jg_score and induceCMAPCollection methods.}

@@ -154,7 +154,7 @@ pairwise_compare <- function( eset,
       stop(paste("Expected ExpressionSet found: ", class(eset)))
     }
   
-  ## Check column, control_perturb_col, exists
+  ## Check column 'control_perturb_col' exists
   if(!control_perturb_col %in% varLabels(eset))
     {
       stop(paste("Column label <", control_perturb_col, "> not found "))
@@ -163,21 +163,21 @@ pairwise_compare <- function( eset,
   ## Check control and perturb exist
   ncontrol = length( which(pData(eset)[,control_perturb_col] == control)) 
   nperturb = length( which(pData(eset)[,control_perturb_col] == perturb)) 
-  
-  if(ncontrol + nperturb != length(sampleNames(eset)))
-    {
-      warning(paste("ExpressionSet includes ", 
-                    length(sampleNames(eset)) - ncontrol - nperturb, 
-                    " non-control/non-perturb samples, these will be ingored"))
-      eset <- eset[,pData(eset)[,control_perturb_col] %in% c(control, perturb)]
-    }
-  
+    
   if(ncontrol == 0 | nperturb == 0)
     {
       stop(paste("Expected at least one control (found ", ncontrol, ") ",
                  "and a at least one perturb (found ", nperturb, ")"))
     }
 
+  if(ncontrol + nperturb != length(sampleNames(eset)))
+  {
+    warning(paste("ExpressionSet includes ", 
+                  length(sampleNames(eset)) - ncontrol - nperturb, 
+                  " non-control/non-perturb samples, these will be ingored"))
+    eset <- eset[,pData(eset)[,control_perturb_col] %in% c(control, perturb)]
+  }
+  
   ## Compare control and perturb
   if(ncontrol == 1 & nperturb == 1)
     {
@@ -902,3 +902,28 @@ pickChannels <- function (object, names, ...) {
              object[elts]
            })
   }
+
+
+eset_instances <- function( instance.matrix, 
+                            eset, 
+                            control_perturb_col="cmap", 
+                            control="control", 
+                            perturb="perturbation") {
+  stopifnot(row.names( instance.matrix == sampleNames( eset )))
+  stopifnot(all( instance.matrix %in% c(-1,0,1))
+            
+  apply( instance.matrix, 2, function( x ){
+    control.samples <- sampleNames( eset )[x == -1]
+    perturbation.samples <- sampleNames( eset )[x == 1]
+    instance.eset <- eset[, c(control.samples, perturbation.samples) ]
+    pData( instance.eset )[,control_perturb_col] <- c( rep( control, 
+                                                            length(control.samples )
+    ), 
+                                                       rep( perturb, 
+                                                            length(perturbation.samples )
+                                                       )
+    )
+    return( instance.eset )
+  })
+}
+
