@@ -16,6 +16,7 @@ export(
        "mapNmerge",
        "memorize",
        "signedRankSumTest",
+       "splitPerturbations",
        "zScores"
        )
 
