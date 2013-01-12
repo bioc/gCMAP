@@ -60,7 +60,13 @@ setMethod(
               query.scores <- lapply( seq( ncol( dat) ), function( m ) {
                 set.members <- which( members(dat)[,m] != 0)
                 sign <-  members(dat)[set.members,m]
-                score <- query[set.members,n,drop=TRUE]
+                
+                ## prevent gene sets with a single member from dropping gene id
+                score <- query[set.members,n,drop=FALSE]
+                gene.id <- row.names( score )
+                score <- as.numeric( score )
+                names(score) <- gene.id
+                
                 attr(score, "sign") <- ifelse( sign == 1, "up", "down")
                 return( score )
               })
@@ -70,7 +76,6 @@ setMethod(
             
             names( res ) <- colnames( query )
             return( res )
-
           })
 
 setMethod(
