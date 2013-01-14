@@ -1084,3 +1084,62 @@ splitPerturbations <- function( eset,
   return( eset.list)
 }
 
+mergeCMAPs <- function(x, y){
+  ## basic checks
+  if( ! inherits(x, "eSet")){
+    stop( "Object 'x' is not an eSet.")
+  }
+  
+  if( ! inherits(y, "eSet")){
+    stop( "Object 'y' is not an eSet.")
+  }
+     
+  if( ! class(x ) == class( y )){
+    stop( "Objects 'x' and 'y' are not of the same class.")
+  }
+
+  if( annotation( x ) != annotation( y )){
+    stop( "Objects 'x' and 'y' have different 'annotation' slots.")
+  }
+
+  if( any( assayDataElementNames( x ) != assayDataElementNames( y))){
+    stop( "Objects 'x' and 'y' have different AssayDataElementNames.")
+  }
+
+  if( length( intersect( sampleNames( x ), sampleNames( y ))) != 0 ){
+    stop( sprintf( "Objects 'x' and 'y' share %s sampleNames. sampleNames must be unique.", length( intersect( sampleNames( x ), sampleNames( y )))))
+  }
+
+  if(  any( varLabels( x ) !=  varLabels( y ))){
+    stop( "Objects 'x' and 'y' have different pData columns.")
+  }
+  
+  common.features <- intersect( featureNames( x ), featureNames( y ))
+  message(sprintf("eSets 'x' and 'y' share %s common features.", length(common.features)))
+  
+  ## create empty eSet for output
+  merged.eset <- new( class( x ) ) 
+  annotation(merged.eset) <- annotation( x )
+  
+  ## merge data for each channel separately
+  for (element in assayDataElementNames( x ) ) {
+    merged.channel <- merge(
+                            assayDataElement( x, element)[,],
+                            assayDataElement( y, element)[,],
+                            by.x=0, by.y=0, all=TRUE
+                            )
+    row.names( merged.channel) <- merged.channel$Row.names
+    merged.channel$Row.names <- NULL
+    assayDataElement( merged.eset, element) <- as.matrix( merged.channel )
+  }
+
+  ## merge pData tables => requires the same column names in each eSet !
+  pData(merged.eset) <- rbind( pData( x ), pData( y ))
+  featureData(merged.eset) <- AnnotatedDataFrame(
+                                                 data.frame(
+                                                            probeid=row.names( merged.channel),
+                                                            row.names=row.names(merged.channel)
+                                                            )
+                                                 )
+  return( merged.eset)
+}

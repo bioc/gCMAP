@@ -181,3 +181,12 @@ test_mapIdentifiers <- function(){
     checkTrue( TRUE, "noticed that annotation package org.Hs.eg.db is not available and skipped this test.")
   }
 }
+
+test_mergeCMAPs <- function() {
+  require(Biobase)
+  data(sample.ExpressionSet)
+  y <- sample.ExpressionSet
+  sampleNames( y ) <- paste( sampleNames( y ), "y", sep=".")
+  m <- mergeCMAPs( sample.ExpressionSet, y )
+  checkEqualsNumeric( 2*ncol(sample.ExpressionSet), ncol(m))
+}

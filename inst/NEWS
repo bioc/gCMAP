@@ -1,8 +1,9 @@
 \name{NEWS}
 \title{NEWS file for the gCMAP}
 
-\section{Changes in version 1.2.0}{
+\section{Changes in version 1.3.0}{
   \itemize{
+    \item{NEW}{ New function mergeCMAPs to combined two eSets that share class, varLabels, annotation and assayDataElementNames.}
     \item{BUGFIX}{ Fixed missing gene names in featureScores method with CMAPCollections queries containing single-gene sets.}
     \item{NEW}{ New splitPerturbations function to split ExpressionSet (e.g. downloaded from ArrayExpress) by annotations provided in the phenoData slot.}
     \item{NEW}{ New eset_instances function to generate lists eSets from larger datasets by specifying an instance.matrix. }

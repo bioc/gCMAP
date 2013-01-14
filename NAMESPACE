@@ -15,6 +15,7 @@ export(
        "eset_instances",
        "mapNmerge",
        "memorize",
+       "mergeCMAPs",
        "signedRankSumTest",
        "splitPerturbations",
        "zScores"
