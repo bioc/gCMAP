@@ -429,7 +429,9 @@ generate_gCMAP_NChannelSet <- function(
                                        perturb="perturbation",
                                        limma=TRUE,
                                        limma.index=2,
-                                       big.matrix=NULL
+                                       big.matrix=NULL,
+                                       center.z="peak",
+                                       center.log_fc="peak"
                                        )
 {
 
@@ -475,7 +477,9 @@ generate_gCMAP_NChannelSet <- function(
                     perturb = perturb,
                     limma = limma,
                     limma.index = limma.index,
-                    big.matrix = big.matrix
+                    big.matrix = big.matrix,
+                    center.z = center.z,
+                    center.log_fc = center.log_fc
                     )
     
   } else if (data.classes == "CountDataSet") {
@@ -487,7 +491,9 @@ generate_gCMAP_NChannelSet <- function(
                     control_perturb_col = control_perturb_col,
                     control = control,
                     perturb = perturb,
-                    big.matrix = big.matrix
+                    big.matrix = big.matrix,
+                    center.z = center.z,
+                    center.log_fc = center.log_fc
                     )
   }
 }
@@ -501,9 +507,14 @@ generate_gCMAP_NChannelSet <- function(
                             perturb,
                             limma,
                             limma.index,
-                            big.matrix
+                            big.matrix,
+                            center.z,
+                            center.log_fc
                             ) 
 {
+  stopifnot(center.z %in% c("none", "mean", "median", "peak") )
+  stopifnot(center.log_fc %in% c("none", "mean", "median", "peak") )
+
   if ( limma == TRUE ) {
     res <- lapply( data.list, function( x ) 
                   try( pairwise_compare_limma( 
@@ -545,7 +556,7 @@ generate_gCMAP_NChannelSet <- function(
 
   ## create in-memory NChannelSet
   assay.data <- assayDataNew( exprs=AveExpr, z=z, p=p, log_fc=log_fc ) 
-  
+
   fdata = data.frame( 
     probeid=row.names( res[[1]] ) ,
     row.names=row.names( res[[1]] ) 
@@ -553,7 +564,8 @@ generate_gCMAP_NChannelSet <- function(
   
   pdata = data.frame( 
     UID = uids,
-    row.names = uids ) 
+    row.names = uids
+    ) 
   
   if ( !is.null( sample.annotation ) ) {
     pdata = cbind( pdata, sample.annotation ) 
@@ -570,6 +582,10 @@ generate_gCMAP_NChannelSet <- function(
              annotation = platform.annotation
              ) 
   
+  ## center z-scores and log_fc channels
+  ncs <- center_eSet( ncs, "z", center=center.z)
+  ncs <- center_eSet( ncs, "log_fc", center=center.log_fc)
+  
   ## create NChannelSet on disk
   if( ! is.null( big.matrix ) ) { ## big.matrix = path to BigMatrix file on disk
     eSetOnDisk( ncs, out.file=big.matrix ) 
@@ -585,9 +601,14 @@ generate_gCMAP_NChannelSet <- function(
                             control_perturb_col,
                             control,
                             perturb,
-                            big.matrix
+                            big.matrix,  
+                            center.z,
+                            center.log_fc
                             )
 {
+
+  stopifnot(center.z %in% c("none", "mean", "median", "peak") )
+  stopifnot(center.log_fc %in% c("none", "mean", "median", "peak") )
 
   vst <- .vst_transform( data.list ) ## variance-stabilizing transformation
   res <- lapply( data.list, function( x )
@@ -626,9 +647,10 @@ generate_gCMAP_NChannelSet <- function(
 
   dimnames( AveExpr ) <- dimnames( z ) <- dimnames( p ) <- dimnames( mod_fc ) <- dimnames( log_fc ) <- list( row.names( res[[1]] ), uids)
 
+  
   ## create in-memory NChannelSet
   assay.data <- assayDataNew( exprs=AveExpr, z=z, p=p, log_fc=log_fc, mod_fc=mod_fc)
-  
+
   fdata = data.frame(
     probeid   = row.names( res[[ 1 ]] ),
     row.names = row.names( res[[ 1 ]] )
@@ -659,6 +681,12 @@ generate_gCMAP_NChannelSet <- function(
              annotation  = platform.annotation
              )
 
+  ## center z-scores and log_fc channels
+  ncs <- center_eSet( ncs, "z", center=center.z)
+  ncs <- center_eSet( ncs, "log_fc", center=center.log_fc)
+  ncs <- center_eSet( ncs, "mod_fc", center=center.log_fc)
+  
+  
   ## create NChannelSet on disk
   if(  ! is.null( big.matrix) ) { ## big.matrix = path to BigMatrix file on disk
     eSetOnDisk(  ncs, out.file=big.matrix )
@@ -1142,4 +1170,47 @@ mergeCMAPs <- function(x, y){
                                                             )
                                                  )
   return( merged.eset)
+}
+
+center.function <- function(x, type) {
+  switch(type,
+         mean = mean(x, na.rm=TRUE),
+         median = median(x, na.rm=TRUE),
+         peak = {
+           d <- density( x, adjust=2, na.rm=TRUE  )
+           d$x[ d$y == max(d$y)][1]
+         })
+}
+
+center_eSet <- function( eset,
+                                channel,
+                                center="peak"){
+  
+  stopifnot( inherits( eset, "eSet"))
+  stopifnot( center %in% c("none", "mean", "median", "peak") )
+  stopifnot( channel %in% assayDataElementNames( eset ))  
+  
+  center.function <- function(x, type) {
+    switch(type,
+           mean = mean(x, na.rm=TRUE),
+           median = median(x, na.rm=TRUE),
+           peak = {
+             d <- density( x, adjust=2, na.rm=TRUE  )
+             d$x[ d$y == max(d$y)][1]
+           })
+  }
+  
+  dat <- assayDataElement( eset, channel)
+  
+  if( center != "none"){
+    dat.shift <- apply( dat, 2, center.function, center)
+    dat <- sweep( dat, 2, dat.shift)
+    assayDataElement( eset, channel) <- dat
+  } else {
+    dat.shift <- rep(NA, ncol( eset ))
+  }
+  pData( eset )[,paste(channel, "shift", sep=".")] <- dat.shift
+  varMetadata( eset )[paste(channel, "shift", sep="."),
+                      "labelDescription"] <- sprintf("center of the uncorrected %s distribution", channel)
+  return( eset)
 }

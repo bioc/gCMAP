@@ -9,7 +9,7 @@ importFrom("bigmemoryExtras", "BigMatrix")
 importFrom("DESeq", "newCountDataSet", "getVarianceStabilizedData", "nbinomTest")
 importFrom("genefilter", "rowttests")
 
-export(
+export("center_eSet",
        "eSetOnDisk",
        "generate_gCMAP_NChannelSet",
        "eset_instances",

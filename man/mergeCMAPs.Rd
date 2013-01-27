@@ -34,7 +34,7 @@ mergeCMAPs(x, y)
 }
 
 \author{
-Thomas Sandmann, thomas.sandmann@gene.com
+Thomas Sandmann, sandmann.thomas@gene.com
 }
 
 \examples{

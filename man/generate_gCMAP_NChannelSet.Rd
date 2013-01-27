@@ -23,7 +23,9 @@ generate_gCMAP_NChannelSet(
                            perturb="perturbation",
                            limma=TRUE,
                            limma.index=2,
-                           big.matrix=NULL
+                           big.matrix=NULL,
+                           center.z="peak",
+                           center.log_fc="peak"
                            )
 }
 
@@ -70,6 +72,8 @@ generate_gCMAP_NChannelSet(
 	  distinguishing files for the different channes by their
 	  suffices. To load the NChannelSet into a different R session,
 	  the binary files must be accessible.}
+  \item{center.z}{One of 'none', 'peak', 'mean', 'median', selecting whether / how to center the z-scores for each experiment. Option 'peak' (default) will center on the peak of the z-score kernel density. Options 'mean' and 'median' will center on their respective values instead.}
+  \item{center.log_fc}{One of 'none', 'peak', 'mean', 'median', selecting whether / how to center the log2 fold-change distribution for each experiment. Option 'peak' (default) will center on the peak of the z-score kernel density. Options 'mean' and 'median' will center on their respective values instead.}
 }
 
 \value{
