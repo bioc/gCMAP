@@ -1203,7 +1203,14 @@ center_eSet <- function( eset,
   dat <- assayDataElement( eset, channel)
   
   if( center != "none"){
-    dat.shift <- apply( dat, 2, center.function, center)
+    dat.shift <- apply( dat, 2, function(x){
+      y <- try( center.function( x, center), silent=TRUE)
+      if( inherits( y, "try-error")){
+        return( NA )
+      } else {
+        return( y )
+      }
+    })
     dat <- sweep( dat, 2, dat.shift)
     assayDataElement( eset, channel) <- dat
   } else {
