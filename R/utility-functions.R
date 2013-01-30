@@ -154,7 +154,7 @@ pairwise_compare <- function( eset,
       stop(paste("Expected ExpressionSet found: ", class(eset)))
     }
   
-  ## Check column, control_perturb_col, exists
+  ## Check column 'control_perturb_col' exists
   if(!control_perturb_col %in% varLabels(eset))
     {
       stop(paste("Column label <", control_perturb_col, "> not found "))
@@ -163,21 +163,21 @@ pairwise_compare <- function( eset,
   ## Check control and perturb exist
   ncontrol = length( which(pData(eset)[,control_perturb_col] == control)) 
   nperturb = length( which(pData(eset)[,control_perturb_col] == perturb)) 
-  
-  if(ncontrol + nperturb != length(sampleNames(eset)))
-    {
-      warning(paste("ExpressionSet includes ", 
-                    length(sampleNames(eset)) - ncontrol - nperturb, 
-                    " non-control/non-perturb samples, these will be ingored"))
-      eset <- eset[,pData(eset)[,control_perturb_col] %in% c(control, perturb)]
-    }
-  
+    
   if(ncontrol == 0 | nperturb == 0)
     {
       stop(paste("Expected at least one control (found ", ncontrol, ") ",
                  "and a at least one perturb (found ", nperturb, ")"))
     }
 
+  if(ncontrol + nperturb != length(sampleNames(eset)))
+  {
+    warning(paste("ExpressionSet includes ", 
+                  length(sampleNames(eset)) - ncontrol - nperturb, 
+                  " non-control/non-perturb samples, these will be ingored"))
+    eset <- eset[,pData(eset)[,control_perturb_col] %in% c(control, perturb)]
+  }
+  
   ## Compare control and perturb
   if(ncontrol == 1 & nperturb == 1)
     {
@@ -429,7 +429,9 @@ generate_gCMAP_NChannelSet <- function(
                                        perturb="perturbation",
                                        limma=TRUE,
                                        limma.index=2,
-                                       big.matrix=NULL
+                                       big.matrix=NULL,
+                                       center.z="peak",
+                                       center.log_fc="peak"
                                        )
 {
 
@@ -475,7 +477,9 @@ generate_gCMAP_NChannelSet <- function(
                     perturb = perturb,
                     limma = limma,
                     limma.index = limma.index,
-                    big.matrix = big.matrix
+                    big.matrix = big.matrix,
+                    center.z = center.z,
+                    center.log_fc = center.log_fc
                     )
     
   } else if (data.classes == "CountDataSet") {
@@ -487,7 +491,9 @@ generate_gCMAP_NChannelSet <- function(
                     control_perturb_col = control_perturb_col,
                     control = control,
                     perturb = perturb,
-                    big.matrix = big.matrix
+                    big.matrix = big.matrix,
+                    center.z = center.z,
+                    center.log_fc = center.log_fc
                     )
   }
 }
@@ -501,9 +507,14 @@ generate_gCMAP_NChannelSet <- function(
                             perturb,
                             limma,
                             limma.index,
-                            big.matrix
+                            big.matrix,
+                            center.z,
+                            center.log_fc
                             ) 
 {
+  stopifnot(center.z %in% c("none", "mean", "median", "peak") )
+  stopifnot(center.log_fc %in% c("none", "mean", "median", "peak") )
+
   if ( limma == TRUE ) {
     res <- lapply( data.list, function( x ) 
                   try( pairwise_compare_limma( 
@@ -545,7 +556,7 @@ generate_gCMAP_NChannelSet <- function(
 
   ## create in-memory NChannelSet
   assay.data <- assayDataNew( exprs=AveExpr, z=z, p=p, log_fc=log_fc ) 
-  
+
   fdata = data.frame( 
     probeid=row.names( res[[1]] ) ,
     row.names=row.names( res[[1]] ) 
@@ -553,7 +564,8 @@ generate_gCMAP_NChannelSet <- function(
   
   pdata = data.frame( 
     UID = uids,
-    row.names = uids ) 
+    row.names = uids
+    ) 
   
   if ( !is.null( sample.annotation ) ) {
     pdata = cbind( pdata, sample.annotation ) 
@@ -570,6 +582,10 @@ generate_gCMAP_NChannelSet <- function(
              annotation = platform.annotation
              ) 
   
+  ## center z-scores and log_fc channels
+  ncs <- center_eSet( ncs, "z", center=center.z)
+  ncs <- center_eSet( ncs, "log_fc", center=center.log_fc)
+  
   ## create NChannelSet on disk
   if( ! is.null( big.matrix ) ) { ## big.matrix = path to BigMatrix file on disk
     eSetOnDisk( ncs, out.file=big.matrix ) 
@@ -585,9 +601,14 @@ generate_gCMAP_NChannelSet <- function(
                             control_perturb_col,
                             control,
                             perturb,
-                            big.matrix
+                            big.matrix,  
+                            center.z,
+                            center.log_fc
                             )
 {
+
+  stopifnot(center.z %in% c("none", "mean", "median", "peak") )
+  stopifnot(center.log_fc %in% c("none", "mean", "median", "peak") )
 
   vst <- .vst_transform( data.list ) ## variance-stabilizing transformation
   res <- lapply( data.list, function( x )
@@ -626,9 +647,10 @@ generate_gCMAP_NChannelSet <- function(
 
   dimnames( AveExpr ) <- dimnames( z ) <- dimnames( p ) <- dimnames( mod_fc ) <- dimnames( log_fc ) <- list( row.names( res[[1]] ), uids)
 
+  
   ## create in-memory NChannelSet
   assay.data <- assayDataNew( exprs=AveExpr, z=z, p=p, log_fc=log_fc, mod_fc=mod_fc)
-  
+
   fdata = data.frame(
     probeid   = row.names( res[[ 1 ]] ),
     row.names = row.names( res[[ 1 ]] )
@@ -659,6 +681,12 @@ generate_gCMAP_NChannelSet <- function(
              annotation  = platform.annotation
              )
 
+  ## center z-scores and log_fc channels
+  ncs <- center_eSet( ncs, "z", center=center.z)
+  ncs <- center_eSet( ncs, "log_fc", center=center.log_fc)
+  ncs <- center_eSet( ncs, "mod_fc", center=center.log_fc)
+  
+  
   ## create NChannelSet on disk
   if(  ! is.null( big.matrix) ) { ## big.matrix = path to BigMatrix file on disk
     eSetOnDisk(  ncs, out.file=big.matrix )
@@ -902,3 +930,294 @@ pickChannels <- function (object, names, ...) {
              object[elts]
            })
   }
+
+
+eset_instances <- function(instance.matrix, 
+                           eset, 
+                           control_perturb_col="cmap", 
+                           control="control", 
+                           perturb="perturbation") {
+  stopifnot(row.names( instance.matrix) %in% sampleNames( eset ))
+  stopifnot(all( instance.matrix %in% c(-1,0,1)))
+  
+  apply( instance.matrix, 2, function( x ){
+    control.samples <- sampleNames( eset )[x == -1]
+    perturbation.samples <- sampleNames( eset )[x == 1]
+    instance.eset <- eset[, c(control.samples, perturbation.samples) ]
+    pData( instance.eset )[,control_perturb_col] <- c( rep( control, 
+                                                           length(control.samples )
+                                                           ), 
+                                                      rep( perturb, 
+                                                          length(perturbation.samples )
+                                                          )
+                                                      )
+    return( instance.eset )
+  })
+}
+
+splitPerturbations <- function( eset, 
+                                control="none",
+                                controlled.factors="none", ## all, none or vector
+                                factor.of.interest="Compound",
+                                ignore.factors=NULL,
+                                cmap.column="cmap",
+                                prefix="^Factor"){
+  
+  ## get annotation information from the phenoData slot
+  pd <- pData( eset )
+  
+  ## remove columns matching the 'ignore.factors' parameter
+  if( !is.null(ignore.factors)){
+    ignore.factors <- sapply(ignore.factors, function( x ){
+      m <- grep( x, grep( prefix, colnames(pd), value=TRUE), value=TRUE )
+      if( length(m) == 0){
+        return(NA)
+      } else {
+        return( m )
+      }
+    })
+    
+    if( all(is.na(ignore.factors))){
+      stop("None of the 'ignore.factors' could be found in the phenoData.")
+    } else {
+      message( sprintf("The following factor(s) will be ignored: %s",
+                       paste(ignore.factors, collapse=", ")))
+      pd <- pd[,!colnames(pd) %in% ignore.factors]
+    }
+  }
+  
+  ## identify experimental factors by the "Factor" prefix
+  factor.all <- grep( prefix, colnames(pd), value=TRUE)
+  
+  ## match / extract the user-specified factors of interest
+  factor.of.interest <- grep( factor.of.interest, factor.all, value=TRUE)
+  if( length( factor.of.interest ) == 0){
+    stop( "Your factor of interest could not be found in the dataset.")
+  } else if( length( factor.of.interest) > 1) {
+    stop( "The 'factor.of.interest' parameter matches multiple annotation columns.")
+  }
+  message(sprintf("Using %s as factor of interest.", factor.of.interest))
+  
+  other.factors <- setdiff( factor.all, factor.of.interest)
+  perturbations <- unique( setdiff( pd[,factor.of.interest], control))
+  
+  if( length( perturbations) == 0){
+    stop( "No perturbations could be found in the 'factor.of.interest' column.")
+  }
+  
+  if( !identical( controlled.factors,"all") & !identical( controlled.factors,"none")){
+    controlled.factors <- sapply(controlled.factors, function( x) { 
+      grep( x, factor.all,value=TRUE)
+    })
+  } else if( controlled.factors == "all"){
+    controlled.factors <- other.factors
+  } else if( controlled.factors == "none"){
+    controlled.factors <- controlled.factors
+  }
+  
+  ## identify control and perturbation instances
+  if( length( other.factors) == 0){
+    control.instances <- pd[pd[, factor.of.interest] == control, factor.of.interest, drop=FALSE ]
+  } else {
+    control.instances <- pd[pd[, factor.of.interest] == control, other.factors,drop=FALSE ]
+  }
+  
+  if( nrow( control.instances) == 0){
+    stop( sprintf("No control instances could be found matching %s in the %s column.", control, factor.of.interest))
+  }
+  
+  perturb.instances <- pd[pd[, factor.of.interest] != control, factor.all, drop=FALSE ]
+  
+  ## iterate over perturbations and compile single-factor experiments
+  all.instances <- lapply( perturbations, function( x ) {
+    ## unique experimental conditions
+    if( length(other.factors) == 0){
+      perturb.unique <- unique(  perturb.instances[ which( perturb.instances[,factor.of.interest] == x),factor.of.interest, drop=FALSE])
+      perturb.all <- perturb.instances[which( perturb.instances[,factor.of.interest] == x), factor.of.interest, drop=FALSE]
+    } else {
+    perturb.unique <- unique(  perturb.instances[ which( perturb.instances[,factor.of.interest] == x),other.factors, drop=FALSE])
+    perturb.all <- perturb.instances[which( perturb.instances[,factor.of.interest] == x), other.factors, drop=FALSE]
+    }
+    
+    ## assign samples to unique experimental conditions
+    matched.samples <- lapply( 1:nrow( perturb.unique), 
+                               function( n ){
+                                 sapply( 1:nrow( perturb.all),
+                                         function( m ){
+                                           all( perturb.all[m,] == perturb.unique[n,])
+                                         })
+                               })
+    
+    matched.samples <- lapply( matched.samples, function(x){ 
+      row.names(perturb.all)[x]
+    })
+    
+    if( any( sapply( matched.samples, length) != 1)){
+      matched.samples <- I(matched.samples)
+    } else {
+      matched.samples <- unlist(matched.samples)
+    }
+    
+    ## identify suitable controls
+    if( identical( controlled.factors,"none")){
+      matched.controls <- lapply( 1:nrow( perturb.unique),function(n){
+        row.names( control.instances )
+      })
+    } else {
+      matched.controls <- lapply( 1:nrow( perturb.unique), 
+                                  function( n ){
+                                    sapply( 1:nrow( control.instances),
+                                            function( m ){
+                                              all( control.instances[m, controlled.factors] == perturb.unique[n,controlled.factors])
+                                            })
+                                  })
+      matched.controls <- lapply( matched.controls, function(x){ 
+        row.names(control.instances)[x]
+      })
+    }
+    
+    if( all( is.na(unlist(matched.controls)))){
+      warning(sprintf("No control samples found for %s", x), call.=FALSE)
+      return( NA)
+    }
+    
+    if( any( sapply( matched.controls, length) != 1)){
+      matched.controls <- I(matched.controls)
+    } else {
+      matched.controls <- unlist(matched.controls)
+    }
+    
+    ## return results as a data.frame
+    data.frame(perturbagen=x, 
+               perturb.unique, 
+               data.frame( matched.samples, stringsAsFactors=FALSE), 
+               data.frame( matched.controls,stringsAsFactors=FALSE))
+  })
+  names( all.instances) <- perturbations
+  
+  instances <- unlist(
+    lapply( all.instances[!is.na(all.instances)], function( x ){
+      lapply( 1:nrow( x ), function( n) {
+        selected.sampes <- c( x[n,"matched.samples"], 
+                              x[n,"matched.controls"])
+        selected.sampes <- unlist( selected.sampes)
+      })
+    }), recursive=FALSE)
+  
+  eset.list <- lapply( instances, function( x ){
+    instance.eset <- eset[, x]
+    pData(instance.eset)[,cmap.column] <- ifelse( pData( instance.eset)[,factor.of.interest] == "none", "control", "perturbation")
+    return( instance.eset)
+  })
+  return( eset.list)
+}
+
+mergeCMAPs <- function(x, y){
+  ## basic checks
+  if( ! inherits(x, "eSet")){
+    stop( "Object 'x' is not an eSet.")
+  }
+  
+  if( ! inherits(y, "eSet")){
+    stop( "Object 'y' is not an eSet.")
+  }
+     
+  if( ! class(x ) == class( y )){
+    stop( "Objects 'x' and 'y' are not of the same class.")
+  }
+
+  if( annotation( x ) != annotation( y )){
+    stop( "Objects 'x' and 'y' have different 'annotation' slots.")
+  }
+
+  if( any( assayDataElementNames( x ) != assayDataElementNames( y))){
+    stop( "Objects 'x' and 'y' have different AssayDataElementNames.")
+  }
+
+  if( length( intersect( sampleNames( x ), sampleNames( y ))) != 0 ){
+    stop( sprintf( "Objects 'x' and 'y' share %s sampleNames. sampleNames must be unique.", length( intersect( sampleNames( x ), sampleNames( y )))))
+  }
+
+  if(  any( varLabels( x ) !=  varLabels( y ))){
+    stop( "Objects 'x' and 'y' have different pData columns.")
+  }
+  
+  common.features <- intersect( featureNames( x ), featureNames( y ))
+  message(sprintf("eSets 'x' and 'y' share %s common features.", length(common.features)))
+  
+  ## create empty eSet for output
+  merged.eset <- new( class( x ) ) 
+  annotation(merged.eset) <- annotation( x )
+  
+  ## merge data for each channel separately
+  for (element in assayDataElementNames( x ) ) {
+    merged.channel <- merge(
+                            assayDataElement( x, element)[,],
+                            assayDataElement( y, element)[,],
+                            by.x=0, by.y=0, all=TRUE
+                            )
+    row.names( merged.channel) <- merged.channel$Row.names
+    merged.channel$Row.names <- NULL
+    assayDataElement( merged.eset, element) <- as.matrix( merged.channel )
+  }
+
+  ## merge pData tables => requires the same column names in each eSet !
+  pData(merged.eset) <- rbind( pData( x ), pData( y ))
+  featureData(merged.eset) <- AnnotatedDataFrame(
+                                                 data.frame(
+                                                            probeid=row.names( merged.channel),
+                                                            row.names=row.names(merged.channel)
+                                                            )
+                                                 )
+  return( merged.eset)
+}
+
+center.function <- function(x, type) {
+  switch(type,
+         mean = mean(x, na.rm=TRUE),
+         median = median(x, na.rm=TRUE),
+         peak = {
+           d <- density( x, adjust=2, na.rm=TRUE  )
+           d$x[ d$y == max(d$y)][1]
+         })
+}
+
+center_eSet <- function( eset,
+                                channel,
+                                center="peak"){
+  
+  stopifnot( inherits( eset, "eSet"))
+  stopifnot( center %in% c("none", "mean", "median", "peak") )
+  stopifnot( channel %in% assayDataElementNames( eset ))  
+  
+  center.function <- function(x, type) {
+    switch(type,
+           mean = mean(x, na.rm=TRUE),
+           median = median(x, na.rm=TRUE),
+           peak = {
+             d <- density( x, adjust=2, na.rm=TRUE  )
+             d$x[ d$y == max(d$y)][1]
+           })
+  }
+  
+  dat <- assayDataElement( eset, channel)
+  
+  if( center != "none"){
+    dat.shift <- apply( dat, 2, function(x){
+      y <- try( center.function( x, center), silent=TRUE)
+      if( inherits( y, "try-error")){
+        return( NA )
+      } else {
+        return( y )
+      }
+    })
+    dat <- sweep( dat, 2, dat.shift)
+    assayDataElement( eset, channel) <- dat
+  } else {
+    dat.shift <- rep(NA, ncol( eset ))
+  }
+  pData( eset )[,paste(channel, "shift", sep=".")] <- dat.shift
+  varMetadata( eset )[paste(channel, "shift", sep="."),
+                      "labelDescription"] <- sprintf("center of the uncorrected %s distribution", channel)
+  return( eset)
+}

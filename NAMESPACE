@@ -11,7 +11,7 @@ importFrom("lattice", "levelplot", "densityplot", "stripplot", "trellis.par.get"
            "panel.densityplot", "panel.rug")
 importFrom("latticeExtra", "panel.key")
 
-export(
+export("center_eSet",
        "eSetOnDisk",
        "generate_gCMAP_NChannelSet",
        "mapNmerge",

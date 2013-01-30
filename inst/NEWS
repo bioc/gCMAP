@@ -1,6 +1,13 @@
 \name{NEWS}
 \title{NEWS file for the gCMAP}
 
+\section{Changes in version 1.1.5}{
+  \itemize{
+    \item{NEW}{ New parameters 'center.z' and 'center.log_fc' for the generate_gCMAP_NChannelSet function, centering each column of the score matrix on the column mean, median or density peak. (Internally, the new 'center_eSet' function is called.)}
+    \item{NEW}{ New function 'center_eSet' to center columns of eSet channels on either their kernel density peak, their mean or their median.}
+  }
+}	
+
 \section{Changes in version 1.1.4}{
   \itemize{
     \item{BUGFIX}{ The gealm_score method is not defined for queries with missing values and will now return the corresponding error message.}
