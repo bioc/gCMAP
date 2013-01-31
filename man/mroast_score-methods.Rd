@@ -10,8 +10,8 @@
 \alias{mroast_score,eSet,GeneSet-method}
 \alias{mroast_score,matrix,GeneSet-method}
 
-\title{ ~~ Methods for Function \code{mroast_score} in Package
-  \pkg{gCMAPQuery} ~~}
+\title{  Methods for Function \code{mroast_score} in Package
+  \pkg{gCMAP} }
 
 \description{
    These methods provide a wrapper for the Rotation Gene Set Tests function

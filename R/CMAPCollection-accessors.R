@@ -348,9 +348,9 @@ setAs("CMAPCollection", "GeneSet",
               set.signs <- rep(FALSE, ncol(eset))
             }
             cmap <- CMAPCollection(
-                                      Matrix::t( sparseMatrix(i=i,
-                                                              j=j,
-                                                              x=x,
+                                      Matrix::t( sparseMatrix(i=as.integer(i),
+                                                              j=as.integer(j),
+                                                              x=as.integer(x),
                                                               dims=list(ncol(eset), nrow(eset)),
                                                               dimnames = list(sampleNames(eset), featureNames(eset)))
                                                 ),

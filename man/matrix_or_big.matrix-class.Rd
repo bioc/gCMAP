@@ -17,6 +17,6 @@ Helper class used to dispatch methods on either matrix or big.matrix objects.
 }
 
 \seealso{
-  \code{\linkS4class{big.matrix}} for links to other classes ~~~
+  \code{\linkS4class{big.matrix}} for links to other classes ~
 }
 \keyword{classes}

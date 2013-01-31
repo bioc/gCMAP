@@ -70,13 +70,13 @@ downregulated.
 }
 \section{Slots}{
   \describe{
-    \item{\code{assayData}:}{Object of class \code{"AssayData"} ~~ }
-    \item{\code{phenoData}:}{Object of class \code{"AnnotatedDataFrame"} ~~ }
-    \item{\code{featureData}:}{Object of class \code{"AnnotatedDataFrame"} ~~ }
-    \item{\code{experimentData}:}{Object of class \code{"MIAxE"} ~~ }
-    \item{\code{annotation}:}{Object of class \code{"character"} ~~ }
-    \item{\code{protocolData}:}{Object of class \code{"AnnotatedDataFrame"} ~~ }
-    \item{\code{.__classVersion__}:}{Object of class \code{"Versions"} ~~ }
+    \item{\code{assayData}:}{Object of class \code{"AssayData"}  }
+    \item{\code{phenoData}:}{Object of class \code{"AnnotatedDataFrame"}  }
+    \item{\code{featureData}:}{Object of class \code{"AnnotatedDataFrame"}  }
+    \item{\code{experimentData}:}{Object of class \code{"MIAxE"}  }
+    \item{\code{annotation}:}{Object of class \code{"character"}  }
+    \item{\code{protocolData}:}{Object of class \code{"AnnotatedDataFrame"}  }
+    \item{\code{.__classVersion__}:}{Object of class \code{"Versions"}  }
   }
 }
 \section{Extends}{
@@ -118,7 +118,7 @@ Thomas Sandmann, sandmann.thomas@gene.com
 \note{
 The CMAPCollections class supports coercion from / to GeneSet and
 GeneSetCollection objects defined by the GSEABase package, as well as
-the SignedGeneSet derivative introduced by the gCMAPQuery package itself.
+the SignedGeneSet derivative introduced by the gCMAP package itself.
 }
 
 \seealso{

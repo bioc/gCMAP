@@ -24,7 +24,7 @@
 \alias{wilcox_score,GeneSetCollection,eSet-method}
 \alias{wilcox_score,GeneSet,eSet-method}
 
-\title{ Methods for Function \code{wilcox_score} in Package \pkg{gCMAPQuery} }
+\title{ Methods for Function \code{wilcox_score} in Package \pkg{gCMAP} }
 \description{
   These methods provide a wrapper for the Mean-rank Gene Set Test function 
  \link[limma]{wilcoxGST}

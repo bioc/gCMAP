@@ -6,7 +6,7 @@
 
 \alias{induceCMAPCollection,eSet-method}
 \alias{induceCMAPCollection,matrix-method}
-\title{ ~~ Methods for Function \code{induceCMAPCollection} in Package \pkg{gCMAPQuery} ~~}
+\title{  Methods for Function \code{induceCMAPCollection} in Package \pkg{gCMAP} ~~}
 
 \description{
 This method defines a \code{\linkS4class{CMAPCollection}} by applying thresholds to an

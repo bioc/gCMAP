@@ -3,7 +3,8 @@
 
 \section{Changes in version 1.3.0}{
   \itemize{
-    \item{NEW}{ New parameters 'center.z' and 'center.log_fc' for the generate_gCMAP_NChannelSet function, centering each column of the score matrix on the column mean, median or density peak. (Internally, the new 'center_eSet' is called.)}
+    \item{BUGFIX}{ induceCMAPCollection method was updated to fix a bug that prevented processing of certain single-sample eSets.}
+    \item{NEW}{ New parameters 'center.z' and 'center.log_fc' for the generate_gCMAP_NChannelSet function, centering each column of the score matrix on the column mean, median or density peak. (Internally, the new 'center_eSet' function is called.)}
     \item{NEW}{ New function 'center_eSet' to center columns of eSet channels on either their kernel density peak, their mean or their median.}
     \item{NEW}{ New function mergeCMAPs to combined two eSets that share class, varLabels, annotation and assayDataElementNames.}
     \item{BUGFIX}{ Fixed missing gene names in featureScores method with CMAPCollections queries containing single-gene sets.}

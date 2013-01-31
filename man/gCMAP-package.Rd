@@ -4,7 +4,7 @@
 \docType{package}
 \title{
 Tools for Connectivity Map-like analyses
-~~ package title ~~
+ package title ~~
 }
 \description{
 
@@ -13,7 +13,7 @@ Tools for Connectivity Map-like analyses
   to compare expression profiles to one another. The original Connectivity Map
   statistical approach is implemented, along with numerous improvements and
   extensions. 
-~~ A concise (1-5 lines) description of the package ~~
+ A concise (1-5 lines) description of the package ~~
 }
 \details{
 \tabular{ll}{
@@ -39,27 +39,27 @@ CMAPResults-class       Class '"CMAPResults"'
 GeneSet                 Methods for 'GeneSet' and 'GeneColorSet'
 SignedGeneSet           Construtor for SignedGeneSet
 SignedGeneSet-class     Class '"SignedGeneSet"'
-camera_score-methods    ~~ Methods for Function 'camera_score' in
-                        Package 'gCMAPQuery' ~~
+camera_score-methods     Methods for Function 'camera_score' in
+                        Package 'gCMAP' 
 connectivity_score      Broad CMAP gene set enrichment metrics
 fisher_score-methods    Hypergeometric probability of gene set
                         enrichment
 gCMAPData               Example 'NChannelSet' and 'ExpressionSet' for
-                        use with the gCMAPQuery package.
-gCMAPQuery-package      Tools for Connectivity Map-like analyses
-geneIndex-methods       ~~ Methods for Function 'geneIndex' in Package
-                        'gCMAPQuery' ~~
+                        use with the gCMAP package.
+gCMAP-package      Tools for Connectivity Map-like analyses
+geneIndex-methods        Methods for Function 'geneIndex' in Package
+                        'gCMAP' 
 generate_gCMAP_NChannelSet
                         Generate a perturbation profile library from
                         expression sets of control/treatment pairs
 gsealm_jg_score-methods
                         Parametric test for testing normally
                         distributed scores for gene set enrichment
-gsealm_score-methods    ~~ Methods for Function 'gsealm_score' in
-                        Package 'gCMAPQuery' ~~
+gsealm_score-methods     Methods for Function 'gsealm_score' in
+                        Package 'gCMAP' 
 induceCMAPCollection-methods
-                        ~~ Methods for Function 'induceCMAPCollection'
-                        in Package 'gCMAPQuery' ~~
+                         Methods for Function 'induceCMAPCollection'
+                        in Package 'gCMAP' 
 mapNmerge               A function to map eSet featureNames and
                         calculate summaries for many-to-one mapping
                         features
@@ -67,24 +67,24 @@ memorize                Create a new NChannelSet instance by selecting
                         specific channels and load BigMatrix assayData
                         into memory, if present
 minSetSize              GeneSetCollection length filtering
-mroast_score-methods    ~~ Methods for Function 'mroast_score' in
-                        Package 'gCMAPQuery' ~~
+mroast_score-methods     Methods for Function 'mroast_score' in
+                        Package 'gCMAP' 
 pairwise_DESeq          Generate statistics associated with pairwise
                         differential expression from RNAseq count data
 pairwise_compare        Generate statistics associated with pairwise
                         differential expression
-romer_score-methods     ~~ Methods for Function 'romer_score' in
-                        Package 'gCMAPQuery' ~~
+romer_score-methods      Methods for Function 'romer_score' in
+                        Package 'gCMAP' 
 signedRankSumTest       An implementation of the Wilcox rank sum test /
                         Mann-Whitney test that takes into account the
                         direction / sign of gene set members and
                         possibly the correlation between cases
-wilcox_score-methods    ~~ Methods for Function 'wilcox_score' in
-                        Package 'gCMAPQuery' ~~
+wilcox_score-methods     Methods for Function 'wilcox_score' in
+                        Package 'gCMAP' 
 zScores                 Function to calculate z-scores from p-values
 }
-~~ An overview of how to use the package, including the most important ~~
-~~ functions ~~
+ An overview of how to use the package, including the most important ~~
+ functions ~~
 }
 \author{
 Thomas Sandmann <sandmann.thomas@gene.com>, Richard Bourgon <bourgon.richard@gene.com> and Sarah Kummerfeld <kummerfeld.sarah@gene.com>
