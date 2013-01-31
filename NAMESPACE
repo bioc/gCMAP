@@ -6,7 +6,6 @@ importFrom("limma", "symbols2indices", "romer", "mroast", "camera", "eBayes", "l
 importClassFrom("bigmemory", "big.matrix")
 importFrom("bigmemory", "mwhich")
 importFrom("bigmemoryExtras", "BigMatrix")
-importFrom("DESeq", "newCountDataSet", "getVarianceStabilizedData", "nbinomTest")
 importFrom("genefilter", "rowttests")
 
 export("center_eSet",

@@ -20,7 +20,7 @@ try.hard = FALSE, control_perturb_col = "cmap",...)
 
 \arguments{
   \item{cds}{
-    A \code{\linkS4class{CountDataSet}} with perturbation and control
+    A CountDataSet with perturbation and control
     samples identified in the pData condition slot.
 }
 \item{control}{
@@ -47,4 +47,7 @@ try.hard = FALSE, control_perturb_col = "cmap",...)
 }
 \value{
   See \link[DESeq]{nbinomTest} for details.
+}
+\note{
+To use this function, please install the suggested Bioconductor package 'DESeq'.
 }

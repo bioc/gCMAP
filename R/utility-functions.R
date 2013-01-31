@@ -287,7 +287,12 @@ pairwise_DESeq <- function( cds,
                            perturb="perturbation",
                            try.hard=FALSE)
 {
-
+  if( is.element("DESeq", installed.packages()[,1])){
+    require( DESeq )
+  } else {
+    stop("To run this function, please install the Bioconductor package 'DESeq'.")
+  }
+  
   ## Immediately fail for cases that have no CountDataSet
   if(!is( cds, "CountDataSet" ))	
     {
@@ -390,18 +395,23 @@ pairwise_DESeq <- function( cds,
                          try.hard=FALSE,
                          control_perturb_col="cmap",
                          ...) {
-
+  if( is.element("DESeq", installed.packages()[,1])){
+    require( DESeq )
+  } else {
+    stop("To use this function, please install the Bioconductor package 'DESeq'.")
+  }
+  
   conditions(cds) <- pData(cds)[, control_perturb_col]
-  cds <- estimateSizeFactors( cds )
+  cds <- DESeq::estimateSizeFactors( cds )
   
   ## can we use replicates to estimate dispersions ?
   if ( max( table( conditions(cds ) )[ c( control, perturb )] ) > 1 ) {
     
     ## yay, replicates for at least one condition !
-    cds <- try( estimateDispersions( cds ) )
+    cds <- try( DESeq::estimateDispersions( cds ) )
   } else {
     ## nay, no replicates
-    cds <- try( estimateDispersions( cds, method = "blind", sharingMode = "fit-only", ... ) )
+    cds <- try( DESeq::estimateDispersions( cds, method = "blind", sharingMode = "fit-only", ... ) )
   }
   
   if( class( cds ) == "try-error" ) {
@@ -415,7 +425,7 @@ pairwise_DESeq <- function( cds,
     }
   }
   
-  res <- nbinomTest( cds, control, perturb )
+  res <- DESeq::nbinomTest( cds, control, perturb )
   res
 }
 
@@ -483,6 +493,12 @@ generate_gCMAP_NChannelSet <- function(
                     )
     
   } else if (data.classes == "CountDataSet") {
+    if( is.element("DESeq", installed.packages()[,1])){
+      require( DESeq )
+    } else {
+      stop("To analyze RNAseq count data, please install the Bioconductor package 'DESeq'.")
+    }
+      
     .process_counts(
                     data.list = data.list,
                     uids = uids,
@@ -606,7 +622,12 @@ generate_gCMAP_NChannelSet <- function(
                             center.log_fc
                             )
 {
-
+  if( is.element("DESeq", installed.packages()[,1])){
+    require( DESeq )
+  } else {
+    stop("To analyze RNAseq count data, please install the Bioconductor package 'DESeq'.")
+  }
+  
   stopifnot(center.z %in% c("none", "mean", "median", "peak") )
   stopifnot(center.log_fc %in% c("none", "mean", "median", "peak") )
 
@@ -695,20 +716,25 @@ generate_gCMAP_NChannelSet <- function(
 }
 
 .vst_transform <- function( cds.list ) {
-
+  if( is.element("DESeq", installed.packages()[,1])){
+    require( DESeq )
+  } else {
+    stop("To perform variance stabilizing normalization, please install the Bioconductor package 'DESeq'.")
+  }
+  
   ## collect all counts in a single data matrix
   list.of.counts <- lapply( cds.list, counts )
   counts.matrix <- do.call( cbind, list.of.counts ) ## contains duplicates of control samples
   counts.matrix <- counts.matrix[, ! duplicated( colnames( counts.matrix ) ) ]
   
   ## estimate SizeFactors and dispersions
-  cds <- newCountDataSet( counts.matrix, colnames( counts.matrix ) )
-  cds <- estimateSizeFactors( cds )
-  try( cds.fit <- estimateDispersions( cds, method = "blind", sharingMode =  "fit-only") )
+  cds <- DESeq::newCountDataSet( counts.matrix, colnames( counts.matrix ) )
+  cds <- DESeq::estimateSizeFactors( cds )
+  try( cds.fit <- DESeq::estimateDispersions( cds, method = "blind", sharingMode =  "fit-only") )
 
   if( is(cds.fit,"try-error")) {
     warning(print(".vst_transform: Parametric dispersion estimate for variance stabilizing tranformation failed. Trying local fit instead."))
-    try( cds.fit <- estimateDispersions( cds, method = "blind", sharingMode =  "fit-only", fitType="local") )
+    try( cds.fit <- DESeq::estimateDispersions( cds, method = "blind", sharingMode =  "fit-only", fitType="local") )
     
     if( is(cds.fit,"try-error")) {
       stop(".vst_transform: Dispersion estimate failed using parametric or local fit.")
@@ -716,7 +742,7 @@ generate_gCMAP_NChannelSet <- function(
   }
   
   ## variance-stabilizing transformation
-  vst <- getVarianceStabilizedData( cds.fit )
+  vst <- DESeq::getVarianceStabilizedData( cds.fit )
 }
 
 mapNmerge <- function(eset, translation.fun = NULL, get="ENTREZID", verbose=FALSE, summary.fun=function(x)mean(x, na.rm=TRUE)) {

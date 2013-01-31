@@ -5,11 +5,7 @@
 \title{Generate a perturbation profile library from expression sets of control/treatment pairs}
 
 \description{ 
-When provided with a list of ExpressionSet or countDataSet objects, comparisons are made between
-control and perturbation samples on a set basis. For countDataSets, a
-moderated log2 fold change for each set is calculated after variance-stabilizing
-transformation of the count data is performed globally across all
-countDataSets in the list.
+When provided with a list of ExpressionSet or countDataSet objects, comparisons are made between control and perturbation samples on a set basis. To process RNAseq count data, the suggested Bioconductor package 'DESeq' must be available on the system. For countDataSets, a moderated log2 fold change for each set is calculated after variance-stabilizing transformation of the count data is performed globally across all countDataSets in the list.
 }
 
 \usage{
@@ -32,7 +28,7 @@ generate_gCMAP_NChannelSet(
 \arguments{
   
 	\item{data.list}{List of \code{\linkS4class{ExpressionSet}} or
-	\code{\linkS4class{CountDataSet}} objects. 
+	CountDataSet objects. 
 	Each element includes all array / RNAseq data for a single instance, 
 	plus metadata on which samples are perturbation and control.}
 
@@ -107,8 +103,11 @@ assayDataElementNames(de)
 head( assayDataElement(de, "z") ) 
 
 \dontrun{
-## list of CountDataSets
+## processing RNAseq data requires the suggested 'DESeq' 
+## Bioconductor package.
+require( DESeq )
 set.seed( 123 )
+## list of CountDataSets
 cds.list <- lapply( 1:3, function(n) {
    cds <- makeExampleCountDataSet()
    featureNames(cds) <- paste("gene",1:10000, sep="_")

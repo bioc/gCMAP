@@ -4,15 +4,14 @@
 \title{Generate statistics associated with pairwise differential
   expression from RNAseq count data}
 
-\description{ When provided with an \code{\linkS4class{CountDataSet}},
-comparisons are made between control and perturbation samples. }
+\description{ When provided with an CountDataSet, comparisons are made between control and perturbation samples. }
 
 \usage{ pairwise_DESeq(cds, vst, control_perturb_col = "condition",
 control="control", perturb="perturbation", try.hard=FALSE) }
 
 \arguments{
   
-  \item{cds}{ \code{\linkS4class{CountDataSet}} with all count data
+  \item{cds}{ CountDataSet with all count data
   for a single instance, plus metadata on which samples are perturbation
   and control. }
 
@@ -60,4 +59,8 @@ control="control", perturb="perturbation", try.hard=FALSE) }
     that this p-value can also be computed from \code{z}, via
     \code{\link{pnorm}} (doubling for two tails). }
   
+}
+
+\note{
+To use this function, please install the suggested Bioconductor package 'DESeq'.
 }

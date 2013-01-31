@@ -312,11 +312,11 @@ setAs("CMAPCollection", "GeneSet",
              }
 
              gss <- mclapply( 1:ncol( ade ),
-                             function( n ) {
-                               if (! is.null( lower )) {
-                                 if( require( bigmemory) ){
-                                   down <- as.vector( mwhich( ade, n, lower, "lt" ))
-                                 } else {
+                              function( n ) {
+                                if (! is.null( lower )) {
+                                  if( require( bigmemory) ){
+                                    down <- as.vector( mwhich( ade, n, lower, "lt" ))
+                                  } else {
                                    down <- as.vector( which( ade[,n] < lower ))
                                  }
                                } else {
@@ -353,7 +353,8 @@ setAs("CMAPCollection", "GeneSet",
                                                               x=as.integer(x),
                                                               dims=list(ncol(eset), nrow(eset)),
                                                               dimnames = list(sampleNames(eset), featureNames(eset)))
-                                                ),
+                                                )
+                                      ,
                                       phenoData = as(pData(eset), "AnnotatedDataFrame"),
                                       featureData = as(fData(eset),"AnnotatedDataFrame"),
                                       signed=set.signs)
