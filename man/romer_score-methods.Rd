@@ -10,12 +10,12 @@
 \alias{romer_score,eSet,GeneSet-method}
 \alias{romer_score,matrix,GeneSet-method}
 
-\title{ ~~ Methods for Function \code{romer_score} in Package
-  \pkg{gCMAPQuery} ~~}
+\title{  Methods for Function \code{romer_score} in Package
+  \pkg{gCMAP} }
 
 \description{
-   ~~ These methods provide a wrapper for the Rotation Gene Set
-   Enrichment Analysis function \link[limma]{romer}  ~~ Romer performes
+    These methods provide a wrapper for the Rotation Gene Set
+   Enrichment Analysis function \link[limma]{romer}. Romer performes
    a competitive test in that the different gene sets are pitted against
    one another. Instead of permutation, it uses rotation, a parametric
    resampling method suitable for linear models (Langsrud, 2005).

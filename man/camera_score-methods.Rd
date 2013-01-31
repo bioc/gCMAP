@@ -10,12 +10,12 @@
 \alias{camera_score,eSet,GeneSet-method}
 \alias{camera_score,matrix,GeneSet-method}
 
-\title{ ~~ Methods for Function \code{camera_score} in Package
-  \pkg{gCMAPQuery} ~~}
+\title{  Methods for Function \code{camera_score} in Package
+  \pkg{gCMAP} }
 
-\description{ ~~ These methods provide a wrapper for the 'Competitive
+\description{  These methods provide a wrapper for the 'Competitive
    Gene Set Test Accounting for Inter-gene Correlation' function
-   \link[limma]{camera} ~~ See 'limma' documention for details.
+   \link[limma]{camera}  See 'limma' documention for details.
 }
 
 \usage{
