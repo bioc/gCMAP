@@ -4,9 +4,13 @@
 \alias{fisher_score-methods}
 \alias{fisher_score}
 \alias{fisher_score,CMAPCollection,CMAPCollection,character-method}
+\alias{fisher_score,CMAPCollection,NChannelSet,character-method}
 \alias{fisher_score,SignedGeneSet,CMAPCollection,character-method}
+\alias{fisher_score,SignedGeneSet,NChannelSet,character-method}
 \alias{fisher_score,GeneSet,CMAPCollection,character-method}
+\alias{fisher_score,GeneSet,NChannelSet,character-method}
 \alias{fisher_score,GeneSetCollection,CMAPCollection,character-method}
+\alias{fisher_score,GeneSetCollection,NChannelSet,character-method}
 \alias{fisher_score,GeneSetCollection,GeneSetCollection,character-method}
 \alias{fisher_score,CMAPCollection,GeneSetCollection,character-method}
 \alias{fisher_score,GeneSet,GeneSet,character-method}
@@ -15,7 +19,7 @@
 \title{Hypergeometric probability of gene set enrichment}
 
 \description{ A method for computing enrichment probilities based on the
-  hypergeometric distribution. }
+  hypergeometric distribution. This method performs an over-representation analysis by generating 2x2 incidence matrices for gene sets provided as 'query' and 'sets' as GeneSet, SignedGeneSet, GeneSetCollection or CMAPCollection objects. If 'sets' is an NChannelSet object with quantitative data, gene sets are induced on the fly from the channel specified by the 'element' parameter.}
 
 \section{Methods}{
   \describe{
@@ -23,13 +27,25 @@
 \item{\code{signature(query = "CMAPCollection", sets = "CMAPCollection", universe = "character")}}{
 }
 
+\item{\code{signature(query = "CMAPCollection", sets = "NChannelSet", universe = "character")}}{
+}
+
 \item{\code{signature(query = "SignedGeneSet", sets = "CMAPCollection", universe = "character")}}{
+}
+
+\item{\code{signature(query = "SignedGeneSet", sets = "NChannelSet", universe = "character")}}{
 }
 
 \item{\code{signature(query = "GeneSet", sets = "CMAPCollection", universe = "character")}}{
 }
 
+\item{\code{signature(query = "GeneSet", sets = "NChannelSet", universe = "character")}}{
+}
+
 \item{\code{signature(query = "GeneSetCollection", sets = "CMAPCollection", universe = "character")}}{
+}
+
+\item{\code{signature(query = "GeneSetCollection", sets = "NChannelSet", universe = "character")}}{
 }
 
 \item{\code{signature(query = "GeneSet", sets = "GeneSetCollection", universe = "character")}}{
@@ -67,6 +83,10 @@
     number of contained gene sets. For very large collections,
     setting this parameter to 'TRUE' may require large amounts
     of memory.}
+  \item{element}{ A character string corresponding to the assayDataElementName of the NChannelSet object to be thresholded on the fly with the \code{\link{induceCMAPCollection}}.}
+  \item{lower}{ The lower threshold for the \code{\link{induceCMAPCollection}}.}
+  \item{higher}{ The 'higher' threshold for the \code{\link{induceCMAPCollection}}.}
+  
 }
 
 \keyword{methods}

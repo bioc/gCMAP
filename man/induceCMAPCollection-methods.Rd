@@ -24,8 +24,7 @@ object. (See example section).
 \arguments{
   \item{eset}{ An object derived from class \code{\linkS4class{eSet}},
     e.g. an NChannelSet}
-  \item{element}{ A character string corresponding to the assayDataElementName of the 'eset' object to which
-    the thresholds should be applied.}
+  \item{element}{ A character string corresponding to the assayDataElementName of the 'eset' object to which the thresholds should be applied.}
   \item{lower}{ The lower threshold. If not 'NULL', genes with a score
     smaller than 'lower' will be included in the gene set with sign
   -1. At least one of 'lower' and 'higher' must be specified.}
