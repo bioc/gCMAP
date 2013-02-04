@@ -483,6 +483,13 @@ generate_gCMAP_NChannelSet <- function(
                     )
     
   } else if (data.classes == "CountDataSet") {
+    data.list <- lapply( data.list, function(x){
+      if( ! identical(varLabels (x ), c("sizeFactor", "condition") )){
+        newCountDataSet( counts( x), conditions=pData( x)[,control_perturb_col])
+      } else {
+        return( x )
+      }
+    })
     .process_counts(
                     data.list = data.list,
                     uids = uids,
