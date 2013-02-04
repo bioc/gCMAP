@@ -6,7 +6,7 @@
 \alias{geneIndex,GeneSet,character-method}
 \alias{geneIndex,GeneSetCollection,character-method}
 
-\title{  Methods for Function \code{geneIndex} in Package \pkg{gCMAP} ~~}
+\title{  Methods for Function \code{geneIndex} in Package \pkg{gCMAP} }
 
 \description{
 These methods match a character vector of gene ids to the members of a

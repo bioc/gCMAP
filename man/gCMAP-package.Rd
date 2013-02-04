@@ -4,7 +4,6 @@
 \docType{package}
 \title{
 Tools for Connectivity Map-like analyses
- package title ~~
 }
 \description{
 
@@ -13,7 +12,6 @@ Tools for Connectivity Map-like analyses
   to compare expression profiles to one another. The original Connectivity Map
   statistical approach is implemented, along with numerous improvements and
   extensions. 
- A concise (1-5 lines) description of the package ~~
 }
 \details{
 \tabular{ll}{
@@ -83,8 +81,7 @@ wilcox_score-methods     Methods for Function 'wilcox_score' in
                         Package 'gCMAP' 
 zScores                 Function to calculate z-scores from p-values
 }
- An overview of how to use the package, including the most important ~~
- functions ~~
+
 }
 \author{
 Thomas Sandmann <sandmann.thomas@gene.com>, Richard Bourgon <bourgon.richard@gene.com> and Sarah Kummerfeld <kummerfeld.sarah@gene.com>

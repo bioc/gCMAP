@@ -164,13 +164,19 @@ setMethod("annotatedDataFrameFrom",
           .annotatedDataFrameFromMatrix)
 
 setAs("CMAPCollection", "matrix",
-      function (from) as.matrix( members( from ) ) )
+      function (from) {
+        cmap <- as.matrix( members( from ) ) 
+        signed( cmap ) <- rep(FALSE, ncol( cmap))
+        cmap
+        })
 
 setAs("list", "CMAPCollection",
       function (from) {
         cmapData <- incidence( from )
         cmapData <- Matrix::t( cmapData )
-        CMAPCollection( cmapData )
+        cmap <- CMAPCollection( cmapData )
+        signed( cmap ) <- rep(FALSE, ncol( cmap))
+        cmap
       })
 
 setAs("GeneSetCollection", "CMAPCollection",

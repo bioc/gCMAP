@@ -23,12 +23,12 @@ To consider all available annotation columns to match controls, the 'controlled.
 }
 
 \usage{
-splitPerturbations(eset, control = "none", controlled.factors = "none", factor.of.interest = "Compound", ignore.factors = NULL, cmap.column ="cmap", prefix = "^Factor")
+splitPerturbations(eset, control = "none", controlled.factors = "none", factor.of.interest = "Compound", ignore.factors = NULL, cmap.column ="cmap", prefix = NULL)
 }
 
 \arguments{
   \item{eset}{
-  An eSet object with experimental factors annotated in the phenoData slot. Experimental factors are identified by the prefix of the column name, specified in the 'prefix' parameter. In ExpressionSets obtained from the ArrayExpress respository experimental factors are identified by the "Factor" prefix.
+  An eSet object with experimental factors annotated in the phenoData slot. Experimental factors are identified by the prefix of the column name, specified in the 'prefix' parameter. In ExpressionSets obtained from the ArrayExpress respository experimental factors can be identified by their "^Factor" prefix.
 }
   \item{control}{
  A character string identifying control samples in the 'factor.of.interest' column.
@@ -46,7 +46,7 @@ splitPerturbations(eset, control = "none", controlled.factors = "none", factor.o
   Column name for an additional annotation column that will be added to all generated eSets. Used by the \code{\link{generate_gCMAP_NChannelSet}} function.
 }
   \item{prefix}{
-  String identifying pData columns with experimental factors. Setting the prefix to "" will include all pData columns. 
+  String identifying pData columns with experimental factors. Setting the prefix to NULL will include all pData columns. 
 }
 }
 \value{
@@ -66,6 +66,7 @@ Annotations for experiments in public repositories are provided by the uploader 
 
 \seealso{
 \code{\link{generate_gCMAP_NChannelSet}}
+\code{\link{annotate_eset_list}}
 }
 \examples{
 require(Biobase)
@@ -83,4 +84,7 @@ length( eset.list )
 pData( eset.list[[1]])
 ## the second eset contains female Cases & controls
 pData( eset.list[[2]])
+
+## generate data.frame with sample annotations
+annotate_eset_list( eset.list)
 }

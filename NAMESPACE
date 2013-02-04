@@ -8,15 +8,19 @@ importFrom("bigmemory", "mwhich")
 importFrom("bigmemoryExtras", "BigMatrix")
 importFrom("genefilter", "rowttests")
 
-export("center_eSet",
+export("annotate_eset_list",
+       "center_eSet",
        "eSetOnDisk",
        "generate_gCMAP_NChannelSet",
        "eset_instances",
+       "KEGG2cmap",
        "mapNmerge",
        "memorize",
        "mergeCMAPs",
+       "reactome2cmap",
        "signedRankSumTest",
        "splitPerturbations",
+       "wiki2cmap",
        "zScores"
        )
 

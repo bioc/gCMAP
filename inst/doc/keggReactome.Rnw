@@ -26,6 +26,9 @@
 options(warn=-1)
 @ 
 
+Please note that this vignette is merely instructional. 
+The same results can be achieved by simply calling the functions \tt KEGG2cmap \rm and \tt reactome2cmap \rm.(The analogous \tt wiki2cmap \rm function retrieves pathway information from the WikiPathways website.)
+
 The \tt reactome.db \rm package offers access to pathway annotations
 from the reactome database \url{http://www.reactome.org/}. This primer
 demonstrates how to use this annotaiton to generate a species-specific

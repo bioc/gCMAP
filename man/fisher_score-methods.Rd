@@ -86,6 +86,7 @@
   \item{element}{ A character string corresponding to the assayDataElementName of the NChannelSet object to be thresholded on the fly with the \code{\link{induceCMAPCollection}}.}
   \item{lower}{ The lower threshold for the \code{\link{induceCMAPCollection}}.}
   \item{higher}{ The 'higher' threshold for the \code{\link{induceCMAPCollection}}.}
+  \item{min.set.size}{ Number of genes a gene set induced by \code{\link{induceCMAPCollection}} needs to contain to be included in the analysis (Default:5).}
   
 }
 

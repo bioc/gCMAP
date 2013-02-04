@@ -12,7 +12,7 @@
 \alias{gsealm_score,matrix,CMAPCollection-method}
 \alias{gsealm_score,matrix,GeneSet-method}
 \alias{gsealm_score,matrix,GeneSetCollection-method}
-\title{  Methods for Function \code{gsealm_score} in Package \pkg{gCMAP} ~~}
+\title{  Methods for Function \code{gsealm_score} in Package \pkg{gCMAP} }
 
 \description{
 

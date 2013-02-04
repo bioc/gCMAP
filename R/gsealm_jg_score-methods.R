@@ -191,7 +191,7 @@ setMethod(
         trend <- ifelse(score[["t"]][n,] >=0, "correlated", "anticorrelated")
       }
 
-      if( !is.na( gene.scores )) { 
+      if( all(is.na( gene.scores ))) { 
         geneScores <- lapply( seq(ncol( gene.scores[[n]]) ), function( m ) {
                           g <- gene.scores[[n]][,m]
                           attr( g, "sign") <- attr( gene.scores[[n]], "sign")

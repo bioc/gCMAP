@@ -498,13 +498,19 @@ generate_gCMAP_NChannelSet <- function(
     } else {
       stop("To analyze RNAseq count data, please install the Bioconductor package 'DESeq'.")
     }
-      
+    data.list <- lapply( data.list, function(x){
+      if( ! identical(varLabels (x ), c("sizeFactor", "condition") )){
+        newCountDataSet( counts( x), conditions=pData( x)[,control_perturb_col])
+      } else {
+        return( x )
+      }
+    })
     .process_counts(
                     data.list = data.list,
                     uids = uids,
                     sample.annotation = sample.annotation,
                     platform.annotation = platform.annotation,
-                    control_perturb_col = control_perturb_col,
+                    control_perturb_col = "condition",
                     control = control,
                     perturb = perturb,
                     big.matrix = big.matrix,
@@ -706,7 +712,6 @@ generate_gCMAP_NChannelSet <- function(
   ncs <- center_eSet( ncs, "z", center=center.z)
   ncs <- center_eSet( ncs, "log_fc", center=center.log_fc)
   ncs <- center_eSet( ncs, "mod_fc", center=center.log_fc)
-  
   
   ## create NChannelSet on disk
   if(  ! is.null( big.matrix) ) { ## big.matrix = path to BigMatrix file on disk
@@ -987,7 +992,10 @@ splitPerturbations <- function( eset,
                                 factor.of.interest="Compound",
                                 ignore.factors=NULL,
                                 cmap.column="cmap",
-                                prefix="^Factor"){
+                                prefix=NULL){
+  if( inherits( eset, "CountDataSet")){
+    ignore.factors <- c(ignore.factors, "sizeFactor")
+  }
   
   ## get annotation information from the phenoData slot
   pd <- pData( eset )
@@ -995,7 +1003,11 @@ splitPerturbations <- function( eset,
   ## remove columns matching the 'ignore.factors' parameter
   if( !is.null(ignore.factors)){
     ignore.factors <- sapply(ignore.factors, function( x ){
-      m <- grep( x, grep( prefix, colnames(pd), value=TRUE), value=TRUE )
+      if( is.null(prefix)){
+        m <- grep( x, colnames(pd), value=TRUE )        
+      } else {
+        m <- grep( x, grep( prefix, colnames(pd), value=TRUE), value=TRUE )
+      }
       if( length(m) == 0){
         return(NA)
       } else {
@@ -1013,7 +1025,11 @@ splitPerturbations <- function( eset,
   }
   
   ## identify experimental factors by the "Factor" prefix
-  factor.all <- grep( prefix, colnames(pd), value=TRUE)
+  if( is.null( prefix )){
+    factor.all <- colnames(pd)
+  } else {
+    factor.all <- grep( prefix, colnames(pd), value=TRUE)
+  }
   
   ## match / extract the user-specified factors of interest
   factor.of.interest <- grep( factor.of.interest, factor.all, value=TRUE)
@@ -1132,11 +1148,33 @@ splitPerturbations <- function( eset,
   
   eset.list <- lapply( instances, function( x ){
     instance.eset <- eset[, x]
-    pData(instance.eset)[,cmap.column] <- ifelse( pData( instance.eset)[,factor.of.interest] == "none", "control", "perturbation")
+    pData(instance.eset)[,cmap.column] <- ifelse( pData( instance.eset)[,factor.of.interest] == control, "control", "perturbation")
     return( instance.eset)
   })
+
   return( eset.list)
 }
+
+annotate_eset_list <- function(eset.list, cmap.column="cmap", 
+                               perturbation="perturbation") {
+  common.varLabels <- Reduce('intersect', lapply( eset.list, varLabels))
+  common.varLabels <- setdiff( common.varLabels, cmap.column )
+  
+  sample.anno <-
+    t(sapply( eset.list, function( x ){
+      perturb <- pData( x )
+      perturb <- perturb[ perturb[,cmap.column] == perturbation, common.varLabels]
+      y <- apply( perturb, 2, function(x) {
+        paste( unique( x ), collapse=", ")
+      })
+      as.character( y )
+    }))
+  
+  sample.anno <- data.frame( apply( sample.anno, 2, as.character))
+  colnames(sample.anno)  <- common.varLabels
+  return( sample.anno )
+}
+
 
 mergeCMAPs <- function(x, y){
   ## basic checks
@@ -1246,4 +1284,120 @@ center_eSet <- function( eset,
   varMetadata( eset )[paste(channel, "shift", sep="."),
                       "labelDescription"] <- sprintf("center of the uncorrected %s distribution", channel)
   return( eset)
+}
+
+
+reactome2cmap <- function(species, annotation.package){ 
+  if( is.element("reactome.db", installed.packages()[,1])){
+    require( "reactome.db",character.only = TRUE )
+  } else {
+    stop("To run this function, please install the Bioconductor package 'reactome.db'.")
+  }
+
+  if( is.element(annotation.package, installed.packages()[,1])){
+    require( annotation.package,character.only = TRUE )
+  } else {
+    stop(sprintf("The specified annotation package %s is not installed on this system.", annotation.package))
+  }
+  
+  pathways <- as.list(reactomePATHID2EXTID)
+  
+  ## retrieve names
+  pathway.names <- unlist(mget(names(pathways), reactomePATHID2NAME))
+  pathway.names <- pathway.names[ match(names( pathways),
+                                        names( pathway.names )) ]
+  
+  ## remove categories with duplicated or missing names
+  filtered.names <- duplicated( names( pathway.names)) | is.na(pathway.names)
+  pathways <- pathways[ ! filtered.names ]
+  pathway.names <- pathway.names[ ! filtered.names]
+  
+  selected.species <- grepl( paste("^", species, sep=""), pathway.names)
+  
+  pheno.data <- as(
+    data.frame(name=pathway.names[ selected.species ],
+               row.names=names(pathways[ selected.species ])
+    ),
+    "AnnotatedDataFrame")
+  
+  i.matrix <- Matrix::t( incidence( pathways[ selected.species ] ) )
+  reactome <- CMAPCollection( i.matrix,
+                                 phenoData=pheno.data,
+                                 annotation=annotation.package,
+                                 signed=rep( FALSE, ncol(i.matrix)) )
+  return( reactome)
+}
+
+KEGG2cmap <- function( species, annotation.package ){
+  if( is.element("KEGG.db", installed.packages()[,1])){
+    require( "KEGG.db",character.only = TRUE )
+  } else {
+    stop("To run this function, please install the Bioconductor package 'KEGG.db'.")
+  }
+
+  if( is.element(annotation.package, installed.packages()[,1])){
+    require( annotation.package,character.only = TRUE )
+  } else {
+    stop(sprintf("The specified annotation package %s is not installed on this system.", annotation.package))
+  }
+  
+  ## retrieve entrez ids of pathway members
+  pathways <- as.list(KEGGPATHID2EXTID)
+  
+  ## retrieve names
+  pathway.names <- unlist(mget(sub("^...", "",names(pathways)), KEGGPATHID2NAME))
+  
+  ## species-specific CMAPCollections
+  selected.species <- grepl( paste("^", species, sep=""), names( pathways ))
+  pheno.data <- as(
+    data.frame(name=pathway.names[ selected.species ],
+               row.names=names(pathways[ selected.species ])
+    ),
+    "AnnotatedDataFrame")
+  
+  i.matrix <- Matrix::t( incidence( pathways[ selected.species ] ) )
+  kegg <- CMAPCollection( i.matrix,
+                                 phenoData=pheno.data,
+                                 annotation=annotation.package,
+                                 signed=rep( FALSE, ncol(i.matrix)) )
+  return( kegg )
+}
+
+wiki2cmap <- function( species, annotation.package ){  
+  if( is.element(annotation.package, installed.packages()[,1])){
+    require( annotation.package,character.only = TRUE )
+  } else {
+    stop(sprintf("The specified annotation package %s is not installed on this system.", annotation.package))
+  }
+  
+  ## Download wikipathways in plain text format
+  url <- sprintf( "http://www.wikipathways.org//wpi/batchDownload.php?species=%s&fileType=txt&tag=Curation:AnalysisCollection", URLencode( species))
+  download.file(url, file.path(tempdir(),"wiki.zip" ))
+  unzip( file.path(tempdir(),"wiki.zip" ), 
+         exdir=file.path( tempdir(), "wiki")
+  )
+  pathways <- lapply( list.files( file.path( tempdir(), "wiki"), 
+                                  full.names=TRUE, pattern=".txt"), 
+                      read.delim)
+  names( pathways ) <- sub(".txt", "",  list.files( file.path( tempdir(), "wiki"), 
+                                                    pattern=".txt" ))
+  
+  pathways <- lapply( pathways, function(x) {
+    entrez <- as.character( x[which(x$Database == "Entrez Gene"), "Identifier"])
+    ensembl.ids <- grep( "Ensembl", x$Database)
+    if( length( ensembl.ids ) > 0){
+      ensembl.ids <- as.character( x[ensembl.ids, "Identifier"])
+      ## construct environment name    
+      ## query environment for Entrez Ids
+      s2e <- get( paste( sub( ".db$", "", annotation.package), "ENSEMBL2EG", sep=""))
+      entrez.ids <- mget(ensembl.ids, s2e, ifnotfound=NA)
+      entrez.ids <- sapply( entrez.ids, "[[", 1) ## for multi-matches, use first Entrez Id
+    } else {
+      entrez.ids <- NULL
+    }
+    return( na.omit(unique(c(entrez, entrez.ids))))
+  })
+
+  wiki.sets <- as( pathways, "CMAPCollection")
+  return( wiki.sets )
 }

@@ -115,10 +115,22 @@ setMethod(
 setMethod(
   "fisher_score",
   signature( query = "CMAPCollection", sets = "NChannelSet", universe = "character" ),
-  function( query, sets, universe, element=NULL, lower=NULL, higher=NULL, keep.scores=FALSE) {
+  function( query, sets, universe, element=NULL, lower=NULL, higher=NULL, 
+            keep.scores=FALSE, min.set.size=5) {
     
     ## induce CMAPCollection from NChannelSet
     induced.sets <- induceCMAPCollection( sets, element=element, lower=lower, higher=higher)
+    if( ncol(induced.sets) == 0){
+      stop("None of the genes in the reference dataset passed the score cutoff to induce gene sets.")
+    }
+    
+    if( !is.null( min.set.size )){
+      induced.sets <- minSetSize(induced.sets, min.members = min.set.size)
+      if( ncol(induced.sets) == 0){
+        stop(sprintf("None of the induced gene sets had more than %s members.", min.set.size))
+      }
+    }
+    
     results <- fisher_score( query, induced.sets, universe=universe, keep.scores=FALSE)
     if( class( results ) != "list"){
       results <- list( results )
