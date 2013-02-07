@@ -16,6 +16,8 @@
 \alias{signed,CMAPCollection-method}
 \alias{signed<-,CMAPCollection-method}
 \alias{incidence,CMAPCollection-method}
+\alias{upIds,CMAPCollection-method}
+\alias{downIds,CMAPCollection-method}
 \alias{incidence,list-method}
 \alias{mergeCollections,CMAPCollection,CMAPCollection-method}
 
@@ -109,6 +111,8 @@ Class \code{"\linkS4class{Versioned}"}, by class "eSet", distance 3.
       GeneSetCollections as defined in the GSEABase package.}
     \item{mergeCollections}{\code{signature(x = "CMAPCollection", y =
 	"CMAPCollection")}: Combines two CMAPCollections into one.}
+    \item{upIds}{\code{signature(x = "CMAPCollection")}: Returns the gene identifiers of all up-regulated gene set members (sign = 1).}
+    \item{downIds}{\code{signature(x = "CMAPCollection")}: Returns the gene identifiers of all down-regulated gene set members (sign = -1).}
   }
   }
 

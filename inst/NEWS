@@ -1,6 +1,10 @@
 \name{NEWS}
 \title{NEWS file for the gCMAP}
 
+\section{Changes in version 1.3.1}{
+ \item{NEW}{ New upIds and downIds methods for CMAPCollection objects.}
+}
+
 \section{Changes in version 1.3.0}{
   \itemize{
     \item{NEW}{ fisher_score method now accepts NChannelSets as 'sets' and thresholds a channel of choice on the fly.}

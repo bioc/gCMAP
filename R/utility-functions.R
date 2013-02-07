@@ -1288,6 +1288,9 @@ center_eSet <- function( eset,
 
 
 reactome2cmap <- function(species, annotation.package){ 
+  reactomePATHID2EXTID <- NULL
+  reactomePATHID2NAME <- NULL
+  
   if( is.element("reactome.db", installed.packages()[,1])){
     require( "reactome.db",character.only = TRUE )
   } else {
@@ -1303,7 +1306,7 @@ reactome2cmap <- function(species, annotation.package){
   pathways <- as.list(reactomePATHID2EXTID)
   
   ## retrieve names
-  pathway.names <- unlist(mget(names(pathways), reactomePATHID2NAME))
+  pathway.names <- unlist(AnnotationDbi::mget(names(pathways), reactomePATHID2NAME))
   pathway.names <- pathway.names[ match(names( pathways),
                                         names( pathway.names )) ]
   
@@ -1341,11 +1344,11 @@ KEGG2cmap <- function( species, annotation.package ){
     stop(sprintf("The specified annotation package %s is not installed on this system.", annotation.package))
   }
   
-  ## retrieve entrez ids of pathway members
+  ## retrieve entrez ids of pathw ay members
   pathways <- as.list(KEGGPATHID2EXTID)
   
   ## retrieve names
-  pathway.names <- unlist(mget(sub("^...", "",names(pathways)), KEGGPATHID2NAME))
+  pathway.names <- unlist(AnnotationDbi::mget(sub("^...", "",names(pathways)), KEGGPATHID2NAME))
   
   ## species-specific CMAPCollections
   selected.species <- grepl( paste("^", species, sep=""), names( pathways ))
@@ -1390,7 +1393,7 @@ wiki2cmap <- function( species, annotation.package ){
       ## construct environment name    
       ## query environment for Entrez Ids
       s2e <- get( paste( sub( ".db$", "", annotation.package), "ENSEMBL2EG", sep=""))
-      entrez.ids <- mget(ensembl.ids, s2e, ifnotfound=NA)
+      entrez.ids <- AnnotationDbi::mget(ensembl.ids, s2e, ifnotfound=NA)
       entrez.ids <- sapply( entrez.ids, "[[", 1) ## for multi-matches, use first Entrez Id
     } else {
       entrez.ids <- NULL

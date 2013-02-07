@@ -36,34 +36,33 @@ setMethod(
             indices <- geneIndex(sets, featureNames(experiment), remove.empty=FALSE)
 
             ## run mroast
-            scores <- mroast(indices, assayDataElement(experiment, element), design.matrix, ...)
+            scores <- mroast(assayDataElement(experiment, element), indices, design.matrix, ...)
 
             ## store raw per-gene expression scores
             if( keep.scores == TRUE ) {
             gene.scores <- featureScores(sets, experiment, element=element )
-            gene.scores <- I(rep(gene.scores, ncol(scores$P.Value)))
             } else{ 
-              gene.scores <- NA
-                    }
+              gene.scores <- rep( NA, nrow( scores))
+            }
             
             ## store results
             res <- CMAPResults(
                                data=data.frame(
-                                 set =rep(sampleNames(sets), ncol(scores$P.Value)),
-                                 trend =rep(colnames(scores$P.Value), each=nrow(scores$P.Value)),
-                                 pval = as.vector(scores$P.Value),
-                                 padj = as.vector(scores$Adj.P.Value),
-                                 nSet =rep( Matrix::colSums( abs( members (sets) ) ), ncol(scores$P.Value)),
-                                 geneScores = gene.scores,
-                                 pData(sets)[match(rep(sampleNames(sets), ncol(scores$P.Value)), sampleNames(sets)),,drop=FALSE]),
+                                 set = row.names(scores),
+                                 trend = scores$Direction,
+                                 pval = scores$PValue,
+                                 padj = scores$FDR,
+                                 nSet = Matrix::colSums( abs( members (sets) ) ),
+                                 geneScores = I(gene.scores),
+                                 pData(sets)[row.names(scores),, drop=FALSE]),
                                docs = "\n All results, including adjusted p-values, were obtained \n with the 'mroast' function from the 'limma' package.."
-                               )
+            )
             
             varMetadata(res)$labelDescription <- 
               c("SetName",
                 "Direction",
                 "P-value",
-                "Adjusted p-value (mroast)",
+                "False-discovery rate",
                 "Number of genes annotated in the query set",
                 "Per-gene raw expression scores",                                               
                 colnames(pData(sets)))

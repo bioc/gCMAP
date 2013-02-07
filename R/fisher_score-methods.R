@@ -115,8 +115,12 @@ setMethod(
 setMethod(
   "fisher_score",
   signature( query = "CMAPCollection", sets = "NChannelSet", universe = "character" ),
-  function( query, sets, universe, element=NULL, lower=NULL, higher=NULL, 
+  function( query, sets, universe, element, lower=NULL, higher=NULL, 
             keep.scores=FALSE, min.set.size=5) {
+    
+    if(all( is.null( c(lower, higher )))){
+      stop("Please provide at least one of the 'higher' and 'lower' parameters.")
+    }
     
     ## induce CMAPCollection from NChannelSet
     induced.sets <- induceCMAPCollection( sets, element=element, lower=lower, higher=higher)
@@ -138,7 +142,7 @@ setMethod(
     
     ## store per-gene scores as data-column:gene-set list-of-list
     query  <- query[intersect(featureNames( query), universe),]
-    sets   <- sets[ intersect(featureNames( sets ),  universe),]
+    sets   <- sets[ intersect(featureNames( sets ),  universe), sampleNames( induced.sets)]
     
     ## store per-gene scores as data-column:gene-set list-of-list
     if( keep.scores == TRUE) {

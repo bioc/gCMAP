@@ -43,11 +43,11 @@
     n <- if (byrow) dims[1] else dims[2]
     nms <-
       if(byrow) rownames(object)
-      else colnames(object)
+    else colnames(object)
     data <- data.frame(numeric(n), row.names=nms)[,FALSE]
     dimLabels <-
       if (byrow) c("featureNames", "featureColumns")
-      else c("sampleNames", "sampleColumns")
+    else c("sampleNames", "sampleColumns")
     new("AnnotatedDataFrame", data=data, dimLabels=dimLabels)
   }
 }
@@ -82,7 +82,7 @@ setMethod("initialize", "CMAPCollection",
                                         ...)
             } else stop("provide at most one of 'assayData' or 'members' to initialize CMAPCollection",
                         call.=FALSE)
-
+            
             if( missing( signed ) ) {
               pData(.Object)$signed <- rep(NA, ncol(.Object))
             } else {
@@ -104,11 +104,11 @@ setMethod("CMAPCollection",
           {
             new("CMAPCollection",
                 assayData=assayDataNew(members=new("dgCMatrix"),
-                  phenoData=phenoData,
-                  featureData=featureData,
-                  annotation=annotation,
-                  protocolData=protocolData, ...)
-                )
+                                       phenoData=phenoData,
+                                       featureData=featureData,
+                                       annotation=annotation,
+                                       protocolData=protocolData, ...)
+            )
           })
 
 setMethod("CMAPCollection",
@@ -168,7 +168,7 @@ setAs("CMAPCollection", "matrix",
         cmap <- as.matrix( members( from ) ) 
         signed( cmap ) <- rep(FALSE, ncol( cmap))
         cmap
-        })
+      })
 
 setAs("list", "CMAPCollection",
       function (from) {
@@ -184,9 +184,9 @@ setAs("GeneSetCollection", "CMAPCollection",
         cmapData <- incidence(from)
         cmapData <- Matrix::t( cmapData )
         cmap <- CMAPCollection(
-                               cmapData,
-                               signed=ifelse( lapply(from, class) == "SignedGeneSet", TRUE, FALSE)
-                               )
+          cmapData,
+          signed=ifelse( lapply(from, class) == "SignedGeneSet", TRUE, FALSE)
+        )
         
         from.anno <- unique( lapply( from, geneIdType))
         if( length (from.anno ) > 1) {
@@ -210,9 +210,9 @@ setAs("GeneSet", "CMAPCollection",
         cmapData <- incidence( from )
         cmapData <- Matrix::t( cmapData )
         cmap <- CMAPCollection(
-                                  cmapData,
-                                  signed=ifelse( lapply(from, class) == "SignedGeneSet", TRUE, FALSE)
-                                  )
+          cmapData,
+          signed=ifelse( lapply(from, class) == "SignedGeneSet", TRUE, FALSE)
+        )
         from.anno <- unique( lapply( from, geneIdType))
         if( length (from.anno ) > 1) {
           annotation(cmap) <- "mixed"
@@ -247,7 +247,7 @@ setAs("CMAPCollection", "GeneSetCollection",
                         longDescription = abstract(from), organism = organism, 
                         pubMedIds = pubMedIds(experimentData(from)), urls = experimentData(from)@url, 
                         contributor = experimentData(from)@name 
-                        )
+          )
         })
         ## convert SignedGeneSets to GeneSets based on 'signed' CMAPCollection entries
         set.list <- lapply( seq( ncol(from) ), function(n) {
@@ -283,115 +283,115 @@ setAs("CMAPCollection", "GeneSet",
                   setName=sampleNames(from),
                   geneIdType = AnnoOrEntrezIdentifier(annotation(from)),
                   shortDescription = experimentData(from)@title, 
-                   longDescription = abstract(from), organism = organism, 
-                   pubMedIds = pubMedIds(experimentData(from)), urls = experimentData(from)@url, 
-                   contributor = experimentData(from)@name 
-                   )
-         } else {
-           geneSign <- ifelse( dat[dat[,1] != 0, 1] == 1, "up", "down")
-           SignedGeneSet(ids,
-                         geneSign = geneSign, 
-                         setName=sampleNames(from),
-                         geneIdType = AnnoOrEntrezIdentifier(annotation(from)),
-                         shortDescription = experimentData(from)@title, 
-                         longDescription = abstract(from), organism = organism, 
-                         pubMedIds = pubMedIds(experimentData(from)), urls = experimentData(from)@url, 
-                         contributor = experimentData(from)@name 
-                         )
-         }
-       })
-
- setMethod(
-           "induceCMAPCollection",
-           signature( "eSet" ),
-           function( eset, element, lower=NULL, higher=NULL, sign.sets=TRUE) {
-
-             if( ! is.null(lower) && ! is.null(higher) && higher == lower) {
-               stop("Please specify two different cutoffs as 'higher' and 'lower' parameters.")
-             }
-
-             if(! element %in% assayDataElementNames(eset) ) stop(paste( "AssayDataElement", element, "not found."))
-             ade <- assayDataElement( eset, element )
-
-             if( inherits( ade, "BigMatrix")){
-               ade <- ade$bigmat
-             }
-
-             gss <- mclapply( 1:ncol( ade ),
-                              function( n ) {
-                                if (! is.null( lower )) {
-                                  if( require( bigmemory) ){
-                                    down <- as.vector( mwhich( ade, n, lower, "lt" ))
-                                  } else {
-                                   down <- as.vector( which( ade[,n] < lower ))
-                                 }
-                               } else {
-                                 down <- NULL
-                               }                            
-                               if (! is.null( higher )) {
-                                 if( require( bigmemory) ){
-                                   up <- as.vector( mwhich( ade, n, higher, "gt"))
-                                 } else {
-                                   up <- as.vector( which( ade[,n] > higher ))
-                                 }
-                               } else {
-                                 up <- NULL
-                               }                            
-                               list( j = c(down, up),
-                                    x = c(rep(-1, length(down)), rep(1, length(up)))
-                                    )
-                             })
-             
-             i <- unlist(
-                        sapply( seq( length( gss ) ), function( m ) {
-                          rep( m, length( gss[[ m ]]$j ) )
-                        }))
-            j <- unlist(sapply(gss ,function( m ) {m$j }))
-            x <- unlist(sapply(gss ,function( m ) {m$x }))            
-            if( sign.sets == TRUE ){
-              set.signs <- rep(TRUE, ncol(eset))
-            } else {
-              set.signs <- rep(FALSE, ncol(eset))
-            }
-            cmap <- CMAPCollection(
-                                      Matrix::t( sparseMatrix(i=as.integer(i),
-                                                              j=as.integer(j),
-                                                              x=as.integer(x),
-                                                              dims=list(ncol(eset), nrow(eset)),
-                                                              dimnames = list(sampleNames(eset), featureNames(eset)))
-                                                )
-                                      ,
-                                      phenoData = as(pData(eset), "AnnotatedDataFrame"),
-                                      featureData = as(fData(eset),"AnnotatedDataFrame"),
-                                      signed=set.signs)
-            notes( cmap ) <- list(CMAPCollection=paste("induced from channel",element,"selecting scores <",lower,"or >",higher))
-            cmap
-          }
+                  longDescription = abstract(from), organism = organism, 
+                  pubMedIds = pubMedIds(experimentData(from)), urls = experimentData(from)@url, 
+                  contributor = experimentData(from)@name 
           )
+        } else {
+          geneSign <- ifelse( dat[dat[,1] != 0, 1] == 1, "up", "down")
+          SignedGeneSet(ids,
+                        geneSign = geneSign, 
+                        setName=sampleNames(from),
+                        geneIdType = AnnoOrEntrezIdentifier(annotation(from)),
+                        shortDescription = experimentData(from)@title, 
+                        longDescription = abstract(from), organism = organism, 
+                        pubMedIds = pubMedIds(experimentData(from)), urls = experimentData(from)@url, 
+                        contributor = experimentData(from)@name 
+          )
+        }
+      })
 
 setMethod(
-          "induceCMAPCollection",
-          signature( "matrix" ),
-          function( eset, element, ...) {
-            induceCMAPCollection( ExpressionSet( eset ), element="exprs", ... )
-          })
+  "induceCMAPCollection",
+  signature( "eSet" ),
+  function( eset, element, lower=NULL, higher=NULL, sign.sets=TRUE) {
+    
+    if( ! is.null(lower) && ! is.null(higher) && higher == lower) {
+      stop("Please specify two different cutoffs as 'higher' and 'lower' parameters.")
+    }
+    
+    if(! element %in% assayDataElementNames(eset) ) stop(paste( "AssayDataElement", element, "not found."))
+    ade <- assayDataElement( eset, element )
+    
+    if( inherits( ade, "BigMatrix")){
+      ade <- ade$bigmat
+    }
+    
+    gss <- mclapply( 1:ncol( ade ),
+                     function( n ) {
+                       if (! is.null( lower )) {
+                         if( require( bigmemory) ){
+                           down <- as.vector( mwhich( ade, n, lower, "lt" ))
+                         } else {
+                           down <- as.vector( which( ade[,n] < lower ))
+                         }
+                       } else {
+                         down <- NULL
+                       }                            
+                       if (! is.null( higher )) {
+                         if( require( bigmemory) ){
+                           up <- as.vector( mwhich( ade, n, higher, "gt"))
+                         } else {
+                           up <- as.vector( which( ade[,n] > higher ))
+                         }
+                       } else {
+                         up <- NULL
+                       }                            
+                       list( j = c(down, up),
+                             x = c(rep(-1, length(down)), rep(1, length(up)))
+                       )
+                     })
+    
+    i <- unlist(
+      sapply( seq( length( gss ) ), function( m ) {
+        rep( m, length( gss[[ m ]]$j ) )
+      }))
+    j <- unlist(sapply(gss ,function( m ) {m$j }))
+    x <- unlist(sapply(gss ,function( m ) {m$x }))            
+    if( sign.sets == TRUE ){
+      set.signs <- rep(TRUE, ncol(eset))
+    } else {
+      set.signs <- rep(FALSE, ncol(eset))
+    }
+    cmap <- CMAPCollection(
+      Matrix::t( sparseMatrix(i=as.integer(i),
+                              j=as.integer(j),
+                              x=as.integer(x),
+                              dims=list(ncol(eset), nrow(eset)),
+                              dimnames = list(sampleNames(eset), featureNames(eset)))
+      )
+      ,
+      phenoData = as(pData(eset), "AnnotatedDataFrame"),
+      featureData = as(fData(eset),"AnnotatedDataFrame"),
+      signed=set.signs)
+    notes( cmap ) <- list(CMAPCollection=paste("induced from channel",element,"selecting scores <",lower,"or >",higher))
+    cmap
+  }
+)
 
 setMethod(
-          "geneIds",
-          signature( "CMAPCollection" ),
-          function( object, ... ) {
-            dat <- members( object )
-            gene.ids <- lapply( seq( ncol( dat ) ), function( n ) {
-              featureNames( object )[ which(dat[,n] != 0 ) ]
-            })
-            names(gene.ids) <- sampleNames( object )
-            if( length (gene.ids) == 1) {
-              return( gene.ids[[1]] )
-            } else {
-              return( gene.ids )
-            }
-          }
-          )
+  "induceCMAPCollection",
+  signature( "matrix" ),
+  function( eset, element, ...) {
+    induceCMAPCollection( ExpressionSet( eset ), element="exprs", ... )
+  })
+
+setMethod(
+  "geneIds",
+  signature( "CMAPCollection" ),
+  function( object, ... ) {
+    dat <- members( object )
+    gene.ids <- lapply( seq( ncol( dat ) ), function( n ) {
+      featureNames( object )[ which(dat[,n] != 0 ) ]
+    })
+    names(gene.ids) <- sampleNames( object )
+    if( length (gene.ids) == 1) {
+      return( gene.ids[[1]] )
+    } else {
+      return( gene.ids )
+    }
+  }
+)
 
 setMethod(
   "setSizes",
@@ -419,30 +419,30 @@ setMethod(
 )
 
 setMethod(
-          "members",
-          signature( "CMAPCollection" ),
-          function( object) {
-            assayData(object)[["members"]]
-          }
-          )
+  "members",
+  signature( "CMAPCollection" ),
+  function( object) {
+    assayData(object)[["members"]]
+  }
+)
 
 setMethod(
-          "members",
-          signature( "CMAPCollection" ),
-          function( object) {
-            assayData(object)[["members"]]
-          }
-          )
+  "members",
+  signature( "CMAPCollection" ),
+  function( object) {
+    assayData(object)[["members"]]
+  }
+)
 
 setMethod(
-          "signed",
-          signature( "CMAPCollection" ),
-          function( object) {
-            signs <- pData(object)$`signed`
-            names( signs ) <- sampleNames(object)
-            signs
-          }
-          )
+  "signed",
+  signature( "CMAPCollection" ),
+  function( object) {
+    signs <- pData(object)$`signed`
+    names( signs ) <- sampleNames(object)
+    signs
+  }
+)
 
 
 setReplaceMethod("signed", "CMAPCollection",
@@ -451,39 +451,72 @@ setReplaceMethod("signed", "CMAPCollection",
                    validObject( x )
                    x
                  }
-                 )
+)
 
 setMethod(
-          "mergeCollections",
-          signature=signature( x="CMAPCollection", y="CMAPCollection" ),
-          function( x, y ) {
-            common.genes <- intersect( featureNames( x ), featureNames( y ) )
-            c.members <- Matrix::cBind( members( x[common.genes,] ), members( y[common.genes,] ) )
+  "mergeCollections",
+  signature=signature( x="CMAPCollection", y="CMAPCollection" ),
+  function( x, y ) {
+    common.genes <- intersect( featureNames( x ), featureNames( y ) )
+    c.members <- Matrix::cBind( members( x[common.genes,] ), members( y[common.genes,] ) )
+    
+    dupl.sets <- duplicated( colnames( c.members ) )
+    if( any( dupl.sets) ){
+      message( "Duplicated set / column names detected: attached suffix.")
+    }
+    
+    n <- 2
+    while( any( dupl.sets ) ) {
+      colnames( c.members )[dupl.sets] <- paste( colnames( c.members )[dupl.sets], n, sep=".")
+      dupl.sets <- duplicated( colnames( c.members ) )
+      n <- n + 1
+    }
+    
+    ## try to merge phenoData
+    if( ncol( pData( x ) ) == ncol( pData( y ) ) && colnames( pData( x ) ) == colnames( pData( y ) ) ) {
+      p.data <- rbind( pData(x), pData(y) )
+      row.names(p.data) <- colnames( c.members )
+    } else {
+      message("Could not merge phenoData frame: colnames don't match.")
+      p.data <- data.frame(row.names = colnames( c.members ) )
+    }
+    
+    p.data <- as(p.data, "AnnotatedDataFrame")
+    
+    CMAPCollection(c.members, phenoData=p.data)
+  }
+)
 
-            dupl.sets <- duplicated( colnames( c.members ) )
-            if( any( dupl.sets) ){
-              message( "Duplicated set / column names detected: attached suffix.")
-            }
-            
-            n <- 2
-            while( any( dupl.sets ) ) {
-              colnames( c.members )[dupl.sets] <- paste( colnames( c.members )[dupl.sets], n, sep=".")
-              dupl.sets <- duplicated( colnames( c.members ) )
-              n <- n + 1
-            }
+setMethod(
+  "upIds",
+  signature( "CMAPCollection" ),
+  function( object, ... ) {
+    dat <- members( object )
+    gene.ids <- lapply( seq( ncol( dat ) ), function( n ) {
+      featureNames( object )[ which(dat[,n] == 1 ) ]
+    })
+    names(gene.ids) <- sampleNames( object )
+    if( length (gene.ids) == 1) {
+      return( gene.ids[[1]] )
+    } else {
+      return( gene.ids )
+    }
+  }
+)
 
-            ## try to merge phenoData
-            if( ncol( pData( x ) ) == ncol( pData( y ) ) && colnames( pData( x ) ) == colnames( pData( y ) ) ) {
-              p.data <- rbind( pData(x), pData(y) )
-              row.names(p.data) <- colnames( c.members )
-            } else {
-              message("Could not merge phenoData frame: colnames don't match.")
-              p.data <- data.frame(row.names = colnames( c.members ) )
-            }
-
-            p.data <- as(p.data, "AnnotatedDataFrame")
-
-            CMAPCollection(c.members, phenoData=p.data)
-          }
-          )
-
+setMethod(
+  "downIds",
+  signature( "CMAPCollection" ),
+  function( object, ... ) {
+    dat <- members( object )
+    gene.ids <- lapply( seq( ncol( dat ) ), function( n ) {
+      featureNames( object )[ which(dat[,n] == -1 ) ]
+    })
+    names(gene.ids) <- sampleNames( object )
+    if( length (gene.ids) == 1) {
+      return( gene.ids[[1]] )
+    } else {
+      return( gene.ids )
+    }
+  }
+)

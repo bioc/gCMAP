@@ -2,7 +2,8 @@
 setMethod(
           "camera_score",
           signature( experiment = "eSet", sets = "CMAPCollection"),
-          function( experiment, sets, predictor=NULL, design.matrix=NULL, element="exprs", keep.scores=FALSE, ... ) {
+          function( experiment, sets, predictor=NULL, design.matrix=NULL, 
+                    element="exprs", keep.scores=FALSE, ... ) {
 
             signed(sets) <- rep(FALSE, ncol(sets)) ## gene signs are not used
 
@@ -35,30 +36,31 @@ setMethod(
             indices <- geneIndex(sets, featureNames(experiment), remove=FALSE)
             
             ## run camera
-            scores <- camera(indices, assayDataElement(experiment, element), design.matrix, ...)
-            
+            scores <- camera(assayDataElement(experiment, element), 
+                             indices, 
+                             design.matrix,
+                             ...)
+  
             ## store raw per-gene expression scores as matrix
             if( keep.scores == TRUE ) {
               gene.scores <- featureScores(sets, experiment, element=element )
-              gene.scores <- I(rep(gene.scores, ncol(scores)-2))
             } else { 
-              gene.scores <- NA
+              gene.scores <- rep( NA, nrow( scores))
            }
 
             ## store results
             res <- CMAPResults(
                                data=data.frame(
-                                 set = rep(sampleNames(sets), ncol(scores)-2),
-                                 trend = rep(colnames(scores)[-c(1,2)], each=nrow(scores)),
-                                 pval = as.vector(as.vector(scores[,-c(1,2)])),
-                                 padj = p.adjust( as.vector(as.vector(scores[,-c(1,2)])), method="BH"),
-                                 nSet = rep( Matrix::colSums( abs( members (sets) ) ), ncol(scores)-2),
-                                 nFound = rep( as.vector(scores[,1]), ncol(scores)-2),
-                                 geneScores = gene.scores,
-                                 pData(sets)[match(rep(sampleNames(sets),
-                                                       ncol(scores)-2), sampleNames(sets)),,drop=FALSE ]),
-                               docs ="\n Results were obtained with the 'camera' function from the 'limma' package.
- P-values were adjusted with the 'p-adjust' function using method 'BH'.")
+                                 set = row.names(scores),
+                                 trend = scores$Direction,
+                                 pval = scores$PValue,
+                                 padj = scores$FDR,
+                                 nSet = Matrix::colSums( abs( members (sets) ) ),
+                                 nFound = scores$NGenes,
+                                 geneScores = I(gene.scores),
+                                 pData(sets)[row.names(scores),, drop=FALSE]
+                                 ),
+                               docs ="\n Results were obtained with the 'camera' function from the 'limma' package.")
             
             varMetadata(res)$labelDescription <-
               c("SetName",
@@ -76,8 +78,8 @@ setMethod(
 setMethod(
           "camera_score",
           signature( experiment = "matrix", sets = "CMAPCollection"),
-          function( experiment, sets, element = "exprs", ...) {
-            camera_score( ExpressionSet(experiment), sets, ...) 
+          function( experiment, sets, ...) {
+            camera_score( ExpressionSet(experiment), sets, element="exprs", ...) 
           }
           )
 

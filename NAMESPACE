@@ -1,8 +1,6 @@
 importFrom("Matrix","sparseMatrix", "Matrix", "t")
 importFrom("GSEAlm","lmPerGene")
 importFrom("parallel", "mclapply")
-importFrom("limma", "symbols2indices", "romer", "mroast", "camera", "eBayes", "lmFit", 
-           "topTable")
 importClassFrom("bigmemory", "big.matrix")
 importFrom("bigmemory", "mwhich")
 importFrom("bigmemoryExtras", "BigMatrix")
