@@ -22,11 +22,11 @@
 \S4method{camera_score}{eSet,CMAPCollection}(experiment,sets,predictor=NULL,
 design.matrix=NULL, element="exprs",keep.scores=FALSE,...)
 
-\S4method{camera_score}{matrix,CMAPCollection}(experiment, sets,element="exprs",...)
+\S4method{camera_score}{matrix,CMAPCollection}(experiment, sets,...)
 
 \S4method{camera_score}{matrix,GeneSet}(experiment,sets,...)
 
-\S4method{camera_score}{eSet,GeneSet}(experiment, sets,element="exprs",...)
+\S4method{camera_score}{eSet,GeneSet}(experiment, sets, element="exprs",...)
 
 \S4method{camera_score}{matrix,GeneSetCollection}(experiment,sets,...)
 

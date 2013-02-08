@@ -2,17 +2,19 @@
 \alias{KEGG2cmap}
 \alias{reactome2cmap}
 \alias{wiki2cmap}
+\alias{go2cmap}
 
 \title{
-Functions to generate species-specific CMAPCollections from Bioconductor KEGG.db, reactome.db annotation packages or the wikipathways \url{http://www.wikipathways.org/index.php/Download_Pathways} project.
+Functions to generate species-specific CMAPCollections from Bioconductor KEGG.db, reactome.db or GO.db annotation packages or the wikipathways \url{http://www.wikipathways.org/index.php/Download_Pathways} project.
 }
 \description{
-These functions extract the gene sets defined for a species of interest from the KEGG or Reactome annotation packages or download the latest gene sets from the Wikipathways website and create a CMAPCollections. Wikipathways provides gene identifiers using different annotation sources; the wiki2cmap function only considers Entrez and Ensembl gene identifiers and return a CMAPCollection with Entrez ids.
+These functions extract the gene sets defined for a species of interest from the KEGG,  Reactome or GO annotation packages or download the latest gene sets from the Wikipathways website and create a CMAPCollections. Wikipathways provides gene identifiers using different annotation sources; the wiki2cmap function only considers Entrez and Ensembl gene identifiers and return a CMAPCollection with Entrez ids. Please note that the GO graph structure will be used to associate every gene with all upstream annotation terms. The relationships between GO categories is not represented in the output CMAPCollection.
 }
 \usage{
 KEGG2cmap(species, annotation.package)
 reactome2cmap(species, annotation.package)
 wiki2cmap(species, annotation.package)
+go2cmap(annotation.package="org.Hs.eg.db", ontology="BP", evidence=NULL)
 }
 
 \arguments{
@@ -22,6 +24,12 @@ wiki2cmap(species, annotation.package)
   \item{annotation.package}{
   Character, the name of the Bioconductor annotation package for the species of interest, e.g. 'org.Hs.eg.db' for human gene annotations.
 }
+  \item{ontology}{
+  One of 'BP', 'MF' and 'CC', identifying the 'biological process', 'molecular function' and 'cellular component' gene ontology domain of interest.
+  }
+  \item{evidence}{
+  Character string identifying the evidence required for a GO annotation to be included in the result. If 'NULL' all annotated terms will be included.
+  }
 }
 
 \value{

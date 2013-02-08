@@ -123,7 +123,8 @@ setMethod(
     }
     
     ## induce CMAPCollection from NChannelSet
-    induced.sets <- induceCMAPCollection( sets, element=element, lower=lower, higher=higher)
+    induced.sets <- induceCMAPCollection( sets, element=element, 
+                                          lower=lower, higher=higher)
     if( ncol(induced.sets) == 0){
       stop("None of the genes in the reference dataset passed the score cutoff to induce gene sets.")
     }

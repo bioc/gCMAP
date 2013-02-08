@@ -1163,7 +1163,8 @@ annotate_eset_list <- function(eset.list, cmap.column="cmap",
   sample.anno <-
     t(sapply( eset.list, function( x ){
       perturb <- pData( x )
-      perturb <- perturb[ perturb[,cmap.column] == perturbation, common.varLabels]
+      perturb <- perturb[ perturb[,cmap.column] == perturbation, 
+                          common.varLabels, drop=FALSE]
       y <- apply( perturb, 2, function(x) {
         paste( unique( x ), collapse=", ")
       })
@@ -1288,9 +1289,6 @@ center_eSet <- function( eset,
 
 
 reactome2cmap <- function(species, annotation.package){ 
-  reactomePATHID2EXTID <- NULL
-  reactomePATHID2NAME <- NULL
-  
   if( is.element("reactome.db", installed.packages()[,1])){
     require( "reactome.db",character.only = TRUE )
   } else {
@@ -1403,4 +1401,91 @@ wiki2cmap <- function( species, annotation.package ){
 
   wiki.sets <- as( pathways, "CMAPCollection")
   return( wiki.sets )
+}
+
+go2cmap <- function( annotation.package="org.Hs.eg.db", ontology="BP", evidence=NULL){
+  GOBPANCESTOR <- GOMFANCESTOR <- GOCCANCESTOR <- NULL
+  
+  if( is.element("GO.db", installed.packages()[,1])){
+    require( "GO.db",character.only = TRUE )
+    message("Successfully loaded GO.db package.")
+  } else {
+    stop("To use this function, please install the Bioconductor package 'GO.db'.")
+  }
+  
+  if( is.element(annotation, installed.packages()[,1])){
+    require( annotation,character.only = TRUE )
+    message(paste("Successfully loaded",annotation, "package."))
+  } else {
+    stop(sprintf("The specified annotation page % was not found.", annotation))
+  }
+  
+  consolidate.gomap = function(gomap) {
+    colnames(gomap)[2] = "go1"
+    gomap = gomap[gomap$go1!="",]
+    
+    ## build GO ancestors
+    cat("consolidate ancestor terms...\n")
+    allgo = unique(gomap$go1)
+    ac = c(as.list(GOBPANCESTOR), as.list(GOMFANCESTOR), as.list(GOCCANCESTOR))
+    ac = ac[allgo]
+    ac = ac[sapply(ac, length)>0]
+    acdf = data.frame(go1=rep(names(ac), sapply(ac, length)), go=unlist(ac), stringsAsFactors=FALSE)
+    acdf = rbind(acdf, data.frame(go1=allgo, go=allgo, stringsAsFactors=FALSE))
+    acdf = acdf[acdf$go!="all",]
+    
+    ## consolidate gomap
+    gomap = merge(gomap, acdf, by="go1", all.x=TRUE)
+    gomap$go1= NULL
+    unique(gomap)
+  }
+  
+  ## build gene/terms association maps
+  build.gomaps <- function(anno, ontology=NULL, evidence=NULL) {
+    ggo <- as.list(get(anno))
+    
+    if( !is.null( evidence )) {
+      ggo <- mclapply( ggo, function( gene ) {
+        if( inherits( gene, "list" ) ) {
+          gene[ sapply(gene, function( category ) { category[["Evidence"]] %in% evidence }) ]
+        } else {
+          NA
+        }
+      })
+    }
+    
+    
+    if( !is.null( ontology )) {
+      ggo <- mclapply( ggo, function( gene ) {
+        if( inherits( gene, "list" ) ) {
+          gene[ sapply(gene, function( category ) { category[["Ontology"]] %in% ontology }) ]
+        } else {
+          NA
+        }
+      })
+    }
+    
+    ggo <- ggo[ ! sapply( ggo, function(x) inherits(x, "logical")) ]
+    ggo <- mclapply(ggo, function(g) names(g))
+    gomap <- data.frame(gene=rep(names(ggo), sapply(ggo, length)), go=unlist(ggo), stringsAsFactors=FALSE)
+    gomap <- consolidate.gomap(gomap)
+    return(gomap)
+  }
+  
+  anno <- paste( sub(".db$", "", annotation),"GO", sep="")
+  go  <-build.gomaps( anno=anno, ontology=ontology )
+  gene.sets <- split(go$gene, go$go)
+  
+  ## retrieve go-term names
+  go.names <- as.data.frame(Term(names( gene.sets )))
+  colnames(go.names) <- "Name"
+  
+  ## create CMAP
+  go.cmap <- CMAPCollection( Matrix::t(incidence(gene.sets)), phenoData=as(go.names, "AnnotatedDataFrame"))
+  signed(go.cmap) <- rep(FALSE, ncol( go.cmap))
+  
+  ## add additional annotations
+  experimentData( go.cmap)@title <- paste("GO", ontology, "ontology")
+  experimentData( go.cmap)@abstract <- sprintf( "%s categories from the GO %s ontology", ncol( go.cmap), ontology)
+  return( go.cmap )
 }
