@@ -1,6 +1,12 @@
 \name{NEWS}
 \title{NEWS file for the gCMAP}
 
+\section{Changes in version 1.1.7}{
+  \itemize{
+    \item{BUGFIX}{ Fixed error for gsealm_jg_score method that appeared when keep.scores was TRUE. }
+}
+}
+
 \section{Changes in version 1.1.6}{
   \itemize{
     \item{BUGFIX}{ Fixed error in generate_gCMAP_NChannelSet for CountDataSets with data.frame in pData slot. }
