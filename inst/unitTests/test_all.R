@@ -43,6 +43,24 @@ test_fisher <- function() {
   checkEqualsNumeric( res@data$LOR[1], Inf)
 }
 
+test_mgsa <- function() {
+  if( is.element("mgsa", installed.packages()[,1])){
+    require( "mgsa",character.only = TRUE )
+    data(gCMAPData)
+    gene.set.collection <- induceCMAPCollection(gCMAPData, "z", 
+                                                higher=2, lower=-2)
+    universe = featureNames(gCMAPData)
+    res <-  mgsa_score(gene.set.collection[,1], 
+                       gene.set.collection, 
+                       universe = universe)
+    checkTrue( inherits(res, "CMAPResults"))
+    ##checkEqualsNumeric( res@data$LOR[1], Inf)
+  } else {
+    message("Skipped test 'test_mgsa' because the mgsa package is not available on this system.")
+  }
+}
+
+
 test_geneIndex <- function() {
   data(gCMAPData)
   gene.set.collection <- induceCMAPCollection(gCMAPData, "z", higher=2, lower=-2)

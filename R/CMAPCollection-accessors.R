@@ -320,7 +320,7 @@ setMethod(
     gss <- mclapply( 1:ncol( ade ),
                      function( n ) {
                        if (! is.null( lower )) {
-                         if( require( bigmemory) ){
+                         if( require( "bigmemory", quietly = TRUE, character.only = TRUE) ){
                            down <- as.vector( mwhich( ade, n, lower, "lt" ))
                          } else {
                            down <- as.vector( which( ade[,n] < lower ))

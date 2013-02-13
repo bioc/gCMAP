@@ -1020,11 +1020,11 @@ splitPerturbations <- function( eset,
     } else {
       message( sprintf("The following factor(s) will be ignored: %s",
                        paste(ignore.factors, collapse=", ")))
-      pd <- pd[,!colnames(pd) %in% ignore.factors]
+      pd <- pd[,!colnames(pd) %in% ignore.factors, drop=FALSE]
     }
   }
   
-  ## identify experimental factors by the "Factor" prefix
+  ## identify experimental factors by the prefix
   if( is.null( prefix )){
     factor.all <- colnames(pd)
   } else {

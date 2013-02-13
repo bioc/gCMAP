@@ -57,6 +57,7 @@ exportMethods(
               "mapIdentifiers",
               "mergeCollections",
               "members",
+	      "mgsa_score",
               "minSetSize",
               "plot",
               "padj",

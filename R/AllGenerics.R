@@ -172,6 +172,10 @@ setGeneric("fisher_score",
            def = function( query, sets, universe, ... ) standardGeneric( "fisher_score" )
            )
 
+setGeneric("mgsa_score",
+           def = function( query, sets, universe, ... ) standardGeneric( "mgsa_score" )
+)
+
 setGeneric("geneIndex",
            def = function( gene.sets, gene.ids, ...) standardGeneric( "geneIndex" )
            )

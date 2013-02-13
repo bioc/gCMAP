@@ -97,8 +97,8 @@ setMethod(
           "Adjusted p-value (BH)",
           "z-score based on the standard normal distribution",
           "Log Odds Ratio",
-          "Number of genes annotated in the query set",
-          "Number of query genes found in target set",
+          "Number of genes annotated in the reference set",
+          "Number of genes found in query and target sets",
           "Identifiers of genes found in query and target sets",
           colnames(pData(sets)))
       

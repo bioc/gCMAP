@@ -275,6 +275,46 @@ setAs("CMAPResults", "data.frame",
       function (from) pData(from)
       )
 
+setAs("MgsaMcmcResults", "CMAPResults",
+      function (from) {
+        res <- gCMAP:::CMAPResults(
+          data=data.frame( 
+            set=row.names( from@setsResults),
+            trend=sapply( from@setsResults$estimate,
+                          function(x){
+                ifelse( !is.na(x) && x < 1, "over", "under")
+              }),
+            pval=sapply( from@setsResults$estimate,
+                         function(x){
+                           ifelse( is.na(x), 1, 1-x)
+                         }),
+            padj=sapply( from@setsResults$estimate,
+                         function(x){
+                           ifelse( is.na(x), 1, 1-x)
+                         }),
+            effect=sapply( from@setsResults$estimate, 
+                           function(x) {
+                             ifelse( is.na(x), 0, zScores(1-x)) 
+                             }),
+            nSet=from@setsResults$inPopulation,
+            nFound=from@setsResults$inStudySet
+          ),
+          docs="\n Results from a Bayesian MGSA analysis.\nThe reported p-values represent '1-marginal posterior probability'."
+          )
+        
+        varMetadata(res)$labelDescription <- 
+          c("SetName",
+            "Deviation from random expectation",
+            "1-estimate of the marginal posterior probability",
+            "1-estimate of the marginal posterior probability",
+            "z-score based on the standard normal distribution",
+            "Number of genes annotated in the reference set",
+            "Number of genes found in query and target sets"
+          )
+        res
+      }
+)
+
 
 zScores <- function(pval, direction=NULL, limit=.Machine$double.xmin) {
   if( !is.null( limit ) ){
