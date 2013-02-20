@@ -23,7 +23,7 @@ To consider all available annotation columns to match controls, the 'controlled.
 }
 
 \usage{
-splitPerturbations(eset, control = "none", controlled.factors = "none", factor.of.interest = "Compound", ignore.factors = NULL, cmap.column ="cmap", prefix = NULL)
+splitPerturbations(eset, control = "none", controlled.factors = NULL, factor.of.interest = "Compound", ignore.factors = NULL, cmap.column ="cmap", prefix = NULL)
 }
 
 \arguments{
@@ -34,7 +34,7 @@ splitPerturbations(eset, control = "none", controlled.factors = "none", factor.o
  A character string identifying control samples in the 'factor.of.interest' column.
 }
   \item{controlled.factors}{
- A character vector specifying which annotation columns should be matched to assign controls to perturbation samples. If the set to 'none' shared controls are used for all perturbations. If set to 'all' all experimental factors must be identical between control and perturbation samples. Alternatively, individual factors and their combinations can be specified as a vector, e.g. as c("Vehice", "Time"). Column names can be abbreviated as long as they uniquely identify the pData column.
+ A character vector specifying which annotation columns should be matched to assign controls to perturbation samples. If the set to NULL shared controls are used for all perturbations. If set to 'all' all experimental factors must be identical between control and perturbation samples. Alternatively, individual factors and their combinations can be specified as a vector, e.g. as c("Vehice", "Time"). Column names can be abbreviated as long as they uniquely identify the pData column.
 }
   \item{factor.of.interest}{
  Character string, the name of the pData column containing the factor of interest. Column name can be abbreviated aslong as it uniquely identifies the pData column.

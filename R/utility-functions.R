@@ -988,7 +988,7 @@ eset_instances <- function(instance.matrix,
 
 splitPerturbations <- function( eset, 
                                 control="none",
-                                controlled.factors="none", ## all, none or vector
+                                controlled.factors=NULL, ## all, NULL or vector
                                 factor.of.interest="Compound",
                                 ignore.factors=NULL,
                                 cmap.column="cmap",
@@ -996,9 +996,14 @@ splitPerturbations <- function( eset,
   if( inherits( eset, "CountDataSet")){
     ignore.factors <- c(ignore.factors, "sizeFactor")
   }
-  
+
+  if( is.na( control )){
+    control <- "NA"
+  }
+
   ## get annotation information from the phenoData slot
   pd <- pData( eset )
+  pd[ is.na( pd )] <- "NA"
   
   ## remove columns matching the 'ignore.factors' parameter
   if( !is.null(ignore.factors)){
@@ -1046,15 +1051,15 @@ splitPerturbations <- function( eset,
   if( length( perturbations) == 0){
     stop( "No perturbations could be found in the 'factor.of.interest' column.")
   }
-  
-  if( !identical( controlled.factors,"all") & !identical( controlled.factors,"none")){
-    controlled.factors <- sapply(controlled.factors, function( x) { 
-      grep( x, factor.all,value=TRUE)
-    })
-  } else if( controlled.factors == "all"){
-    controlled.factors <- other.factors
-  } else if( controlled.factors == "none"){
-    controlled.factors <- controlled.factors
+
+  if( !is.null( controlled.factors )){
+    if( !identical( controlled.factors,"all")){
+      controlled.factors <- sapply(controlled.factors, function( x) { 
+        grep( x, factor.all,value=TRUE)
+      })
+    } else if( controlled.factors == "all"){
+      controlled.factors <- other.factors
+    }
   }
   
   ## identify control and perturbation instances
@@ -1101,7 +1106,7 @@ splitPerturbations <- function( eset,
     }
     
     ## identify suitable controls
-    if( identical( controlled.factors,"none")){
+    if( is.null( controlled.factors)){
       matched.controls <- lapply( 1:nrow( perturb.unique),function(n){
         row.names( control.instances )
       })
@@ -1110,7 +1115,9 @@ splitPerturbations <- function( eset,
                                   function( n ){
                                     sapply( 1:nrow( control.instances),
                                             function( m ){
-                                              all( control.instances[m, controlled.factors] == perturb.unique[n,controlled.factors])
+                                              all( control.instances[m,
+                                                                     controlled.factors] == perturb.unique[n,
+                                                                      controlled.factors])
                                             })
                                   })
       matched.controls <- lapply( matched.controls, function(x){ 
@@ -1148,7 +1155,9 @@ splitPerturbations <- function( eset,
   
   eset.list <- lapply( instances, function( x ){
     instance.eset <- eset[, x]
-    pData(instance.eset)[,cmap.column] <- ifelse( pData( instance.eset)[,factor.of.interest] == control, "control", "perturbation")
+    p <- pData( instance.eset)[,factor.of.interest]
+    p[is.na( p )] <- "NA"
+    pData(instance.eset)[,cmap.column] <- ifelse( p == control, "control", "perturbation")
     return( instance.eset)
   })
 
@@ -1159,7 +1168,6 @@ annotate_eset_list <- function(eset.list, cmap.column="cmap",
                                perturbation="perturbation") {
   common.varLabels <- Reduce('intersect', lapply( eset.list, varLabels))
   common.varLabels <- setdiff( common.varLabels, cmap.column )
-  
   sample.anno <-
     t(sapply( eset.list, function( x ){
       perturb <- pData( x )
@@ -1171,7 +1179,7 @@ annotate_eset_list <- function(eset.list, cmap.column="cmap",
       as.character( y )
     }))
   
-  sample.anno <- data.frame( apply( sample.anno, 2, as.character))
+  sample.anno <- data.frame( sample.anno, stringsAsFactors=FALSE)
   colnames(sample.anno)  <- common.varLabels
   return( sample.anno )
 }
@@ -1234,6 +1242,7 @@ mergeCMAPs <- function(x, y){
                                                             row.names=row.names(merged.channel)
                                                             )
                                                  )
+  sampleNames( merged.eset ) <- c( sampleNames( x ), sampleNames( y ))
   return( merged.eset)
 }
 
