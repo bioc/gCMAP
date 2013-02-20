@@ -38,3 +38,4 @@ setClassUnion(
               "matrix_or_big.matrix",
               c("matrix", "big.matrix")
               )
+

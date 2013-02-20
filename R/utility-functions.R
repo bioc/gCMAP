@@ -605,9 +605,12 @@ generate_gCMAP_NChannelSet <- function(
              ) 
   
   ## center z-scores and log_fc channels
-  ncs <- center_eSet( ncs, "z", center=center.z)
-  ncs <- center_eSet( ncs, "log_fc", center=center.log_fc)
-  
+  if( center.z != "none"){
+    ncs <- center_eSet( ncs, "z", center=center.z)
+  }
+  if( center.log_fc != "none"){
+    ncs <- center_eSet( ncs, "log_fc", center=center.log_fc)
+  }
   ## create NChannelSet on disk
   if( ! is.null( big.matrix ) ) { ## big.matrix = path to BigMatrix file on disk
     eSetOnDisk( ncs, out.file=big.matrix ) 
@@ -709,9 +712,13 @@ generate_gCMAP_NChannelSet <- function(
              )
 
   ## center z-scores and log_fc channels
-  ncs <- center_eSet( ncs, "z", center=center.z)
-  ncs <- center_eSet( ncs, "log_fc", center=center.log_fc)
-  ncs <- center_eSet( ncs, "mod_fc", center=center.log_fc)
+  if( center.z != "none"){
+    ncs <- center_eSet( ncs, "z", center=center.z)
+  }
+  if( center.log_fc != "none"){
+    ncs <- center_eSet( ncs, "log_fc", center=center.log_fc)
+    ncs <- center_eSet( ncs, "mod_fc", center=center.log_fc)
+  }
   
   ## create NChannelSet on disk
   if(  ! is.null( big.matrix) ) { ## big.matrix = path to BigMatrix file on disk
@@ -1497,4 +1504,71 @@ go2cmap <- function( annotation.package="org.Hs.eg.db", ontology="BP", evidence=
   experimentData( go.cmap)@title <- paste("GO", ontology, "ontology")
   experimentData( go.cmap)@abstract <- sprintf( "%s categories from the GO %s ontology", ncol( go.cmap), ontology)
   return( go.cmap )
+}
+
+cmapQAPlot <- function(result.list,
+                       score.thresholds=c(5,10,15,20),
+                       y.threshold=0.05){
+  
+  fractionMatched <- function( result.list,
+                               score.thresholds
+  ){
+    set.ids <- as.character( set( result.list[[1]]))
+    scores <-sapply( result.list, function(x) {
+      effect( x )[set.ids]
+    })
+    
+    passes.score.cutoff <- sapply( score.thresholds, function(s){
+      apply( abs( scores ) > s, 1, sum)
+    })
+    
+    fraction.matched <- passes.score.cutoff / length( result.list)
+    colnames( fraction.matched ) <- score.thresholds
+    return( fraction.matched )
+  }
+  
+  plotFractions <- function( fraction.matched,
+                             score.thresholds,
+                             main="",
+                             alpha=125){
+    my.colors <- rainbow(length( score.thresholds))
+    my.colors <- apply( col2rgb( my.colors), 2, function(x){
+      rgb( x[1], x[2], x[3], alpha=alpha, maxColorValue=255)
+    })
+    
+    plot( sort( fraction.matched[,1], decreasing=TRUE),
+          ylab="Fraction of queries matched",
+          ylim=c(0,1),
+          pch=20,
+          cex=0.5,
+          col=my.colors[1],
+          main=main)
+    if( length( score.thresholds ) > 1){
+      for( n in 2:length( score.thresholds)){
+        points( sort( fraction.matched[,n], decreasing=TRUE),
+                pch=20,
+                cex=0.5,
+                col=my.colors[n])
+      }
+    }
+    if( !is.null( y.threshold )){
+      abline(h=y.threshold, lty=2)
+    }
+    legend("topright", title="Score cutoff",
+           legend=score.thresholds, fill=my.colors)
+  }
+  
+  ## load query dataset & induce gene sets
+  if( !inherits( result.list, "list")){
+    stop("Please provide a list of CMAPResult objects as 'result.list'")
+  }
+  
+  if( !all( sapply( result.list, class ) == "CMAPResults")){
+    stop("Please provide a list of CMAPResult objects as 'result.list'")
+  }
+  
+  fraction.matched <- fractionMatched( result.list, score.thresholds )
+  plotFractions( fraction.matched, score.thresholds,
+                 main="Fraction of matched queries")
+  return( fraction.matched[order( row.names( fraction.matched)),] )
 }

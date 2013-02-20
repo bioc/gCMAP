@@ -1,12 +1,12 @@
 Package: gCMAP
 Type: Package
 Title: Tools for Connectivity Map-like analyses
-Version: 1.3.2
-Date: 2013-2-12
+Version: 1.3.3
+Date: 2013-2-20
 Depends: GSEABase, DESeq, limma (>= 3.15.14)
-Imports: Biobase, GSEAlm, Category, bigmemory, bigmemoryExtras (>=
+Imports: Biobase, BiocGenerics, methods, GSEAlm, Category, bigmemory, bigmemoryExtras (>=
         1.1.2), Matrix (>= 1.0.9), parallel, annotate, genefilter, AnnotationDbi
-Suggests: KEGG.db, reactome.db, RUnit, reshape, lattice, GO.db
+Suggests: KEGG.db, reactome.db, RUnit, reshape, lattice, GO.db, mgsa
 Author: Thomas Sandmann <sandmann.thomas@gene.com>, Richard Bourgon
 	<bourgon.richard@gene.com> and Sarah Kummerfeld
 	<kummerfeld.sarah@gene.com>
@@ -44,7 +44,6 @@ OS_type: unix
 ByteCompile: TRUE
 biocViews: Bioinformatics, Microarray, Software, Pathways, Annotation
 Collate: 'AllClasses.R' 'AllGenerics.R' 'SignedGeneSet-accessors.R'
-        'CMAPCollection-accessors.R' 'CMAPResults-accessors.R'
         'utility-functions.R' 'camera_score-methods.R'
         'connectivity_score-methods.R' 'featureScore-methods.R'
         'fisher_score-methods.R' 'geneIndex-methods.R'
@@ -53,3 +52,4 @@ Collate: 'AllClasses.R' 'AllGenerics.R' 'SignedGeneSet-accessors.R'
         'mapIdentifiers-methods.R'
         'minSetSize-methods.R' 'mroast_score-methods.R'
         'romer_score-methods.R' 'wilcox_score-methods.R'
+        'CMAPCollection-accessors.R' 'CMAPResults-accessors.R'

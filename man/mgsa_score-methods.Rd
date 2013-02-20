@@ -13,6 +13,7 @@
 \alias{mgsa_score,GeneSet,GeneSetCollection,character-method}
 \alias{mgsa_score,GeneSet,GeneSet,character-method}
 \alias{mgsa_score,CMAPCollection,CMAPCollection,character-method}
+\alias{mgsa_score,CMAPCollection,GeneSetCollection,character-method}
 
 \title{Model-based gene set analysis (MGSA) }
 
@@ -50,7 +51,8 @@
 
 \item{\code{signature(query = "CMAPCollection", sets = "CMAPCollection", universe = "character")}}{
 }
-}
+\item{\code{signature(query = "CMAPCollection", sets = "GeneSetCollection", universe = "character")}}{
+}}
 }
 
 \arguments{

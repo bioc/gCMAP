@@ -8,6 +8,7 @@ importFrom("genefilter", "rowttests")
 
 export("annotate_eset_list",
        "center_eSet",
+       "cmapQAPlot",
        "eSetOnDisk",
        "generate_gCMAP_NChannelSet",
        "eset_instances",
@@ -57,7 +58,7 @@ exportMethods(
               "mapIdentifiers",
               "mergeCollections",
               "members",
-	      "mgsa_score",
+	            "mgsa_score",
               "minSetSize",
               "plot",
               "padj",

@@ -1,3 +1,9 @@
+if( ! isClass("MgsaMcmcResults")){
+	setClass(
+        "MgsaMcmcResults"
+        )
+}
+
 setMethod(
   "mgsa_score",
   signature( query = "GeneSet", sets = "CMAPCollection", universe = "character" ),
