@@ -316,11 +316,17 @@ setAs("MgsaMcmcResults", "CMAPResults",
 )
 
 
-zScores <- function(pval, direction=NULL, limit=.Machine$double.xmin) {
+zScores <- function(pval, tails=2, direction=NULL, limit=.Machine$double.xmin) {
   if( !is.null( limit ) ){
     pval[which(pval < limit )] <- limit ## set lower limit to avoid Inf/-Inf zscores
   }
-  z <- qnorm( pval/2, lower.tail=FALSE )
+  if( tails == 2){
+    z <- qnorm( pval/2, lower.tail=FALSE )
+  } else if( tails == 1){
+    z <- qnorm(pval, lower.tail = FALSE)
+  } else {
+    stop( "Parameter 'tails' must be set to either 1 or 2.")
+  }
   if ( !is.null( direction) ) {
     z <-  z * sign( direction )
   }

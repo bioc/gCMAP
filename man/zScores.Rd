@@ -11,7 +11,7 @@ two-tailed p-value and sign vector (e.g. log2 fold change). To avoid
 -Inf/Inf z-scores, p-values < 'limit' are set to 'limit'.
 }
 \usage{
-zScores(pval, direction=NULL, limit=.Machine$double.xmin)
+zScores(pval, tails=2, direction=NULL, limit=.Machine$double.xmin)
 }
 \arguments{
   \item{pval}{
@@ -24,9 +24,13 @@ suitable vectors (e.g. log2 fold change) can be supplied.
 }
 
 \item{limit}{
-  Numerical (default: .Machine$double.xmin). pvalues < 'limit' will be
+  Numeric (default: .Machine$double.xmin). pvalues < 'limit' will be
   set to 'limit' to avoid Inf/-Inf z-scores. Set to NULL to disable.
   }
+  
+\item{tails}{
+  Numeric, either 1 for p-values from one-tailed or 2 for p-values from two-tailed tests.
+}
 }
 
 \value{

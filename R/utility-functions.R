@@ -441,8 +441,9 @@ generate_gCMAP_NChannelSet <- function(
                                        limma.index=2,
                                        big.matrix=NULL,
                                        center.z="peak",
-                                       center.log_fc="peak"
-                                       )
+                                       center.log_fc="peak",
+                                       report.shifts=FALSE
+)
 {
 
   ## Check that sample.annotation is complete or NULL
@@ -488,6 +489,7 @@ generate_gCMAP_NChannelSet <- function(
                     limma = limma,
                     limma.index = limma.index,
                     big.matrix = big.matrix,
+                    report.shifts=report.shifts,
                     center.z = center.z,
                     center.log_fc = center.log_fc
                     )
@@ -514,6 +516,7 @@ generate_gCMAP_NChannelSet <- function(
                     control = control,
                     perturb = perturb,
                     big.matrix = big.matrix,
+                    report.shifts=report.shifts,
                     center.z = center.z,
                     center.log_fc = center.log_fc
                     )
@@ -530,6 +533,7 @@ generate_gCMAP_NChannelSet <- function(
                             limma,
                             limma.index,
                             big.matrix,
+                            report.shifts,
                             center.z,
                             center.log_fc
                             ) 
@@ -626,7 +630,8 @@ generate_gCMAP_NChannelSet <- function(
                             control_perturb_col,
                             control,
                             perturb,
-                            big.matrix,  
+                            big.matrix,
+                            report.shifts,
                             center.z,
                             center.log_fc
                             )
@@ -1162,7 +1167,7 @@ splitPerturbations <- function( eset,
   
   eset.list <- lapply( instances, function( x ){
     instance.eset <- eset[, x]
-    p <- pData( instance.eset)[,factor.of.interest]
+    p <- as.character( pData( instance.eset)[,factor.of.interest])
     p[is.na( p )] <- "NA"
     pData(instance.eset)[,cmap.column] <- ifelse( p == control, "control", "perturbation")
     return( instance.eset)
@@ -1263,9 +1268,8 @@ center.function <- function(x, type) {
          })
 }
 
-center_eSet <- function( eset,
-                                channel,
-                                center="peak"){
+center_eSet <- function( eset, channel, center="peak",
+                         report.shifts=FALSE){
   
   stopifnot( inherits( eset, "eSet"))
   stopifnot( center %in% c("none", "mean", "median", "peak") )
@@ -1279,6 +1283,10 @@ center_eSet <- function( eset,
              d <- density( x, adjust=2, na.rm=TRUE  )
              d$x[ d$y == max(d$y)][1]
            })
+  }
+  
+  mad.about.mode <- function(z, M ){
+    mad <- median( abs( z - M ), na.rm = TRUE )
   }
   
   dat <- assayDataElement( eset, channel)
@@ -1297,9 +1305,21 @@ center_eSet <- function( eset,
   } else {
     dat.shift <- rep(NA, ncol( eset ))
   }
-  pData( eset )[,paste(channel, "shift", sep=".")] <- dat.shift
-  varMetadata( eset )[paste(channel, "shift", sep="."),
-                      "labelDescription"] <- sprintf("center of the uncorrected %s distribution", channel)
+  if( report.shifts == TRUE){
+    dat.mad <- apply( dat, 2, function(x){
+      y <- try( mad.about.mode( x, 0), silent=TRUE)
+      if( inherits( y, "try-error")){
+        return( NA )
+      } else {
+        return( y )
+      }
+    })
+    
+    pData( eset )[,paste(channel, "mad", sep=".")] <- dat.mad
+    pData( eset )[,paste(channel, "shift", sep=".")] <- dat.shift
+    varMetadata( eset )[paste(channel, "shift", sep="."),
+                        "labelDescription"] <- sprintf("center of the uncorrected %s distribution", channel)
+  }
   return( eset)
 }
 

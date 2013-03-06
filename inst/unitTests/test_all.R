@@ -50,11 +50,11 @@ test_mgsa <- function() {
     gene.set.collection <- induceCMAPCollection(gCMAPData, "z", 
                                                 higher=2, lower=-2)
     universe = featureNames(gCMAPData)
-    res <-  mgsa_score(gene.set.collection[,1], 
+    res <-  mgsa_score(gene.set.collection[,2], 
                        gene.set.collection, 
                        universe = universe)
-    checkTrue( inherits(res, "CMAPResults"))
-    ##checkEqualsNumeric( res@data$LOR[1], Inf)
+    checkTrue( inherits(res, "CMAPResults"), msg="mgsa_score did not produce a CMAPResults object.")
+    checkTrue( as.character(set( res)[1]) == sampleNames( gene.set.collection[,2]), msg= "mgsa_score did not identify the correct self-self match.")
   } else {
     message("Skipped test 'test_mgsa' because the mgsa package is not available on this system.")
   }
@@ -207,4 +207,28 @@ test_mergeCMAPs <- function() {
   sampleNames( y ) <- paste( sampleNames( y ), "y", sep=".")
   m <- mergeCMAPs( sample.ExpressionSet, y )
   checkEqualsNumeric( 2*ncol(sample.ExpressionSet), ncol(m))
+}
+
+test_cmapQAPlot <- function() {
+  data(gCMAPData)
+  gene.set.collection <- induceCMAPCollection(gCMAPData, "z", 
+                                              higher=2, lower=-2)  
+  profile <- assayDataElement(gCMAPData[,1], "z")
+  res <- wilcox_score(profile, gene.set.collection)
+  res <- cmapQAPlot( list(res ))
+  checkTrue( all( res["drug1", ] == 1), msg="cmapQAPlot did not calculate the correct fractions.")
+}
+
+test_splitPerturbation <- function() {
+  require(Biobase)
+  data( sample.ExpressionSet )
+  eset.list <- splitPerturbations( eset=sample.ExpressionSet,
+                                   factor.of.interest="type",
+                                   control="Control",
+                                   controlled.factors="sex",
+                                   ignore.factors="score",
+                                   prefix=""
+  )
+  checkTrue( class( eset.list ) == "list", msg="splitPerturbation did not return a list.")
+  checkTrue( length( eset.list) == 2, msg="splitPerturbation did not identify two constrasts")
 }
