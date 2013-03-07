@@ -441,7 +441,7 @@ generate_gCMAP_NChannelSet <- function(
                                        limma.index=2,
                                        big.matrix=NULL,
                                        center.z="peak",
-                                       center.log_fc="peak",
+                                       center.log_fc="none",
                                        report.shifts=FALSE
 )
 {
@@ -1289,7 +1289,7 @@ center_eSet <- function( eset, channel, center="peak",
     mad <- median( abs( z - M ), na.rm = TRUE )
   }
   
-  dat <- assayDataElement( eset, channel)
+  dat <- assayDataElement( eset, channel)[,]
   
   if( center != "none"){
     dat.shift <- apply( dat, 2, function(x){
@@ -1592,3 +1592,35 @@ cmapQAPlot <- function(result.list,
                  main="Fraction of matched queries")
   return( fraction.matched[order( row.names( fraction.matched)),] )
 }
+
+filterCMAP <- function(query.cmap,
+                       test.cmap,
+                       max.fraction =  0.1,
+                       score.threshold  = 10,
+                       min.set.size = 10,
+                       max.set.size = 500,
+                       z.threshold = 3,
+                       element = "z"){
+
+  if( inherits( query.cmap, "CMAPCollection")){
+    query.sets <- query.cmap
+  } else {
+    if( inherits( query.cmap, "eSet")){
+      query.sets <- induceCMAPCollection( query.cmap, lower=-z.threshold, higher=z.threshold, element=element)
+    } else {
+      stop("query.cmap must be an NChannelSet or a CMAPCollection")
+    }
+  } 
+
+  query.sizes <- setSizes( query.sets )[,"n.total"]
+  query.sets <- query.sets[,query.sizes > min.set.size & query.sizes < max.set.size]
+  
+  options( mc.cores = 1 )
+  res.list <- gsealm_jg_score( query.sets,
+                              test.cmap,
+                              element=element
+                              )
+  fraction.matched <- cmapQAPlot( res.list, score.thresholds=score.threshold )
+  keep.instances <- names( fraction.matched )[ fraction.matched < max.fraction ] 
+  return( test.cmap[, keep.instances] )
+}  
