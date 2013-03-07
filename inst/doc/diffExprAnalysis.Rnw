@@ -17,6 +17,7 @@
 \title{Primer: Preparing NChannelSet objects with differential expression scores}
 
 \begin{document}
+\SweaveOpts{concordance=TRUE}
 
 \maketitle
 

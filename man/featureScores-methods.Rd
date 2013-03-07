@@ -109,14 +109,14 @@ Thomas Sandmann
   class(res2[["set1"]]) ## list
   length(res2[["set1"]])
 
+\dontrun{
   ## stripplot for set2, colored by annotated sign
   require( lattice )
+  require( reshape )
   m <- res[["set2"]][,"drug2"]
   colors <- ifelse( attr(res[["set2"]], "sign") == "up", "red", "blue")
   stripplot(m, col=colors, xlab="z-score", main="set2, drug2")
     
-  ## lattice plots
-  if( require( reshape )) {
   y <- melt( res[["set1"]] )
 
   ## gene signs for "set1"

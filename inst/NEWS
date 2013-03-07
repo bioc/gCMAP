@@ -1,11 +1,13 @@
 \name{NEWS}
 \title{NEWS file for the gCMAP}
 
-\section{Changes in version 1.3.3}{
- \item{NEW}{New cmapQAPlot function to calculate and plot the fraction of queries matched by each reference instance.}
+\section{Changes in version 1.3.4}{
+ \item{NEW}{Removed lattice and reshape from "Suggests".}
+}
 
 \section{Changes in version 1.3.2}{
  \item{NEW}{New mgsa_score method wrapping the model-based gene set analysis approach available in the mgsa package.}
+}
 
 \section{Changes in version 1.3.1}{
  \item{NEW}{New KEGG2cmap, reactome2cmap, wiki2cmap and go2cmap to functions to generate CMAPCollections from public annotation databases}

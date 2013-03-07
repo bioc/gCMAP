@@ -443,50 +443,6 @@ names(res)
 identical( res[["set1"]], set1.expr )
 @
 
-Different scores for the same gene set can be handled conveniently as
-matrices, because all score vectors are of the same length. In a
-different scenario, we might want to compare expression changes for
-different gene sets, likely containing different numbers of
-genes. Reversing the order of the arguments passed to the \tt
-featureScores \rm function returns a list of score vectors for each
-perturbation.
-
-The \tt melt \rm function from the \tt reshape \rm package offers a
-simple way to convert it into a data.frame as input e.g. for plot
-functions from the \tt lattice \rm or \tt ggplot2 \rm package. (For
-more on handling of nested lists, you may want to take a look at the
-\tt plyr \rm package.)
-
-To demonstrate, we return to the z-score vector 'z' and the associated
-\tt CMAPCollection \rm 'cmap.2' we generated in the section 'Overview
-plots'.
-
-\setkeys{Gin}{width=.65\linewidth}
-\centering
-<<violinPlot, fig=TRUE, width=7.5, height=7.5, include=TRUE>>=
-## retrieve scores for the first three sets
-res <- featureScores(z, cmap.2[,1:3]) ## reversed argument order
-res <- res[[1]]
-
-## transform into data.frame
-require( reshape )
-df <- melt( res )
-
-## collect gene signs
-signs <- as.vector(sapply(res, attr, "sign"))
-
-require( lattice )
-bwplot(value ~ L1, data=df, 
-    xlab="Gene set", ylab="z-score",
-    main="Exciting perturbation",    
-    panel = function(..., box.ratio) {
-    panel.violin(..., col = "transparent",
-    varwidth = FALSE, box.ratio = box.ratio)
-    panel.xyplot(..., jitter.x=TRUE, fill = NULL,
-    col=ifelse( signs == "up", "red", "blue"))
-    })
-@
-
 <<sessionInfo>>=
   sessionInfo()
 @  

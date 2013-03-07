@@ -316,7 +316,7 @@ setAs("MgsaMcmcResults", "CMAPResults",
 )
 
 
-zScores <- function(pval, tails=2, direction=NULL, limit=.Machine$double.xmin) {
+zScores <- function(pval, direction=NULL, tails=2,limit=.Machine$double.xmin) {
   if( !is.null( limit ) ){
     pval[which(pval < limit )] <- limit ## set lower limit to avoid Inf/-Inf zscores
   }

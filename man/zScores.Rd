@@ -11,7 +11,7 @@ two-tailed p-value and sign vector (e.g. log2 fold change). To avoid
 -Inf/Inf z-scores, p-values < 'limit' are set to 'limit'.
 }
 \usage{
-zScores(pval, tails=2, direction=NULL, limit=.Machine$double.xmin)
+zScores(pval, direction=NULL, tails=2, limit=.Machine$double.xmin)
 }
 \arguments{
   \item{pval}{
