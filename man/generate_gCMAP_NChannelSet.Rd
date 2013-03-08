@@ -20,9 +20,9 @@ generate_gCMAP_NChannelSet(
                            limma=TRUE,
                            limma.index=2,
                            big.matrix=NULL,
-                           report.shifts=FALSE,
                            center.z="peak",
-                           center.log_fc="peak"
+                           center.log_fc="none",
+                           report.center=FALSE
                            )
 }
 
@@ -70,13 +70,13 @@ generate_gCMAP_NChannelSet(
 	  suffices. To load the NChannelSet into a different R session,
 	  the binary files must be accessible.}
   \item{center.z}{One of 'none', 'peak', 'mean', 'median', selecting whether / how to center the z-scores for each experiment. Option 'peak' (default) will center on the peak of the z-score kernel density. Options 'mean' and 'median' will center on their respective values instead.}
-  \item{center.log_fc}{One of 'none', 'peak', 'mean', 'median', selecting whether / how to center the log2 fold-change distribution for each experiment. Option 'peak' (default) will center on the peak of the z-score kernel density. Options 'mean' and 'median' will center on their respective values instead.}
-  \item{report.shifts}{Logical, include the z-score / log2 fold change corrections (see center.z and center.log_fc parameters) in the pData slot of the returned NChannelSet ?}
+  \item{center.log_fc}{One of 'none', 'peak', 'mean', 'median', selecting whether / how to center the log2 fold-change distribution for each experiment. Option 'peak' will center on the peak of the z-score kernel density. Options 'mean' and 'median' will center on their respective values instead.}
+  \item{report.center}{Logical, include the z-score / log2 fold change corrections and the median absolute deviation of the respective distribution about zero in the pData slot of the returned NChannelSet ?}
 }
 
 \value{
 The function returns an \code{\linkS4class{NChannelSet}} with one channel for each of the columns returned by \code{\link{pairwise_compare}}. This can be worked with directly (e.g, \code{assayData(obj)$z}), or specific channels can be converted to regular \code{\linkS4class{ExpressionSet}} objects (e.g.,\code{es <- channel(obj, "z")}). In the latter case, one would access \code{z} by \code{exprs(es)}.
-If 'report.shifts' is TRUE, the pData slot of the NChannelSet contains columns reporting the shift applied to the z-score and / or log2 fold change columns to center the score distributions on zero and the median absolute deviation of the shifted distribution about zero.
+If 'report.center' is TRUE, the pData slot of the NChannelSet contains columns reporting the shift applied to the z-score and / or log2 fold change columns to center the score distributions on zero and the median absolute deviation of the shifted distribution about zero.
 }
 
 \examples{

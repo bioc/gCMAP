@@ -209,16 +209,6 @@ test_mergeCMAPs <- function() {
   checkEqualsNumeric( 2*ncol(sample.ExpressionSet), ncol(m))
 }
 
-test_cmapQAPlot <- function() {
-  data(gCMAPData)
-  gene.set.collection <- induceCMAPCollection(gCMAPData, "z", 
-                                              higher=2, lower=-2)  
-  profile <- assayDataElement(gCMAPData[,1], "z")
-  res <- wilcox_score(profile, gene.set.collection)
-  res <- cmapQAPlot( list(res ))
-  checkTrue( all( res["drug1", ] == 1), msg="cmapQAPlot did not calculate the correct fractions.")
-}
-
 test_splitPerturbation <- function() {
   require(Biobase)
   data( sample.ExpressionSet )

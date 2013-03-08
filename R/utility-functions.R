@@ -442,7 +442,7 @@ generate_gCMAP_NChannelSet <- function(
                                        big.matrix=NULL,
                                        center.z="peak",
                                        center.log_fc="none",
-                                       report.shifts=FALSE
+                                       report.center=FALSE
 )
 {
 
@@ -489,7 +489,7 @@ generate_gCMAP_NChannelSet <- function(
                     limma = limma,
                     limma.index = limma.index,
                     big.matrix = big.matrix,
-                    report.shifts=report.shifts,
+                    report.center=report.center,
                     center.z = center.z,
                     center.log_fc = center.log_fc
                     )
@@ -516,7 +516,7 @@ generate_gCMAP_NChannelSet <- function(
                     control = control,
                     perturb = perturb,
                     big.matrix = big.matrix,
-                    report.shifts=report.shifts,
+                    report.center=report.center,
                     center.z = center.z,
                     center.log_fc = center.log_fc
                     )
@@ -533,7 +533,7 @@ generate_gCMAP_NChannelSet <- function(
                             limma,
                             limma.index,
                             big.matrix,
-                            report.shifts,
+                            report.center,
                             center.z,
                             center.log_fc
                             ) 
@@ -631,7 +631,7 @@ generate_gCMAP_NChannelSet <- function(
                             control,
                             perturb,
                             big.matrix,
-                            report.shifts,
+                            report.center,
                             center.z,
                             center.log_fc
                             )
@@ -1269,7 +1269,7 @@ center.function <- function(x, type) {
 }
 
 center_eSet <- function( eset, channel, center="peak",
-                         report.shifts=FALSE){
+                         report.center=FALSE){
   
   stopifnot( inherits( eset, "eSet"))
   stopifnot( center %in% c("none", "mean", "median", "peak") )
@@ -1305,7 +1305,7 @@ center_eSet <- function( eset, channel, center="peak",
   } else {
     dat.shift <- rep(NA, ncol( eset ))
   }
-  if( report.shifts == TRUE){
+  if( report.center == TRUE){
     dat.mad <- apply( dat, 2, function(x){
       y <- try( mad.about.mode( x, 0), silent=TRUE)
       if( inherits( y, "try-error")){

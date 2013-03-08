@@ -6,7 +6,7 @@ A function to to center columns of eSet channels on either their kernel density 
 This function works on the eSet assayDataElement specified as 'channel' and sweeps out either the 'peak', ( max of the kernel density), 'mean' or 'median' statistic from each column. A modified eSet containing the centered assayDataElement is returned, with an additional .shift column included in the pData slot recording the shift statistic for each sample.
 }
 \usage{
-center_eSet(eset, channel, center = "peak", report.shifts=FALSE)
+center_eSet(eset, channel, center = "peak", report.center=FALSE)
 }
 \arguments{
   \item{eset}{
@@ -18,7 +18,7 @@ center_eSet(eset, channel, center = "peak", report.shifts=FALSE)
   \item{center}{
  One of 'peak', 'mean', 'median' or 'none', specifying the statistic to sweep from each column of 'channel' in 'eset'. If 'peak', the max of the kernel density is determined and used a statistic in sweep. If 'none', the original 'eset' is returned.
 }
-  \item{report.shifts}{Logical, include the shift applied to 'channel' in the pData slot of the returned NChannelSet ?}
+  \item{report.center}{Logical, include the shift applied to 'channel' in the pData slot of the returned NChannelSet ?}
 
 }
 

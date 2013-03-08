@@ -109,27 +109,15 @@ Thomas Sandmann
   class(res2[["set1"]]) ## list
   length(res2[["set1"]])
 
-\dontrun{
   ## stripplot for set2, colored by annotated sign
-  require( lattice )
-  require( reshape )
   m <- res[["set2"]][,"drug2"]
   colors <- ifelse( attr(res[["set2"]], "sign") == "up", "red", "blue")
-  stripplot(m, col=colors, xlab="z-score", main="set2, drug2")
-    
-  y <- melt( res[["set1"]] )
-
-  ## gene signs for "set1"
-  signs <- attr(res[["set1"]], "sign")
-            
-  bwplot(value ~ X2, data=y, 
-    xlab="Perturbation", ylab="z-score",
-    main="set1",    
-    panel = function(..., box.ratio) {
-    panel.violin(..., col = "transparent",
-    varwidth = FALSE, box.ratio = box.ratio)
-    panel.xyplot(..., jitter.x=TRUE, fill = NULL,
-    col=ifelse( signs == "up", "red", "blue"))
-    })
-}
+  gene.sign <- factor( attr(res[["set2"]], "sign"))
+  boxplot( 
+    m ~ gene.sign,
+    col=c("blue", "red"),
+    ylab="z-score", 
+    xlab="Query gene sign",
+    main="Set 2"
+    )
 }

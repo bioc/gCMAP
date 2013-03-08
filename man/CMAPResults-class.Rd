@@ -247,13 +247,11 @@ m <- geneScores(res)
 m[["set1"]] ## scores for set1
 
 ## stripplot for set1, colored by annotated sign
-if( require( lattice ) ){
-colors <- ifelse( attr(m[["set1"]], "sign") == "up", "red", "blue")
-stripplot(m[["set1"]], xlab="z-score", main="set1", pch=23, col=colors)
-}
-
-## See examples for method 'featureScores'
-## for additional gene-level plots
+gene.signs <- factor( attr(m[["set1"]], "sign"))
+boxplot( m[["set1"]] ~ gene.signs, 
+  ylab="z-score", 
+  main="Set1", 
+  col=c("blue", "red"))
 }
 
 \keyword{classes}
