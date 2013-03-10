@@ -104,7 +104,7 @@
 
 \examples{
 if( is.element("mgsa", installed.packages()[,1])){
-   require( "mgsa", character.only = TRUE )
+   suppressMessages( require( "mgsa", character.only = TRUE ))
    
    data(gCMAPData)
    gene.set.collection <- induceCMAPCollection(gCMAPData, "z", 
