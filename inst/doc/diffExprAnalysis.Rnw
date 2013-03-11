@@ -46,6 +46,7 @@ makeExampleCountDataSet \rm function from the \tt DESeq \rm package.
 
 <<makeExampleCountDataSet>>=
 library(gCMAP)
+library(DESeq)
 
 set.seed( 123 )
 cds.list <- lapply( 1:3, function(n) {
