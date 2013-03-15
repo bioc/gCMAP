@@ -610,10 +610,10 @@ generate_gCMAP_NChannelSet <- function(
   
   ## center z-scores and log_fc channels
   if( center.z != "none"){
-    ncs <- center_eSet( ncs, "z", center=center.z)
+    ncs <- center_eSet( ncs, "z", center=center.z, report.center=report.center)
   }
   if( center.log_fc != "none"){
-    ncs <- center_eSet( ncs, "log_fc", center=center.log_fc)
+    ncs <- center_eSet( ncs, "log_fc", center=center.log_fc, report.center=report.center)
   }
   ## create NChannelSet on disk
   if( ! is.null( big.matrix ) ) { ## big.matrix = path to BigMatrix file on disk
@@ -718,11 +718,11 @@ generate_gCMAP_NChannelSet <- function(
 
   ## center z-scores and log_fc channels
   if( center.z != "none"){
-    ncs <- center_eSet( ncs, "z", center=center.z)
+    ncs <- center_eSet( ncs, "z", center=center.z,report.center=report.center)
   }
   if( center.log_fc != "none"){
-    ncs <- center_eSet( ncs, "log_fc", center=center.log_fc)
-    ncs <- center_eSet( ncs, "mod_fc", center=center.log_fc)
+    ncs <- center_eSet( ncs, "log_fc", center=center.log_fc, report.center=report.center)
+    ncs <- center_eSet( ncs, "mod_fc", center=center.log_fc, report.center=report.center)
   }
   
   ## create NChannelSet on disk
