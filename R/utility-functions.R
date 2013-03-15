@@ -1289,7 +1289,7 @@ center_eSet <- function( eset, channel, center="peak",
     mad <- median( abs( z - M ), na.rm = TRUE )
   }
   
-  dat <- assayDataElement( eset, channel)[,]
+  dat <- assayDataElement( eset, channel)[,,drop=FALSE]
   
   if( center != "none"){
     dat.shift <- apply( dat, 2, function(x){
