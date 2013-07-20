@@ -604,7 +604,8 @@ generate_gCMAP_NChannelSet <- function(
   ncs <- new( "NChannelSet",
              assayData = assay.data,
              featureData = new( "AnnotatedDataFrame", data = fdata ) ,
-             phenoData = new( "AnnotatedDataFrame", data = pdata, varMetadata = vdata ) ,
+             phenoData = new( "AnnotatedDataFrame", data = pdata ),
+             varMetadata = new( "AnnotatedDataFrame", vdata ),
              annotation = platform.annotation
              ) 
   
@@ -712,7 +713,8 @@ generate_gCMAP_NChannelSet <- function(
   ncs <- new( "NChannelSet",
              assayData   = assay.data,
              featureData = new( "AnnotatedDataFrame", data = fdata ),
-             phenoData   = new( "AnnotatedDataFrame", data = pdata, varMetadata=vdata),
+             phenoData   = new( "AnnotatedDataFrame", data = pdata ),
+             varMetadata = new( "AnnotatedDataFrame", data = vdata ),
              annotation  = platform.annotation
              )
 
