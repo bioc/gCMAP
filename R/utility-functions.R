@@ -770,80 +770,86 @@ mapNmerge <- function(eset, translation.fun = NULL, get="ENTREZID", verbose=FALS
     featureNames(eset) <- translation.fun(featureNames(eset))
     annotation(eset) <- get
     gene.ids <- featureNames(eset)
-
+    
   } else {
     if ( length(annotation(eset)) == 0 ) {
       stop("eSet does not contain annotation information and 'translation.fun' has not been specified.")
     }
-
+    
     ## load annotation package an retrieve ENTREIDs
     gene.ids <- unlist(
-                       lookUp(
-                              featureNames(eset),
-                              annotation(eset),
-                              what=get,
-                              load=TRUE
-                              )
-                       )
-
+      lookUp(
+        featureNames(eset),
+        annotation(eset),
+        what=get,
+        load=TRUE
+        )
+      )
+    
     if ( all(is.na(gene.ids))) {
       stop("None of the feature ids could be mapped to EntrezIds.")
     }
     
     if( verbose == TRUE) {
       message(
-            paste(
-                  length(
-                         gene.ids[!is.na(gene.ids)]
-                         ),
-                  "of",
-                  dim(eset)[1],
-                  "feature ids were successfully mapped to",
-                  length(unique(na.omit(gene.ids))),
-                  paste(get,"s", sep="")
-                  )
-            )
+        paste(
+          length(
+            gene.ids[!is.na(gene.ids)]
+            ),
+          "of",
+          dim(eset)[1],
+          "feature ids were successfully mapped to",
+          length(unique(na.omit(gene.ids))),
+          paste(get,"s", sep="")
+          )
+        )
     }
   }
-
+  
   if( any( duplicated( gene.ids ) ) & is.null( summary.fun )) {
     stop("Multiple features mapped to the same identifier, but no 'summary.fun' was specified.")
-
+    
   } else if (is.null( summary.fun )) {
     new.eset <- eset
     
   } else {
-
-    ## create new output eSet
-    new.eset <- eset[,FALSE] ## metaData only
-    annotation(new.eset) <- get
-
+    
     ## apply 'summary.fun' to multiple probes mapped to the same EntrezId
-    for (element in assayDataElementNames(eset) ) {
+    mapped.adata <- lapply( assayDataElementNames(eset), function(element){
       element.sum <- matrix(
-                            apply(assayDataElement(eset, element),
-                                  2,
-                                  function(column) {
-                                    ave(column,
-                                        gene.ids,
-                                        FUN=summary.fun)
-                                  }
-                                  ),
-                            dimnames=list(
-                              gene.ids,
-                              sampleNames(eset)),
-                            ncol=dim(eset)[2]
-                            )
-
+        apply(assayDataElement(eset, element),
+              2,
+              function(column) {
+                ave(column,
+                    gene.ids,
+                    FUN=summary.fun)
+              }
+              ),
+        dimnames=list(
+          gene.ids,
+          sampleNames(eset)),
+        ncol=dim(eset)[2]
+        )
+      
       if( class(eset) == "CountDataSet") { ## integers allowed only
         element.sum <- round(element.sum,0)
       }
-
       element.sum <- as.matrix(element.sum[! (is.na(row.names(element.sum)) | duplicated(row.names(element.sum))) ,])
-      assayDataElement(new.eset, element) <- element.sum
-    }
-    featureData(new.eset) <- as(data.frame(row.names=row.names(element.sum)), "AnnotatedDataFrame")
-    phenoData(new.eset) <- phenoData(eset)
+      return( element.sum )
+    })
+    names( mapped.adata ) <- assayDataElementNames( eset)
+    
+    ## create new output eSet
+    ##new.eset <- eset[,FALSE] ## metaData only
+    storageMode( mapped.adata) <- "environment"
+    new.eset <- new(
+      Class=class(eset),
+      assayData=mapped.adata,
+      phenoData=AnnotatedDataFrame(pData(eset)),
+      protocolData=protocolData( eset ),
+      experimentData=experimentData( eset )
+      )
+    annotation(new.eset) <- get
   }
   return( new.eset )
 }
