@@ -1,4 +1,4 @@
-% \VignetteIndexEntry{main}
+% \VignetteIndexEntry{Creating reference datasets}
 % \VignetteDepends{}
 % \VignetteKeywords{gCMAP}
 % \VignettePackage{gCMAP}

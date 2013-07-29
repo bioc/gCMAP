@@ -1,6 +1,10 @@
 \name{NEWS}
 \title{NEWS file for the gCMAP}
 
+\section{Changes in version 1.5.3}{
+ \item{NEW}{Updated titles of vignettes}
+}
+
 \section{Changes in version 1.5.2}{
  \item{BUGFIX}{Updated eSet construction in mapNmerge function}
 }

@@ -1,4 +1,4 @@
-% \VignetteIndexEntry{main}
+% \VignetteIndexEntry{gCMAP classes and methods}
 % \VignetteDepends{}
 % \VignetteKeywords{gCMAP}
 % \VignettePackage{gCMAP}
