@@ -1,9 +1,9 @@
 importFrom("Matrix","sparseMatrix", "Matrix", "t")
 importFrom("GSEAlm","lmPerGene")
 importFrom("parallel", "mclapply")
-importClassFrom("bigmemory", "big.matrix")
-importFrom("bigmemory", "mwhich")
-importFrom("bigmemoryExtras", "BigMatrix")
+##importClassFrom("bigmemory", "big.matrix")
+##importFrom("bigmemory", "mwhich")
+##importFrom("bigmemoryExtras", "BigMatrix")
 importFrom("genefilter", "rowttests")
 
 export("annotate_eset_list",

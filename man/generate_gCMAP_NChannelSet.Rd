@@ -63,7 +63,7 @@ generate_gCMAP_NChannelSet(
 	  filename to store the NChannelSets on disk instead of in
 	  memory.
 	  If 'NULL' (default), an NChannelSet is returned.
-	  If not 'NULL', the BigMatrix package will create (or
+	  If not 'NULL', the bigmemoryExtras package will create (or
 	  overwrite !) three binary files for each channel of the
 	  NChannelSet at the location provided as 'big.matrix',
 	  distinguishing files for the different channes by their

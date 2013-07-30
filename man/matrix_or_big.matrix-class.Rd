@@ -5,7 +5,9 @@
 
 \title{Class \code{"matrix_or_big.matrix"}}
 \description{
-Union of base's 'matrix' and bigmemory's 'big.matrix' objects.
+Union of  \code{base}'s 'matrix' and \code{bigmemory}'s 'big.matrix' objects. 
+If the \code{bigmemory} package is unavailable, an empty, dummy \code{big.matrix} 
+class is created first.
 }
 \section{Objects from the Class}{A virtual Class: No objects may be created from it.}
 
@@ -16,7 +18,4 @@ Thomas Sandmann, sandmann.thomas@gene.com
 Helper class used to dispatch methods on either matrix or big.matrix objects.
 }
 
-\seealso{
-  \code{\linkS4class{big.matrix}} for links to other classes ~
-}
 \keyword{classes}

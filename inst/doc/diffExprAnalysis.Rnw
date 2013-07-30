@@ -20,6 +20,7 @@
 \SweaveOpts{concordance=TRUE}
 
 \maketitle
+This document exemplifies the processing of differential expression data using small, simulated datasets shipped with the gCMAP package. To see real-life examples with data from available from public databases, please refer to the documentation of the \Rpackage{gCMAPWeb} companion package.
 
 \section{Differential expression analysis}
 
@@ -104,18 +105,16 @@ details.)
 
 \subsection{Storing assayData as BigMatrix objects on disk}
 
-When large numbers of instances are processed, the resulting \tt
-NChannelSet \rm objects can require large amounts of memory. If a file
-name is provided via the "big.matrix" parameter, \tt
-generate\_gCMAP\_NChannelSet \rm uses the \tt BigMatrix \rm package to
-store data from each channel on disk. In the future, individual
-channels and / or subsets of the datasets can then be loaded without
-requiring the full object to be read into memory again.
+When large numbers of instances are processed, the resulting \tt NChannelSet \rm objects can require large amounts of memory. The \tt bigmemory \rm and \tt bigmemoryExtras \rm  packages can be used to create \tt BigMatrix \rm objects, allowing methods to subset large datasets without having to load them fully into memory first. 
+
+Note: at the time of writing, the \tt bigmemory \rm package was only available for Unix and Mac OS X operating systems but not for Windows. Windows users can take advantage of \tt gCMAP's \rm functionality but datasets must be fully loaded into memory first.
+
+If the \tt bigmemory \rm and \tt bigmemoryExtras \rm  packages are available and a file name is provided via the "big.matrix" parameter, \tt generate\_gCMAP\_NChannelSet \rm uses the \tt BigMatrix \rm package to store data from each channel on disk. In the future, individual channels and / or subsets of the datasets can then be loaded without requiring the full object to be read into memory again.
 
 To highlight this functionality, we derive three (arbitrary) instances
 from the sample.ExpressionSet object available from tbe \tt Biobase
 \rm package, process them and store the results in a temporary
-directory.
+directory. Note: this section will only created the expected \tt big.matrix \rm files on disk if the \tt bigmemory \rm and \tt bigmemoryExtras \rm  packages can be loaded. Otherwise, a standard Rdata object is created and a warning is issued.
 
 <<big.matrix>>=
 ## list of ExpressionSets
@@ -146,27 +145,23 @@ head( assayDataElement(de, "z") )
 dir(dirname( storage.file ))
 @ 
 
-For each channel, three files were generated in the temporary
-directory, identified by their suffices. To demonstrate the use of
-these disk-based \tt NChannelSet \rm objects, we will first delete the
-object from the current R session and reload it from disk.
+If the \tt bigmemoryExtras \rm package is available, it generated a \tt BigMatrix \rm objects containing pointers to three files in the temporary directory, one for each channel (identified by their suffices). If the package is unavailable, a standard eSet is saved to disk, which will be read fully into memory upon reload.
 
-Accessing the complete matrix in the assayData slots, e.g. for the "z"
-channel, returns a BigMatrix object - a pointer to the associated file
-on disk. Upon subsetting, only the requested part of the dataset is
-loaded into memory.
+To demonstrate the use of disk-based \tt NChannelSet \rm objects, we will first delete the object from the current R workspace and reload it from disk. 
+
+Accessing the complete matrix in the assayData slots, e.g. for the "z" channel, returns another BigMatrix object with assayData slot pointing to the associated file on disk. Upon subsetting, only the requested part of the dataset is loaded into memory.
 
 <<subsettingBigMatrices>>=
 ## remove de object from R session and reload
 rm( de )
 
 de <-get( load( paste( storage.file, "rdata", sep=".")) )
-class( assayDataElement(de, "z") ) ## Bigmatrix
+class( assayDataElement(de, "z") )
 assayDataElement(de, "z")[1:10,] ## load subset
 @
 
 The \tt memorize \rm function reads the complete \tt NChannelSet \rm
-into memory. Alternatively, one or more selected channels can be
+into memory. In addition, one or more selected channels can be
 specified with the 'name' parameter.
 
 <<memorize>>=

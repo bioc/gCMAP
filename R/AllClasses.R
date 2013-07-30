@@ -34,8 +34,18 @@ setClass(
          }
          )
 
-setClassUnion(
-              "matrix_or_big.matrix",
-              c("matrix", "big.matrix")
-              )
+## if bigmemory package is unavailable, create dummy Class big.matrix
+if( ! isClass("big.matrix")){
+  setClass(
+    "big.matrix", contains="matrix"
+  )
+}
 
+## if bigmemoryExtras package is unavailable, create dummy Class BigMatrix
+if( ! isClass("BigMatrix")){
+  setClass(
+    "BigMatrix"
+  )
+}
+
+setClassUnion( "matrix_or_big.matrix", c("matrix", "big.matrix"))

@@ -44,8 +44,7 @@ test_fisher <- function() {
 }
 
 test_mgsa <- function() {
-  if( is.element("mgsa", installed.packages()[,1])){
-    require( "mgsa",character.only = TRUE )
+  if( suppressWarnings(require("mgsa", quietly=TRUE, character.only=TRUE))){
     data(gCMAPData)
     gene.set.collection <- induceCMAPCollection(gCMAPData, "z", 
                                                 higher=2, lower=-2)
@@ -100,7 +99,7 @@ test_gsealm_jg <- function() {
 }
 
 test_mapNmerge <- function() {
-  if( require( "hgu95av2.db" )) {
+  if(suppressWarnings(require("hgu95av2.db", quietly=TRUE, character.only=TRUE))){
     data(sample.ExpressionSet) ## from Biobase
     entrez <- mapNmerge(sample.ExpressionSet)
     
@@ -188,8 +187,7 @@ test_featureScores <- function() {
 }
 
 test_mapIdentifiers <- function(){
-  if( is.element("org.Hs.eg.db", installed.packages()[,1])){
-    require( org.Hs.eg.db )
+  if(suppressWarnings(require("org.Hs.eg.db", quietly=TRUE, character.only=TRUE))){
     gene.ids <- c("TP53", "GAPDH")
     gene.signs <- c("up","down")
     s <- SignedGeneSet(gene.ids, geneSign=gene.signs, setName="set1", geneIdType=SymbolIdentifier("org.Hs.eg"))

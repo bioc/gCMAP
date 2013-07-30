@@ -6,10 +6,11 @@ A function to store the assayData of an eSet object as BigMatrix files
 on disk.
 }
 \description{
-This function accepts and eSet object and generates separate file-backed
-BigMatrix objects for each assayDataElement. Data is only loaded into
-memory upon subsetting, allowing the retrieval of selected data without
-loading the (potentially large) object into memory in full.
+If the \code{bigmemoryExtras} package is available, this function accepts 
+and eSet object and generates separate file-backed BigMatrix objects for 
+each assayDataElement. Data is only loaded into memory upon subsetting, 
+allowing the retrieval of selected data without loading the (potentially large) 
+object into memory in full.
 }
 \usage{
 eSetOnDisk(eset, out.file = NULL)
@@ -27,7 +28,7 @@ The path and basename of the output file. Three files will be generated
 }
 
 \value{
-An object of the same class as 'eset', with BigMatrix elements in the
+An object of the same class as 'eset', with file-backed big.matrix elements in the
 assayData slot.
 }
 \author{
@@ -35,16 +36,16 @@ Thomas Sandmann
 }
 
 \note{
-  Please see the BigMatrix package for more details on BigMatrix objects.
+  Please see the bigmemoryExtras package for more details on BigMatrix objects.
 }
 
 \seealso{
-  \code{\link{BigMatrix}}
   \code{\link{eSet}}
   \code{\link{memorize}}
 }
 \examples{
-
+if(suppressWarnings(require("bigmemoryExtras", 
+    quietly=TRUE, character.only=TRUE))){
 ## load ExpressionSet
 data("sample.ExpressionSet") ## from Biobase
 sample.ExpressionSet ## two assayDataElements: exprs, se
@@ -73,4 +74,5 @@ class( assayDataElement( in.memory, "exprs" ) ) ## standard matrix object
 
 ## remove tempfiles generated for this example
 unlink(paste(storage.file,"*", sep=""))  
+}
 }

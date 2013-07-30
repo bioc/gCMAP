@@ -1,6 +1,11 @@
 eSetOnDisk <- function(eset, out.file=NULL) {
+  if(! suppressWarnings(require("bigmemoryExtras", 
+                                quietly=TRUE, character.only=TRUE))){
+    stop("Package 'bigmemoryExtras' is not installed, cannot create file-backed BigMatrix object")
+  }
+  
   if( is.null(out.file)) {
-   stop("Please provide path/basename of the output file(s).")
+    stop("Please provide path/basename of the output file(s).")
   }
   
   storageMode(assayData( eset )) <- "list" ## unlock
@@ -8,8 +13,8 @@ eSetOnDisk <- function(eset, out.file=NULL) {
   for ( element.name in assayDataElementNames( eset ) ) {
     element <- assayDataElement( eset, element.name )
     bm <- BigMatrix(element,
-                      backingfile = paste( out.file, element.name, sep="_"),
-                      )
+                    backingfile = paste( out.file, element.name, sep="_"),
+    )
     
     assayData( eset )[[element.name]] <- bm
   }
@@ -22,25 +27,25 @@ eSetOnDisk <- function(eset, out.file=NULL) {
 
 eSetProbeToGene <- function(eset, get="ENTREZID", channel=NULL, genes=NULL, na.rm=TRUE) {
   gene.ids <- .probeAnno(eset, get=get)
-
+  
   if ( all(is.na(gene.ids))) {
     stop("None of the feature ids could be mapped !")
-
+    
   } else {
     message(
-          paste(
-                length(
-                       gene.ids[!is.na(gene.ids)]
-                       ),
-                "of",
-                dim(eset)[1],
-                "feature ids were successfully mapped to",
-                length(unique(na.omit(gene.ids))),
-                paste(get,"s", sep="")
-                )
-          )
+      paste(
+        length(
+          gene.ids[!is.na(gene.ids)]
+        ),
+        "of",
+        dim(eset)[1],
+        "feature ids were successfully mapped to",
+        length(unique(na.omit(gene.ids))),
+        paste(get,"s", sep="")
+      )
+    )
   }      
-
+  
   ## subset eSet if requested
   if ( !is.null( genes ) ) {
     matched.features <- which(gene.ids %in% genes)
@@ -57,28 +62,28 @@ eSetProbeToGene <- function(eset, get="ENTREZID", channel=NULL, genes=NULL, na.r
   
   ## for probes mapped to the same gene identifier, apply 'fun'
   if( is.null(channel) )
-    {
-      channels <- assayDataElementNames(eset)
-    } else {
-      channels <- intersect(channel, assayDataElementNames(eset))
-      message(paste("Retaining channels:", paste(channels, collapse=", ")))
-    }
+  {
+    channels <- assayDataElementNames(eset)
+  } else {
+    channels <- intersect(channel, assayDataElementNames(eset))
+    message(paste("Retaining channels:", paste(channels, collapse=", ")))
+  }
   
   for (element in channels ) {
     assayDataElement(gene.eset,element) <- matrix(
-                                                  apply(assayDataElement(eset, element),
-                                                        2,
-                                                        function(column) {
-                                                          ave(column,
-                                                              gene.ids,
-                                                              FUN=function(x)mean(x, na.rm=na.rm))
-                                                        }
-                                                        ),
-                                                  ncol=ncol(eset),
-                                                  dimnames=list(
-                                                    gene.ids,
-                                                    sampleNames(eset)),
-                                                  )
+      apply(assayDataElement(eset, element),
+            2,
+            function(column) {
+              ave(column,
+                  gene.ids,
+                  FUN=function(x)mean(x, na.rm=na.rm))
+            }
+      ),
+      ncol=ncol(eset),
+      dimnames=list(
+        gene.ids,
+        sampleNames(eset)),
+    )
     
   }
   gene.eset[! (is.na(featureNames(gene.eset)) | duplicated(featureNames(gene.eset))),]
@@ -87,35 +92,35 @@ eSetProbeToGene <- function(eset, get="ENTREZID", channel=NULL, genes=NULL, na.r
 
 .lookupAnno <- function(gene.ids, platform, get="ENTREZID") {
   unlist(
-         lookUp(
-                gene.ids,
-                platform,
-                what=get,
-                load=TRUE
-                )
-         )
+    lookUp(
+      gene.ids,
+      platform,
+      what=get,
+      load=TRUE
+    )
+  )
 }
 
 .probeAnno <- function(eset, get="ENTREZID") {
-
+  
   if ( length(annotation(eset)) == 0 ) {
     stop("eSet does not contain annotation information.")
   }
-
+  
   ## IGIS annotation
   if ( grepl("igis", annotation(eset), ignore.case=TRUE ) )
-    {
-      if( get != "ENTREZID" ) {
-        stop("Currently IGIS ids can only be converted to ENTREZIDs.")
-      } else {
-        ## for IGIS ids, simply drop the prefix      
-        return( sub("GeneID:", "", featureNames(eset)) )
-      }
-      
+  {
+    if( get != "ENTREZID" ) {
+      stop("Currently IGIS ids can only be converted to ENTREZIDs.")
     } else {
-      ## for other platforms, use bioconductor annotation package
-      .lookupAnno(featureNames(eset), annotation(eset), get=get)
+      ## for IGIS ids, simply drop the prefix      
+      return( sub("GeneID:", "", featureNames(eset)) )
     }
+    
+  } else {
+    ## for other platforms, use bioconductor annotation package
+    .lookupAnno(featureNames(eset), annotation(eset), get=get)
+  }
 }
 
 addFeatureData <- function(eset) {
@@ -132,7 +137,7 @@ foldChange <- function(vst, perturbations, controls) {
   ## the rowMeans of perturbation and control samples
   ## perturbations = sample names of perturbation columns
   ## controls = sample names of control columns
-
+  
   mod_fc <- rowMeans( subset(vst, select=perturbations) ) - rowMeans( subset(vst, select=controls) )
   if( length(mod_fc) == 0) {
     return(as.numeric(rep(NA, dim(vst)[1])))
@@ -144,32 +149,32 @@ foldChange <- function(vst, perturbations, controls) {
 ## standard t-test for array data
 ##----------------------------------------
 pairwise_compare <- function( eset,
-                             control_perturb_col = "cmap", 
-                             control="control",
-                             perturb="perturbation") {
+                              control_perturb_col = "cmap", 
+                              control="control",
+                              perturb="perturbation") {
   
   ## Immediately fail for cases that have no ExpressionSet
   if(!is( eset, "ExpressionSet" ))	
-    {
-      stop(paste("Expected ExpressionSet found: ", class(eset)))
-    }
+  {
+    stop(paste("Expected ExpressionSet found: ", class(eset)))
+  }
   
   ## Check column 'control_perturb_col' exists
   if(!control_perturb_col %in% varLabels(eset))
-    {
-      stop(paste("Column label <", control_perturb_col, "> not found "))
-    }
+  {
+    stop(paste("Column label <", control_perturb_col, "> not found "))
+  }
   
   ## Check control and perturb exist
   ncontrol = length( which(pData(eset)[,control_perturb_col] == control)) 
   nperturb = length( which(pData(eset)[,control_perturb_col] == perturb)) 
-    
+  
   if(ncontrol == 0 | nperturb == 0)
-    {
-      stop(paste("Expected at least one control (found ", ncontrol, ") ",
-                 "and a at least one perturb (found ", nperturb, ")"))
-    }
-
+  {
+    stop(paste("Expected at least one control (found ", ncontrol, ") ",
+               "and a at least one perturb (found ", nperturb, ")"))
+  }
+  
   if(ncontrol + nperturb != length(sampleNames(eset)))
   {
     warning(paste("ExpressionSet includes ", 
@@ -180,22 +185,22 @@ pairwise_compare <- function( eset,
   
   ## Compare control and perturb
   if(ncontrol == 1 & nperturb == 1)
-    {
-      AveExpr = rowMeans(exprs(eset), na.rm=TRUE)
-      log_fc = exprs(eset)[,which(pData(eset)[,control_perturb_col] == perturb)] - 
-        exprs(eset)[,which(pData(eset)[,control_perturb_col] == control)]
-      p = rep(NA_real_, length(featureNames(eset)))
-      z = rep(NA_real_, length(featureNames(eset)))
-    }
+  {
+    AveExpr = rowMeans(exprs(eset), na.rm=TRUE)
+    log_fc = exprs(eset)[,which(pData(eset)[,control_perturb_col] == perturb)] - 
+      exprs(eset)[,which(pData(eset)[,control_perturb_col] == control)]
+    p = rep(NA_real_, length(featureNames(eset)))
+    z = rep(NA_real_, length(featureNames(eset)))
+  }
   else
-    {
-      comparison <- factor(pData(eset)[,control_perturb_col], levels=c(perturb, control), ordered=TRUE)
-      t_res= rowttests(exprs(eset), fac=comparison)
-      AveExpr = rowMeans(exprs(eset), na.rm=TRUE)
-      log_fc = t_res$dm  ## perturb - control
-      p = t_res$p.value
-      z =  zScores(p, log_fc)
-    }
+  {
+    comparison <- factor(pData(eset)[,control_perturb_col], levels=c(perturb, control), ordered=TRUE)
+    t_res= rowttests(exprs(eset), fac=comparison)
+    AveExpr = rowMeans(exprs(eset), na.rm=TRUE)
+    log_fc = t_res$dm  ## perturb - control
+    p = t_res$p.value
+    z =  zScores(p, log_fc)
+  }
   
   data.frame(exprs=AveExpr, log_fc, p, z, row.names = featureNames(eset))  
 }
@@ -204,76 +209,76 @@ pairwise_compare <- function( eset,
 ## limma's moderated t-test for array data
 ##----------------------------------------
 pairwise_compare_limma <- function( eset,
-                                   control_perturb_col = "cmap", 
-                                   control="control",
-                                   perturb="perturbation",
-                                   limma.index=2)
+                                    control_perturb_col = "cmap", 
+                                    control="control",
+                                    perturb="perturbation",
+                                    limma.index=2)
 {
   ## Immediately fail for cases that have no ExpressionSet
   if( ! is( eset, "ExpressionSet" ) )	
-    {
-      stop( paste( "Expected ExpressionSet found: ", class( eset ) ) )
-    }
+  {
+    stop( paste( "Expected ExpressionSet found: ", class( eset ) ) )
+  }
   
   ## Check column, control_perturb_col, exists
   if( !control_perturb_col %in% varLabels( eset ) )
-    {
-      stop( paste( "Column label <", control_perturb_col, "> not found " ) )
-    }
+  {
+    stop( paste( "Column label <", control_perturb_col, "> not found " ) )
+  }
   
   ## Check control and perturb exist
   ncontrol = length( which( pData( eset )[,control_perturb_col] == control ) ) 
   nperturb = length( which( pData( eset )[,control_perturb_col] == perturb ) ) 
   
   if( ncontrol + nperturb != length( sampleNames( eset ) ) )
-    {
-      warning( paste( "ExpressionSet includes ", 
-                     length( sampleNames( eset ) ) - ncontrol - nperturb, 
-                     " non-control/non-perturb samples, these will be ingored" ) )
-    }
+  {
+    warning( paste( "ExpressionSet includes ", 
+                    length( sampleNames( eset ) ) - ncontrol - nperturb, 
+                    " non-control/non-perturb samples, these will be ingored" ) )
+  }
   
   if( ncontrol == 0 | nperturb == 0 )
-    {
-      stop( paste( "Expected at least one control ( found ", ncontrol, " ) ",
-                  "and a at least one perturb ( found ", nperturb, " )" ) )
-      eset <- eset[,pData( eset )[,control_perturb_col] %in% c( control, perturb )]
-    }
-
+  {
+    stop( paste( "Expected at least one control ( found ", ncontrol, " ) ",
+                 "and a at least one perturb ( found ", nperturb, " )" ) )
+    eset <- eset[,pData( eset )[,control_perturb_col] %in% c( control, perturb )]
+  }
+  
   ## Differential expression analysis
   if( ncontrol == 1 & nperturb == 1 ) ## no replicates, no statistical testing
-    {
-      AveExpr = rowMeans( exprs( eset ), na.rm=TRUE )
-      log_fc = exprs( eset )[,which( pData( eset )[,control_perturb_col] == perturb )] - 
-        exprs( eset )[,which( pData( eset )[,control_perturb_col] == control )]
-      p = rep( NA_real_, length( featureNames( eset ) ) )
-      z = rep( NA_real_, length( featureNames( eset ) ) )
-      
-    } else {
-      design <- model.matrix( ~factor( pData( eset )[[control_perturb_col]], level=c( control, perturb ) ) )
-      fit <- eBayes( lmFit( eset, design ) )
-
-      ## Check that the residual degress of freedom and stdev.unscaled do not vary.
-      if ( !all( fit$df.residual == fit$df.residual[1] ) )
-        stop( "Code assumes that 'df.residual' is not gene specific. Was there missing data?" )
-      
-      if ( !all( fit$stdev.unscaled[,limma.index] == fit$stdev.unscaled[1,limma.index] ) )
-        stop( "Code assumes that 'stdev.unscaled' is the same for all genes. Was there missing data?" )
-      
-      ## Extract relevant columns from limma results
-      topT <- topTable( fit, coef=limma.index, sort.by="none", number=Inf )
-      
-      AveExpr = topT$AveExpr
-      log_fc   = topT$logFC
-      p        = topT$P.Value
-      z         = zScores( p, log_fc )      
-    }
+  {
+    AveExpr = rowMeans( exprs( eset ), na.rm=TRUE )
+    log_fc = exprs( eset )[,which( pData( eset )[,control_perturb_col] == perturb )] - 
+      exprs( eset )[,which( pData( eset )[,control_perturb_col] == control )]
+    p = rep( NA_real_, length( featureNames( eset ) ) )
+    z = rep( NA_real_, length( featureNames( eset ) ) )
+    
+  } else {
+    design <- model.matrix( ~factor( pData( eset )[[control_perturb_col]], level=c( control, perturb ) ) )
+    fit <- eBayes( lmFit( eset, design ) )
+    
+    ## Check that the residual degress of freedom and stdev.unscaled do not vary.
+    if ( !all( fit$df.residual == fit$df.residual[1] ) )
+      stop( "Code assumes that 'df.residual' is not gene specific. Was there missing data?" )
+    
+    if ( !all( fit$stdev.unscaled[,limma.index] == fit$stdev.unscaled[1,limma.index] ) )
+      stop( "Code assumes that 'stdev.unscaled' is the same for all genes. Was there missing data?" )
+    
+    ## Extract relevant columns from limma results
+    topT <- topTable( fit, coef=limma.index, sort.by="none", number=Inf )
+    
+    AveExpr = topT$AveExpr
+    log_fc   = topT$logFC
+    p        = topT$P.Value
+    z         = zScores( p, log_fc )      
+  }
   ## return results as a data.frame
   data.frame(exprs=AveExpr,
              log_fc,
              p,
              z,
              row.names = featureNames( eset )
-             ) 
+  ) 
 }
 
 
@@ -281,79 +286,77 @@ pairwise_compare_limma <- function( eset,
 ## DESeq's nbinomTest for count data
 ##----------------------------------------
 pairwise_DESeq <- function( cds,
-                           vst,
-                           control_perturb_col = "condition", 
-                           control="control",
-                           perturb="perturbation",
-                           try.hard=FALSE)
+                            vst,
+                            control_perturb_col = "condition", 
+                            control="control",
+                            perturb="perturbation",
+                            try.hard=FALSE)
 {
-  if( is.element("DESeq", installed.packages()[,1])){
-    require( DESeq )
-  } else {
+  if( !suppressWarnings(require("DESeq", quietly=TRUE, character.only=TRUE))){
     stop("To run this function, please install the Bioconductor package 'DESeq'.")
   }
   
   ## Immediately fail for cases that have no CountDataSet
   if(!is( cds, "CountDataSet" ))	
-    {
-      stop( paste( "Expected CountDataSet, found: ", class( cds )))
-    }
+  {
+    stop( paste( "Expected CountDataSet, found: ", class( cds )))
+  }
   
   ## Check column, control_perturb_col, exists
   if( ! control_perturb_col %in% varLabels( cds ) )
-    {
-      stop( paste( "Column label <", control_perturb_col, "> not found "))
-    }
+  {
+    stop( paste( "Column label <", control_perturb_col, "> not found "))
+  }
   
   ## Check control and perturb exist
   ncontrol = length( which( pData( cds )[, control_perturb_col ] == control )) 
   nperturb = length( which( pData( cds )[, control_perturb_col ] == perturb )) 
   
   if( ncontrol + nperturb != length( sampleNames( cds ) ) )
-    {
-      warning( paste( "CountDataset includes ", 
+  {
+    warning( paste( "CountDataset includes ", 
                     length( sampleNames( cds ) ) - ncontrol - nperturb, 
                     " non-control/non-perturb samples, these will be ingored"))
-      cds <- cds[, pData( cds )[, control_perturb_col ] %in% c( control, perturb )]
-    }
+    cds <- cds[, pData( cds )[, control_perturb_col ] %in% c( control, perturb )]
+  }
   
   if( ncontrol == 0 | nperturb == 0 )
-    {
-      stop( paste( "Expected at least one control (found ", ncontrol, ") ",
+  {
+    stop( paste( "Expected at least one control (found ", ncontrol, ") ",
                  "and a at least one perturb (found ", nperturb, ")"
-                  )
-           )
-    }
-
+    )
+    )
+  }
+  
   ## Compare control and perturb
   design <- model.matrix( ~factor( pData( cds )[[ control_perturb_col ]],
-                                 level = c( control, perturb ) ) )
+                                   level = c( control, perturb ) ) )
   res <- try( .DESeq_nbinom(cds,
-                           control,
-                           perturb,
-                           try.hard,
-                           control_perturb_col=control_perturb_col)
-             )
+                            control,
+                            perturb,
+                            try.hard,
+                            control_perturb_col=control_perturb_col)
+  )
   
   if( class(res) != "try-error" ) {
     ## compute moderated fold-changes from variance-transformed counts (vst)
     res$mod_logFC <- .moderated_logFC(vst, cds, control_perturb_col, control, perturb)
   }
-
+  
   p        = res$pval
   z        = zScores( p, res$log2FoldChange )
-
+  
   p[ is.na( p ) ] <- 1 ## replace NA with p-value 1
   z[ is.na( z ) ] <- 0 ## replace NA with z-score 0
-
+  
   data.frame(
-             exprs  = res$baseMean,
-             log_fc = res$log2FoldChange,
-             mod_fc = res$mod_logFC,
-             p = p,
-             z = z,
-             row.names = featureNames( cds )
-             )
+    exprs  = res$baseMean,
+    log_fc = res$log2FoldChange,
+    mod_fc = res$mod_logFC,
+    p = p,
+    z = z,
+    row.names = featureNames( cds )
+  )
 }
 
 ##----------------------------------------
@@ -361,19 +364,19 @@ pairwise_DESeq <- function( cds,
 ## changes from variance-transformed data
 ##----------------------------------------
 .moderated_logFC <- function(vst, cds, control_perturb_col, control, perturb) {
-
+  
   ## identify indices of control and perturbation columns
-    perturbations <- sampleNames(cds)[which(pData(cds)[,control_perturb_col] == perturb)]
-    controls <- sampleNames(cds)[which(pData(cds)[,control_perturb_col] == control)]
-
-    ## calculate fold changes
-    mod_fc <- .foldChange( vst, perturbations, controls )  
-    mod_fc <- rowMeans( subset( vst, select=perturbations) ) - rowMeans( subset( vst, select=controls ) )
-    if( length(mod_fc) == 0) {
-      mod_fc <- as.numeric(rep(NA, dim( vst )[ 1 ] ) )
-    }
-    return( mod_fc )
+  perturbations <- sampleNames(cds)[which(pData(cds)[,control_perturb_col] == perturb)]
+  controls <- sampleNames(cds)[which(pData(cds)[,control_perturb_col] == control)]
+  
+  ## calculate fold changes
+  mod_fc <- .foldChange( vst, perturbations, controls )  
+  mod_fc <- rowMeans( subset( vst, select=perturbations) ) - rowMeans( subset( vst, select=controls ) )
+  if( length(mod_fc) == 0) {
+    mod_fc <- as.numeric(rep(NA, dim( vst )[ 1 ] ) )
   }
+  return( mod_fc )
+}
 
 .foldChange <- function(vst, perturbations, controls) {
   ## perturbations = sample names of perturbation columns
@@ -390,14 +393,12 @@ pairwise_DESeq <- function( cds,
 ## nbinomTest of count data
 ##----------------------------------------
 .DESeq_nbinom <- function(cds,
-                         control="control",
-                         perturb="perturbation",
-                         try.hard=FALSE,
-                         control_perturb_col="cmap",
-                         ...) {
-  if( is.element("DESeq", installed.packages()[,1])){
-    require( DESeq )
-  } else {
+                          control="control",
+                          perturb="perturbation",
+                          try.hard=FALSE,
+                          control_perturb_col="cmap",
+                          ...) {
+  if( !suppressWarnings(require("DESeq", quietly=TRUE, character.only=TRUE))){
     stop("To use this function, please install the Bioconductor package 'DESeq'.")
   }
   
@@ -430,22 +431,22 @@ pairwise_DESeq <- function( cds,
 }
 
 generate_gCMAP_NChannelSet <- function(
-                                       data.list,
-                                       uids=1:length(data.list),
-                                       sample.annotation=NULL,
-                                       platform.annotation="",
-                                       control_perturb_col="cmap",
-                                       control="control",
-                                       perturb="perturbation",
-                                       limma=TRUE,
-                                       limma.index=2,
-                                       big.matrix=NULL,
-                                       center.z="peak",
-                                       center.log_fc="none",
-                                       report.center=FALSE
+  data.list,
+  uids=1:length(data.list),
+  sample.annotation=NULL,
+  platform.annotation="",
+  control_perturb_col="cmap",
+  control="control",
+  perturb="perturbation",
+  limma=TRUE,
+  limma.index=2,
+  big.matrix=NULL,
+  center.z="peak",
+  center.log_fc="none",
+  report.center=FALSE
 )
 {
-
+  
   ## Check that sample.annotation is complete or NULL
   if ( !is.null(sample.annotation) )
     if ( !is.data.frame(sample.annotation) || nrow(sample.annotation) != length(data.list) )
@@ -457,7 +458,7 @@ generate_gCMAP_NChannelSet <- function(
   if(length(data.classes) > 1) {
     stop("All data.list elements must be of the same class (ExpressionSet or CountDataSet).")
   }
-
+  
   if(! data.classes %in% c("ExpressionSet", "CountDataSet")) {
     stop("'Data.list' must be a list of either ExpressionSet or CountDataSet objects")
   }
@@ -469,35 +470,33 @@ generate_gCMAP_NChannelSet <- function(
     stop("featureNames for are not consistent for all items of data.list")
   }    
   feature.number <- nrow(data.list[[1]])
-
+  
   ## Check unique ids are really unique
   uids <- as.character( uids )
   if( any( duplicated( uids ) ) )  {
     stop("uids must be a vector of unique ids")
   }
-
+  
   ## start processing
   if( data.classes == "ExpressionSet") {
     .process_arrays(
-                    data.list = data.list,
-                    uids = uids,
-                    sample.annotation = sample.annotation,
-                    platform.annotation = platform.annotation,
-                    control_perturb_col = control_perturb_col,
-                    control = control,
-                    perturb = perturb,
-                    limma = limma,
-                    limma.index = limma.index,
-                    big.matrix = big.matrix,
-                    report.center=report.center,
-                    center.z = center.z,
-                    center.log_fc = center.log_fc
-                    )
+      data.list = data.list,
+      uids = uids,
+      sample.annotation = sample.annotation,
+      platform.annotation = platform.annotation,
+      control_perturb_col = control_perturb_col,
+      control = control,
+      perturb = perturb,
+      limma = limma,
+      limma.index = limma.index,
+      big.matrix = big.matrix,
+      report.center=report.center,
+      center.z = center.z,
+      center.log_fc = center.log_fc
+    )
     
   } else if (data.classes == "CountDataSet") {
-    if( is.element("DESeq", installed.packages()[,1])){
-      require( DESeq )
-    } else {
+    if( !suppressWarnings(require("DESeq", quietly=TRUE, character.only=TRUE))){
       stop("To analyze RNAseq count data, please install the Bioconductor package 'DESeq'.")
     }
     data.list <- lapply( data.list, function(x){
@@ -508,18 +507,18 @@ generate_gCMAP_NChannelSet <- function(
       }
     })
     .process_counts(
-                    data.list = data.list,
-                    uids = uids,
-                    sample.annotation = sample.annotation,
-                    platform.annotation = platform.annotation,
-                    control_perturb_col = "condition",
-                    control = control,
-                    perturb = perturb,
-                    big.matrix = big.matrix,
-                    report.center=report.center,
-                    center.z = center.z,
-                    center.log_fc = center.log_fc
-                    )
+      data.list = data.list,
+      uids = uids,
+      sample.annotation = sample.annotation,
+      platform.annotation = platform.annotation,
+      control_perturb_col = "condition",
+      control = control,
+      perturb = perturb,
+      big.matrix = big.matrix,
+      report.center=report.center,
+      center.z = center.z,
+      center.log_fc = center.log_fc
+    )
   }
 }
 
@@ -536,28 +535,28 @@ generate_gCMAP_NChannelSet <- function(
                             report.center,
                             center.z,
                             center.log_fc
-                            ) 
+) 
 {
   stopifnot(center.z %in% c("none", "mean", "median", "peak") )
   stopifnot(center.log_fc %in% c("none", "mean", "median", "peak") )
-
+  
   if ( limma == TRUE ) {
     res <- lapply( data.list, function( x ) 
-                  try( pairwise_compare_limma( 
-                                              x,
-                                              control_perturb_col = control_perturb_col,
-                                              control=control, perturb=perturb ) ,
-                      silent=TRUE ) 
-                  ) 
-
+      try( pairwise_compare_limma( 
+        x,
+        control_perturb_col = control_perturb_col,
+        control=control, perturb=perturb ) ,
+           silent=TRUE ) 
+    ) 
+    
   } else { ## standard t-tests
     res <- lapply( data.list, function( x ) 
-                  try( pairwise_compare( 
-                                        x,
-                                        control_perturb_col = control_perturb_col,
-                                        control=control, perturb=perturb ) ,
-                      silent=TRUE ) 
-                  ) 
+      try( pairwise_compare( 
+        x,
+        control_perturb_col = control_perturb_col,
+        control=control, perturb=perturb ) ,
+           silent=TRUE ) 
+    ) 
   }
   
   ## remove failed instances
@@ -579,35 +578,35 @@ generate_gCMAP_NChannelSet <- function(
   log_fc = sapply( res, "[[", "log_fc" ) 
   
   dimnames( AveExpr ) <- dimnames( z ) <- dimnames( p ) <- dimnames( log_fc ) <- list( row.names( res[[ 1 ]] ) , uids ) 
-
+  
   ## create in-memory NChannelSet
   assay.data <- assayDataNew( exprs=AveExpr, z=z, p=p, log_fc=log_fc ) 
-
+  
   fdata = data.frame( 
     probeid=row.names( res[[1]] ) ,
     row.names=row.names( res[[1]] ) 
-    ) 
+  ) 
   
   pdata = data.frame( 
     UID = uids,
     row.names = uids
-    ) 
+  ) 
   
   if ( !is.null( sample.annotation ) ) {
     pdata = cbind( pdata, sample.annotation ) 
   }
-
+  
   vdata <- data.frame( 
-                      labelDescription=colnames( pdata ) , 
-                      channel=factor( rep( "_ALL_", ncol( pdata ) ) , levels=c( "_ALL_", colnames( pdata ) ) ) ) 
+    labelDescription=colnames( pdata ) , 
+    channel=factor( rep( "_ALL_", ncol( pdata ) ) , levels=c( "_ALL_", colnames( pdata ) ) ) ) 
   
   ncs <- new( "NChannelSet",
-             assayData = assay.data,
-             featureData = new( "AnnotatedDataFrame", data = fdata ) ,
-             phenoData = new( "AnnotatedDataFrame", data = pdata ),
-             varMetadata = new( "AnnotatedDataFrame", vdata ),
-             annotation = platform.annotation
-             ) 
+              assayData = assay.data,
+              featureData = new( "AnnotatedDataFrame", data = fdata ) ,
+              phenoData = new( "AnnotatedDataFrame", data = pdata ),
+              varMetadata = new( "AnnotatedDataFrame", vdata ),
+              annotation = platform.annotation
+  ) 
   
   ## center z-scores and log_fc channels
   if( center.z != "none"){
@@ -616,11 +615,19 @@ generate_gCMAP_NChannelSet <- function(
   if( center.log_fc != "none"){
     ncs <- center_eSet( ncs, "log_fc", center=center.log_fc, report.center=report.center)
   }
-  ## create NChannelSet on disk
+  ## if possible, write file-back BigMatrix to disk
   if( ! is.null( big.matrix ) ) { ## big.matrix = path to BigMatrix file on disk
-    eSetOnDisk( ncs, out.file=big.matrix ) 
+    if( suppressWarnings(require("bigmemoryExtras", 
+                                 quietly=TRUE, character.only=TRUE))){
+      message(
+        sprintf("Successfully created file-backed BigMatrix object %s.", big.matrix))
+      ## create NChannelSet on disk
+      eSetOnDisk( ncs, out.file=big.matrix ) 
+    } else{
+      warning("Package 'bigmemoryExtras' is not installed, cannot create file-backed BigMatrix object. Instead, a standard eSet object was written to disk.")
+      save( ncs, file=paste( big.matrix, "rdata", sep="."))
+    }
   }
-
   return(ncs)
 }
 
@@ -635,89 +642,87 @@ generate_gCMAP_NChannelSet <- function(
                             report.center,
                             center.z,
                             center.log_fc
-                            )
+)
 {
-  if( is.element("DESeq", installed.packages()[,1])){
-    require( DESeq )
-  } else {
+  if( !suppressWarnings(require("DESeq", quietly=TRUE, character.only=TRUE))){
     stop("To analyze RNAseq count data, please install the Bioconductor package 'DESeq'.")
   }
   
   stopifnot(center.z %in% c("none", "mean", "median", "peak") )
   stopifnot(center.log_fc %in% c("none", "mean", "median", "peak") )
-
+  
   vst <- .vst_transform( data.list ) ## variance-stabilizing transformation
   res <- lapply( data.list, function( x )
-                try(
-                    pairwise_DESeq( x,
-                                   vst,
-                                   control_perturb_col = control_perturb_col,
-                                   control=control, perturb=perturb,
-                                   try.hard=FALSE),
-                    silent=TRUE)
-                )      
+    try(
+      pairwise_DESeq( x,
+                      vst,
+                      control_perturb_col = control_perturb_col,
+                      control=control, perturb=perturb,
+                      try.hard=FALSE),
+      silent=TRUE)
+  )      
   
   ## remove failed instances
   bad.instances = sapply(res, is, "try-error")
   
   if ( any( bad.instances ) ) {
     warning( sprintf( "The following instances could not be analyzed: %s",
-                     paste( names( res[ bad.instances ] ),
-                           collapse=", ")
-                     )
-            )
-
+                      paste( names( res[ bad.instances ] ),
+                             collapse=", ")
+    )
+    )
+    
     res  = res [ ! bad.instances ]
     uids = uids[ ! bad.instances ]
     if( ! is.null( sample.annotation ) ) {
       sample.annotation <- sample.annotation[ which( ! bad.instances ), ]
     }
   }
-
+  
   ## collect results from all instances
   AveExpr = sapply( res, "[[", "exprs" )
   z = sapply( res, "[[", "z" )
   p = sapply( res, "[[", "p" )
   log_fc = sapply( res, "[[", "log_fc" )
   mod_fc = sapply( res, "[[", "mod_fc" )
-
+  
   dimnames( AveExpr ) <- dimnames( z ) <- dimnames( p ) <- dimnames( mod_fc ) <- dimnames( log_fc ) <- list( row.names( res[[1]] ), uids)
-
+  
   
   ## create in-memory NChannelSet
   assay.data <- assayDataNew( exprs=AveExpr, z=z, p=p, log_fc=log_fc, mod_fc=mod_fc)
-
+  
   fdata = data.frame(
     probeid   = row.names( res[[ 1 ]] ),
     row.names = row.names( res[[ 1 ]] )
-    )
+  )
   
   pdata = data.frame(
     UID = uids,
     row.names = uids
-    )
+  )
   
   if ( !is.null( sample.annotation ) ) {
     pdata = cbind( pdata, sample.annotation)
   }
   
   vdata <- data.frame(
-                      labelDescription = colnames( pdata ), 
-                      channel=factor( rep( "_ALL_", ncol( pdata )),
-                        levels=c( "_ALL_", colnames( pdata )
-                          )
-                        )
-                      )
+    labelDescription = colnames( pdata ), 
+    channel=factor( rep( "_ALL_", ncol( pdata )),
+                    levels=c( "_ALL_", colnames( pdata )
+                    )
+    )
+  )
   
   ## in-memory NChannelSet
   ncs <- new( "NChannelSet",
-             assayData   = assay.data,
-             featureData = new( "AnnotatedDataFrame", data = fdata ),
-             phenoData   = new( "AnnotatedDataFrame", data = pdata ),
-             varMetadata = new( "AnnotatedDataFrame", data = vdata ),
-             annotation  = platform.annotation
-             )
-
+              assayData   = assay.data,
+              featureData = new( "AnnotatedDataFrame", data = fdata ),
+              phenoData   = new( "AnnotatedDataFrame", data = pdata ),
+              varMetadata = new( "AnnotatedDataFrame", data = vdata ),
+              annotation  = platform.annotation
+  )
+  
   ## center z-scores and log_fc channels
   if( center.z != "none"){
     ncs <- center_eSet( ncs, "z", center=center.z,report.center=report.center)
@@ -728,16 +733,23 @@ generate_gCMAP_NChannelSet <- function(
   }
   
   ## create NChannelSet on disk
-  if(  ! is.null( big.matrix) ) { ## big.matrix = path to BigMatrix file on disk
-    eSetOnDisk(  ncs, out.file=big.matrix )
+  ## if possible, write file-back BigMatrix to disk
+  if( ! is.null( big.matrix ) ) { ## big.matrix = path to BigMatrix file on disk
+    if( suppressWarnings(require("bigmemoryExtras", quietly=TRUE, character.only=TRUE))){
+      message(
+        sprintf("Successfully created file-backed BigMatrix object %s.", big.matrix))
+      ## create NChannelSet on disk
+      eSetOnDisk( ncs, out.file=big.matrix ) 
+    } else{
+      warning("Package 'bigmemoryExtras' is not installed, cannot create file-backed BigMatrix object. Instead, a standard eSet object was written to disk.")
+      save( ncs, file=paste( big.matrix, "rdata", sep="."))
+    }
   }
   return( ncs )
 }
 
 .vst_transform <- function( cds.list ) {
-  if( is.element("DESeq", installed.packages()[,1])){
-    require( DESeq )
-  } else {
+  if( !suppressWarnings(require("DESeq", quietly=TRUE, character.only=TRUE))){
     stop("To perform variance stabilizing normalization, please install the Bioconductor package 'DESeq'.")
   }
   
@@ -750,7 +762,7 @@ generate_gCMAP_NChannelSet <- function(
   cds <- DESeq::newCountDataSet( counts.matrix, colnames( counts.matrix ) )
   cds <- DESeq::estimateSizeFactors( cds )
   try( cds.fit <- DESeq::estimateDispersions( cds, method = "blind", sharingMode =  "fit-only") )
-
+  
   if( is(cds.fit,"try-error")) {
     warning(print(".vst_transform: Parametric dispersion estimate for variance stabilizing tranformation failed. Trying local fit instead."))
     try( cds.fit <- DESeq::estimateDispersions( cds, method = "blind", sharingMode =  "fit-only", fitType="local") )
@@ -765,7 +777,7 @@ generate_gCMAP_NChannelSet <- function(
 }
 
 mapNmerge <- function(eset, translation.fun = NULL, get="ENTREZID", verbose=FALSE, summary.fun=function(x)mean(x, na.rm=TRUE)) {
-
+  
   if( !is.null( translation.fun )) {
     featureNames(eset) <- translation.fun(featureNames(eset))
     annotation(eset) <- get
@@ -783,8 +795,8 @@ mapNmerge <- function(eset, translation.fun = NULL, get="ENTREZID", verbose=FALS
         annotation(eset),
         what=get,
         load=TRUE
-        )
       )
+    )
     
     if ( all(is.na(gene.ids))) {
       stop("None of the feature ids could be mapped to EntrezIds.")
@@ -795,14 +807,14 @@ mapNmerge <- function(eset, translation.fun = NULL, get="ENTREZID", verbose=FALS
         paste(
           length(
             gene.ids[!is.na(gene.ids)]
-            ),
+          ),
           "of",
           dim(eset)[1],
           "feature ids were successfully mapped to",
           length(unique(na.omit(gene.ids))),
           paste(get,"s", sep="")
-          )
         )
+      )
     }
   }
   
@@ -824,12 +836,12 @@ mapNmerge <- function(eset, translation.fun = NULL, get="ENTREZID", verbose=FALS
                     gene.ids,
                     FUN=summary.fun)
               }
-              ),
+        ),
         dimnames=list(
           gene.ids,
           sampleNames(eset)),
         ncol=dim(eset)[2]
-        )
+      )
       
       if( class(eset) == "CountDataSet") { ## integers allowed only
         element.sum <- round(element.sum,0)
@@ -848,7 +860,7 @@ mapNmerge <- function(eset, translation.fun = NULL, get="ENTREZID", verbose=FALS
       phenoData=AnnotatedDataFrame(pData(eset)),
       protocolData=protocolData( eset ),
       experimentData=experimentData( eset )
-      )
+    )
     annotation(new.eset) <- get
   }
   return( new.eset )
@@ -857,130 +869,130 @@ mapNmerge <- function(eset, translation.fun = NULL, get="ENTREZID", verbose=FALS
 memorize <- function (object,
                       names=assayDataElementNames( object ),
                       ...) {
-    if (any(duplicated(names)))
-      stop("Channel 'names' must be unique")
-
-    channelNames <- assayDataElementNames(object)
-    badNames <- !names %in% channelNames
-
-    if (any(badNames))
-      stop("Channel 'names' must be channels")
-
-    dropChannels <- channelNames[!channelNames %in% names]
-
-    assayData <- .assayDataSubsetElements(assayData(object), names)
-    metadata <- varMetadata(object)[["channel"]]
-    okMetadata <- !metadata %in% dropChannels
-    phenoData <- phenoData(object)[, okMetadata]
-    varMetadata(phenoData)[["channel"]] <- factor(metadata[okMetadata],
-                                                  levels = unique(c(names, "_ALL_")))
-    initialize(object, assayData = assayData, phenoData = phenoData,
-               featureData = featureData(object), experimentData = experimentData(object),
-               annotation = annotation(object), protocolData = protocolData(object)
-               ,...)
-  }
+  if (any(duplicated(names)))
+    stop("Channel 'names' must be unique")
+  
+  channelNames <- assayDataElementNames(object)
+  badNames <- !names %in% channelNames
+  
+  if (any(badNames))
+    stop("Channel 'names' must be channels")
+  
+  dropChannels <- channelNames[!channelNames %in% names]
+  
+  assayData <- .assayDataSubsetElements(assayData(object), names)
+  metadata <- varMetadata(object)[["channel"]]
+  okMetadata <- !metadata %in% dropChannels
+  phenoData <- phenoData(object)[, okMetadata]
+  varMetadata(phenoData)[["channel"]] <- factor(metadata[okMetadata],
+                                                levels = unique(c(names, "_ALL_")))
+  initialize(object, assayData = assayData, phenoData = phenoData,
+             featureData = featureData(object), experimentData = experimentData(object),
+             annotation = annotation(object), protocolData = protocolData(object)
+             ,...)
+}
 
 .assayDataSubsetElements <- function (object, elts) {
-    if (any(duplicated(elts)))
-      stop("'AssayData' element names must be unique")
-    
-    storageMode <- if (is(object, "list")) {
-      "list"
-    } else if (environmentIsLocked(object)) {
-      "lockedEnvironment" 
-    } else {
-      "environment"
-    }
-
-    names <- if (storageMode(object) == "list") {
-      names(object)
-    } else {
-      ls(object)
-    }
-    
-    if (!all(elts %in% names))
-      stop("'AssayData' missing elements: '", paste(elts[!elts %in%
-                                                         names], collapse = "', '", sep = ""), "'")
-    switch(storageMode,
-           lockedEnvironment = {
-             assayData <- new.env(parent = emptyenv())
-             for (nm in elts) {
-               assayData[[nm]] <- as( object[[nm]], "matrix" )
-             }
-             lockEnvironment(assayData, bindings = TRUE)
-             assayData
-           },           
-           environment = {
-             assayData <- new.env(parent = emptyenv())
-             for (nm in elts) assayData[[nm]] <- as( object[[nm]], "matrix" )
-             assayData
-           }, list = {
-             object[elts]
-           })
+  if (any(duplicated(elts)))
+    stop("'AssayData' element names must be unique")
+  
+  storageMode <- if (is(object, "list")) {
+    "list"
+  } else if (environmentIsLocked(object)) {
+    "lockedEnvironment" 
+  } else {
+    "environment"
   }
+  
+  names <- if (storageMode(object) == "list") {
+    names(object)
+  } else {
+    ls(object)
+  }
+  
+  if (!all(elts %in% names))
+    stop("'AssayData' missing elements: '", paste(elts[!elts %in%
+                                                         names], collapse = "', '", sep = ""), "'")
+  switch(storageMode,
+         lockedEnvironment = {
+           assayData <- new.env(parent = emptyenv())
+           for (nm in elts) {
+             assayData[[nm]] <- as( object[[nm]], "matrix" )
+           }
+           lockEnvironment(assayData, bindings = TRUE)
+           assayData
+         },           
+         environment = {
+           assayData <- new.env(parent = emptyenv())
+           for (nm in elts) assayData[[nm]] <- as( object[[nm]], "matrix" )
+           assayData
+         }, list = {
+           object[elts]
+         })
+}
 
 pickChannels <- function (object, names, ...) {
-    if (any(duplicated(names)))
-      stop("Channel 'names' must be unique")
-
-    channelNames <- assayDataElementNames(object)
-    badNames <- !names %in% channelNames
-
-    if (any(badNames))
-      stop("Channel 'names' must be channels")
-
-    dropChannels <- channelNames[!channelNames %in% names]
-
-    assayData <- .assayDataSubsetElements(assayData(object), names)
-    metadata <- varMetadata(object)[["channel"]]
-    okMetadata <- !metadata %in% dropChannels
-    phenoData <- phenoData(object)[, okMetadata]
-    varMetadata(phenoData)[["channel"]] <- factor(metadata[okMetadata],
-                                                  levels = unique(c(names, "_ALL_")))
-    initialize(object, assayData = assayData, phenoData = phenoData,
-               featureData = featureData(object), experimentData = experimentData(object),
-               annotation = annotation(object), protocolData = protocolData(object)
-               ,...)
-  }
+  if (any(duplicated(names)))
+    stop("Channel 'names' must be unique")
+  
+  channelNames <- assayDataElementNames(object)
+  badNames <- !names %in% channelNames
+  
+  if (any(badNames))
+    stop("Channel 'names' must be channels")
+  
+  dropChannels <- channelNames[!channelNames %in% names]
+  
+  assayData <- .assayDataSubsetElements(assayData(object), names)
+  metadata <- varMetadata(object)[["channel"]]
+  okMetadata <- !metadata %in% dropChannels
+  phenoData <- phenoData(object)[, okMetadata]
+  varMetadata(phenoData)[["channel"]] <- factor(metadata[okMetadata],
+                                                levels = unique(c(names, "_ALL_")))
+  initialize(object, assayData = assayData, phenoData = phenoData,
+             featureData = featureData(object), experimentData = experimentData(object),
+             annotation = annotation(object), protocolData = protocolData(object)
+             ,...)
+}
 
 .assayDataSubsetElements <- function (object, elts) {
-    if (any(duplicated(elts)))
-      stop("'AssayData' element names must be unique")
-    
-    storageMode <- if (is(object, "list")) {
-      "list"
-    } else if (environmentIsLocked(object)) {
-      "lockedEnvironment" 
-    } else {
-      "environment"
-    }
-
-    names <- if (storageMode(object) == "list") {
-      names(object)
-    } else {
-      ls(object)
-    }
-    
-    if (!all(elts %in% names))
-      stop("'AssayData' missing elements: '", paste(elts[!elts %in%
-                                                         names], collapse = "', '", sep = ""), "'")
-    switch(storageMode,
-           lockedEnvironment = {
-             assayData <- new.env(parent = emptyenv())
-             for (nm in elts) {
-               assayData[[nm]] <- as( object[[nm]], "matrix" )
-             }
-             lockEnvironment(assayData, bindings = TRUE)
-             assayData
-           },           
-           environment = {
-             assayData <- new.env(parent = emptyenv())
-             for (nm in elts) assayData[[nm]] <- as( object[[nm]], "matrix" )
-             assayData
-           }, list = {
-             object[elts]
-           })
+  if (any(duplicated(elts)))
+    stop("'AssayData' element names must be unique")
+  
+  storageMode <- if (is(object, "list")) {
+    "list"
+  } else if (environmentIsLocked(object)) {
+    "lockedEnvironment" 
+  } else {
+    "environment"
   }
+  
+  names <- if (storageMode(object) == "list") {
+    names(object)
+  } else {
+    ls(object)
+  }
+  
+  if (!all(elts %in% names))
+    stop("'AssayData' missing elements: '", paste(elts[!elts %in%
+                                                         names], collapse = "', '", sep = ""), "'")
+  switch(storageMode,
+         lockedEnvironment = {
+           assayData <- new.env(parent = emptyenv())
+           for (nm in elts) {
+             assayData[[nm]] <- as( object[[nm]], "matrix" )
+           }
+           lockEnvironment(assayData, bindings = TRUE)
+           assayData
+         },           
+         environment = {
+           assayData <- new.env(parent = emptyenv())
+           for (nm in elts) assayData[[nm]] <- as( object[[nm]], "matrix" )
+           assayData
+         }, list = {
+           object[elts]
+         })
+}
 
 
 eset_instances <- function(instance.matrix, 
@@ -996,12 +1008,12 @@ eset_instances <- function(instance.matrix,
     perturbation.samples <- sampleNames( eset )[x == 1]
     instance.eset <- eset[, c(control.samples, perturbation.samples) ]
     pData( instance.eset )[,control_perturb_col] <- c( rep( control, 
-                                                           length(control.samples )
-                                                           ), 
-                                                      rep( perturb, 
-                                                          length(perturbation.samples )
-                                                          )
-                                                      )
+                                                            length(control.samples )
+    ), 
+                                                       rep( perturb, 
+                                                            length(perturbation.samples )
+                                                       )
+    )
     return( instance.eset )
   })
 }
@@ -1016,11 +1028,11 @@ splitPerturbations <- function( eset,
   if( inherits( eset, "CountDataSet")){
     ignore.factors <- c(ignore.factors, "sizeFactor")
   }
-
+  
   if( is.na( control )){
     control <- "NA"
   }
-
+  
   ## get annotation information from the phenoData slot
   pd <- pData( eset )
   pd[ is.na( pd )] <- "NA"
@@ -1071,7 +1083,7 @@ splitPerturbations <- function( eset,
   if( length( perturbations) == 0){
     stop( "No perturbations could be found in the 'factor.of.interest' column.")
   }
-
+  
   if( !is.null( controlled.factors )){
     if( !identical( controlled.factors,"all")){
       controlled.factors <- sapply(controlled.factors, function( x) { 
@@ -1102,8 +1114,8 @@ splitPerturbations <- function( eset,
       perturb.unique <- unique(  perturb.instances[ which( perturb.instances[,factor.of.interest] == x),factor.of.interest, drop=FALSE])
       perturb.all <- perturb.instances[which( perturb.instances[,factor.of.interest] == x), factor.of.interest, drop=FALSE]
     } else {
-    perturb.unique <- unique(  perturb.instances[ which( perturb.instances[,factor.of.interest] == x),other.factors, drop=FALSE])
-    perturb.all <- perturb.instances[which( perturb.instances[,factor.of.interest] == x), other.factors, drop=FALSE]
+      perturb.unique <- unique(  perturb.instances[ which( perturb.instances[,factor.of.interest] == x),other.factors, drop=FALSE])
+      perturb.all <- perturb.instances[which( perturb.instances[,factor.of.interest] == x), other.factors, drop=FALSE]
     }
     
     ## assign samples to unique experimental conditions
@@ -1137,7 +1149,7 @@ splitPerturbations <- function( eset,
                                             function( m ){
                                               all( control.instances[m,
                                                                      controlled.factors] == perturb.unique[n,
-                                                                      controlled.factors])
+                                                                                                           controlled.factors])
                                             })
                                   })
       matched.controls <- lapply( matched.controls, function(x){ 
@@ -1180,7 +1192,7 @@ splitPerturbations <- function( eset,
     pData(instance.eset)[,cmap.column] <- ifelse( p == control, "control", "perturbation")
     return( instance.eset)
   })
-
+  
   return( eset.list)
 }
 
@@ -1214,23 +1226,23 @@ mergeCMAPs <- function(x, y){
   if( ! inherits(y, "eSet")){
     stop( "Object 'y' is not an eSet.")
   }
-     
+  
   if( ! class(x ) == class( y )){
     stop( "Objects 'x' and 'y' are not of the same class.")
   }
-
+  
   if( annotation( x ) != annotation( y )){
     stop( "Objects 'x' and 'y' have different 'annotation' slots.")
   }
-
+  
   if( any( assayDataElementNames( x ) != assayDataElementNames( y))){
     stop( "Objects 'x' and 'y' have different AssayDataElementNames.")
   }
-
+  
   if( length( intersect( sampleNames( x ), sampleNames( y ))) != 0 ){
     stop( sprintf( "Objects 'x' and 'y' share %s sampleNames. sampleNames must be unique.", length( intersect( sampleNames( x ), sampleNames( y )))))
   }
-
+  
   if(  any( varLabels( x ) !=  varLabels( y ))){
     stop( "Objects 'x' and 'y' have different pData columns.")
   }
@@ -1245,23 +1257,23 @@ mergeCMAPs <- function(x, y){
   ## merge data for each channel separately
   for (element in assayDataElementNames( x ) ) {
     merged.channel <- merge(
-                            assayDataElement( x, element)[,],
-                            assayDataElement( y, element)[,],
-                            by.x=0, by.y=0, all=TRUE
-                            )
+      assayDataElement( x, element)[,],
+      assayDataElement( y, element)[,],
+      by.x=0, by.y=0, all=TRUE
+    )
     row.names( merged.channel) <- merged.channel$Row.names
     merged.channel$Row.names <- NULL
     assayDataElement( merged.eset, element) <- as.matrix( merged.channel )
   }
-
+  
   ## merge pData tables => requires the same column names in each eSet !
   pData(merged.eset) <- rbind( pData( x ), pData( y ))
   featureData(merged.eset) <- AnnotatedDataFrame(
-                                                 data.frame(
-                                                            probeid=row.names( merged.channel),
-                                                            row.names=row.names(merged.channel)
-                                                            )
-                                                 )
+    data.frame(
+      probeid=row.names( merged.channel),
+      row.names=row.names(merged.channel)
+    )
+  )
   sampleNames( merged.eset ) <- c( sampleNames( x ), sampleNames( y ))
   return( merged.eset)
 }
@@ -1333,15 +1345,11 @@ center_eSet <- function( eset, channel, center="peak",
 
 
 reactome2cmap <- function(species, annotation.package){ 
-  if( is.element("reactome.db", installed.packages()[,1])){
-    require( "reactome.db",character.only = TRUE )
-  } else {
+  if( ! suppressWarnings(require("reactome.db", quietly=TRUE, character.only=TRUE))){
     stop("To run this function, please install the Bioconductor package 'reactome.db'.")
   }
-
-  if( is.element(annotation.package, installed.packages()[,1])){
-    require( annotation.package,character.only = TRUE )
-  } else {
+  
+  if( ! suppressWarnings(require(annotation.package, quietly=TRUE, character.only=TRUE))){
     stop(sprintf("The specified annotation package %s is not installed on this system.", annotation.package))
   }
   
@@ -1367,22 +1375,18 @@ reactome2cmap <- function(species, annotation.package){
   
   i.matrix <- Matrix::t( incidence( pathways[ selected.species ] ) )
   reactome <- CMAPCollection( i.matrix,
-                                 phenoData=pheno.data,
-                                 annotation=annotation.package,
-                                 signed=rep( FALSE, ncol(i.matrix)) )
+                              phenoData=pheno.data,
+                              annotation=annotation.package,
+                              signed=rep( FALSE, ncol(i.matrix)) )
   return( reactome)
 }
 
 KEGG2cmap <- function( species, annotation.package ){
-  if( is.element("KEGG.db", installed.packages()[,1])){
-    require( "KEGG.db",character.only = TRUE )
-  } else {
+  if( ! suppressWarnings(require("KEGG.db", quietly=TRUE, character.only=TRUE))){
     stop("To run this function, please install the Bioconductor package 'KEGG.db'.")
   }
-
-  if( is.element(annotation.package, installed.packages()[,1])){
-    require( annotation.package,character.only = TRUE )
-  } else {
+  
+  if( ! suppressWarnings(require(annotation.package, quietly=TRUE, character.only=TRUE))){
     stop(sprintf("The specified annotation package %s is not installed on this system.", annotation.package))
   }
   
@@ -1402,16 +1406,14 @@ KEGG2cmap <- function( species, annotation.package ){
   
   i.matrix <- Matrix::t( incidence( pathways[ selected.species ] ) )
   kegg <- CMAPCollection( i.matrix,
-                                 phenoData=pheno.data,
-                                 annotation=annotation.package,
-                                 signed=rep( FALSE, ncol(i.matrix)) )
+                          phenoData=pheno.data,
+                          annotation=annotation.package,
+                          signed=rep( FALSE, ncol(i.matrix)) )
   return( kegg )
 }
 
 wiki2cmap <- function( species, annotation.package ){  
-  if( is.element(annotation.package, installed.packages()[,1])){
-    require( annotation.package,character.only = TRUE )
-  } else {
+  if( !suppressWarnings(require(annotation.package, quietly=TRUE, character.only=TRUE))){
     stop(sprintf("The specified annotation package %s is not installed on this system.", annotation.package))
   }
   
@@ -1442,7 +1444,7 @@ wiki2cmap <- function( species, annotation.package ){
     }
     return( na.omit(unique(c(entrez, entrez.ids))))
   })
-
+  
   wiki.sets <- as( pathways, "CMAPCollection")
   return( wiki.sets )
 }
@@ -1450,17 +1452,11 @@ wiki2cmap <- function( species, annotation.package ){
 go2cmap <- function( annotation.package="org.Hs.eg.db", ontology="BP", evidence=NULL){
   GOBPANCESTOR <- GOMFANCESTOR <- GOCCANCESTOR <- NULL
   
-  if( is.element("GO.db", installed.packages()[,1])){
-    require( "GO.db",character.only = TRUE )
-    message("Successfully loaded GO.db package.")
-  } else {
+  if( !suppressWarnings(require("GO.db", quietly=TRUE, character.only=TRUE))){
     stop("To use this function, please install the Bioconductor package 'GO.db'.")
   }
   
-  if( is.element(annotation, installed.packages()[,1])){
-    require( annotation,character.only = TRUE )
-    message(paste("Successfully loaded",annotation, "package."))
-  } else {
+  if( !suppressWarnings(require(annotation, quietly=TRUE, character.only=TRUE))){
     stop(sprintf("The specified annotation page % was not found.", annotation))
   }
   

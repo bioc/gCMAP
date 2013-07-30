@@ -15,9 +15,7 @@ setMethod(
             steps=1e6, restarts=5, 
             threads=getOption("mc.cores", default=0)) {
     
-    if( is.element("mgsa", installed.packages()[,1])){
-      require( "mgsa",character.only = TRUE )
-    } else {
+    if(!suppressWarnings(require("mgsa", quietly=TRUE, character.only=TRUE))){
       stop("To use this method, please install the Bioconductor package 'mgsa'.")
     }
     

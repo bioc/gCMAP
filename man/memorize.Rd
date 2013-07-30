@@ -3,13 +3,12 @@
 
 \title{
   Create a new NChannelSet instance by selecting specific channels and
-  load BigMatrix assayData into memory, if present
-
+  load BigMatrix assayData into memory.
 }
 \description{
   This function converts BigMatrix objects stored in the assayData slot
   of NChannelSets into standard matrices, loading them fully into
-  memory. Standard matrices are returned unchanged.
+  memory. Standard in-memory objects are returned unchanged. Requires \code{bigmemoryExtras} package to process BigMatrix objects.
 }
 \usage{
 memorize(object, names, ...)
@@ -40,12 +39,13 @@ eSet class. For non NChannelSets, meta data may not be transferred correctly.
 }
 
 \seealso{
-  \code{\link{BigMatrix}}
   \code{\link{eSet}}
   \code{\link{memorize}}
   \code{\link{selectChannels}}
 }
 \examples{
+if( suppressWarnings(require("bigmemoryExtras", 
+     quietly=TRUE, character.only=TRUE))){
 ## load ExpressionSet
 data("sample.ExpressionSet") ## from Biobase
 sample.ExpressionSet ## two assayDataElements: exprs, se
@@ -77,4 +77,5 @@ assayDataElementNames( in.memory )
 
 ## remove tempfiles generated for this example
 unlink(paste(storage.file,"*", sep=""))  
+}
 }
