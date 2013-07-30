@@ -1,4 +1,4 @@
-% \VignetteIndexEntry{main}
+% \VignetteIndexEntry{gCMAP classes and methods}
 % \VignetteDepends{}
 % \VignetteKeywords{gCMAP}
 % \VignettePackage{gCMAP}
@@ -14,13 +14,16 @@
 \evensidemargin=-.1in
 \headheight=-.3in
 
+\newcommand{\Rpackage}[1]{{\textit{#1}}}
+
 \title{Gene set analyses with the gCMAP package}
 \author{Thomas Sandmann and Richard Bourgon}
 \date{\today}
 
 \begin{document}
-
 \maketitle
+This document exemplifies the structure and use of the classes and (some of) the methods offered by the \Rpackage{gCMAP} package. For information on performing queries via an R-only, custom web application and to access a tutorial with examples using real biological datasets available from public databases, please refer to the documentation of the \Rpackage{gCMAPWeb} companion package.
+
 \tableofcontents
 \newpage
 
