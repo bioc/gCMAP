@@ -14,7 +14,10 @@
 \evensidemargin=-.1in
 \headheight=-.3in
 
-\newcommand{\Rpackage}[1]{{\textit{#1}}}
+\newcommand{\Robject}[1]{{\texttt{#1}}}
+\newcommand{\Rpackage}[1]{{\textsf{#1}}}
+\newcommand{\Rclass}[1]{{\textit{#1}}}
+\newcommand{\Rfunarg}[1]{{\texttt{#1}}}
 
 \title{Gene set analyses with the gCMAP package}
 \author{Thomas Sandmann and Richard Bourgon}
