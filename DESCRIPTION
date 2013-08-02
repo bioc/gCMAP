@@ -40,7 +40,6 @@ Description:
   high-level summary plots.
 License: Artistic-2.0
 LazyLoad: yes
-OS_type: unix
 ByteCompile: TRUE
 biocViews: Bioinformatics, Microarray, Software, Pathways, Annotation
 Collate: 'AllClasses.R' 'AllGenerics.R' 'SignedGeneSet-accessors.R'
