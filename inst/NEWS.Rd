@@ -81,7 +81,7 @@
 \section{Changes in version 1.1.4}{
   \itemize{
     \item{BUGFIX: }{The gealm_score method is not defined for queries with missing values and will now return the corresponding error message.}
-    \itme{BUGFIX: }{GeneSetCollections containing only one set are processed correctly by gsealm_score.}
+    \item{BUGFIX: }{GeneSetCollections containing only one set are processed correctly by gsealm_score.}
   }
 }	
 
