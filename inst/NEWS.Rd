@@ -1,6 +1,12 @@
 \name{NEWS}
 \title{NEWS file for the gCMAP}
 
+\section{Changes in version 1.7.1}{
+  \itemize{
+ \item{CHANGE: }{Vignettes are now stored in vignettes directory.}
+}
+}
+
 \section{Changes in version 1.5.4}{
   \itemize{
  \item{NEW: }{The bigmemory and bigmemoryExtras packages are not optional, enabling use of gCMAP on Windows}
