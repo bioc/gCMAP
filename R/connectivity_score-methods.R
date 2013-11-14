@@ -30,9 +30,9 @@ about up-/down-regulated categories required to compute the connectivity score."
     
     ## calculate connectivity score
     raw.score <- apply( rank.matrix, 2, function( r ) {
-      sapply(seq_along( sets.up ), function( n ) {
+      unlist(mclapply(seq_along( sets.up ), function( n ) {
         .s( r[sets.up[[n]]], r[sets.down[[n]]], length( r ) )
-      })
+      }))
     })
     raw.score <- matrix(raw.score, ncol=ncol( experiment ))
 
