@@ -1,54 +1,57 @@
 Package: gCMAP
 Type: Package
 Title: Tools for Connectivity Map-like analyses
-Version: 1.7.1
+Version: 1.7.2
 Date: 2013-10-21
 Depends: GSEABase, limma (>= 3.15.14)
-Imports: Biobase, BiocGenerics, methods, GSEAlm, Category, Matrix (>= 1.0.9), parallel, annotate, genefilter, AnnotationDbi
+Imports: Biobase, BiocGenerics, methods, GSEAlm, Category, Matrix (>=
+        1.0.9), parallel, annotate, genefilter, AnnotationDbi
 Suggests: DESeq, KEGG.db, reactome.db, RUnit, GO.db, mgsa
 Enhances: bigmemory, bigmemoryExtras (>= 1.1.2)
 Author: Thomas Sandmann <sandmann.thomas@gene.com>, Richard Bourgon
-	<bourgon.richard@gene.com> and Sarah Kummerfeld
-	<kummerfeld.sarah@gene.com>
+        <bourgon.richard@gene.com> and Sarah Kummerfeld
+        <kummerfeld.sarah@gene.com>
 Maintainer: Thomas Sandmann <sandmann.thomas@gene.com>
-Description: 
-  The gCMAP package provides a toolkit for comparing differential gene
-  expression profiles through gene set enrichment analysis. Starting
-  from normalized microarray or RNA-seq gene expression values (stored
-  in lists of ExpressionSet and CountDataSet objects) the package
-  performs differential expression analysis using the limma or DESeq
-  packages. Supplying a simple list of gene identifiers, global
-  differential expression profiles or data from complete experiments
-  as input, users can use a unified set of several well-known gene set
-  enrichment analysis methods to retrieve experiments with similar
-  changes in gene expression. To take into account the directionality
-  of gene expression changes, gCMAPQuery introduces the SignedGeneSet
-  class, directly extending GeneSet from the GSEABase package.  To
-  increase performance of large queries, multiple gene sets are stored
-  as sparse incidence matrices within CMAPCollection eSets. gCMAP
-  offers implementations of 1. Fisher's exact test (Fisher, J R Stat
-  Soc, 1922) 2. The "connectivity map" method (Lamb et al, Science,
-  2006) 3. Parametric and non-parametric t-statistic summaries (Jiang
-  & Gentleman, Bioinformatics, 2007) and 4. Wilcoxon / Mann-Whitney
-  rank sum statistics (Wilcoxon, Biometrics Bulletin, 1945) as well as
-  wrappers for the 5. camera (Wu & Smyth, Nucleic Acid Res, 2012)
-  6. mroast and romer (Wu et al, Bioinformatics, 2010) functions from
-  the limma package and 7. wraps the gsea method from the mgsa package 
-  (Bauer et al, NAR, 2010). All methods return CMAPResult objects, an S4
-  class inheriting from AnnotatedDataFrame, containing enrichment
-  statistics as well as annotation data and providing simple
-  high-level summary plots.
+Description: The gCMAP package provides a toolkit for comparing
+        differential gene expression profiles through gene set
+        enrichment analysis. Starting from normalized microarray or
+        RNA-seq gene expression values (stored in lists of
+        ExpressionSet and CountDataSet objects) the package performs
+        differential expression analysis using the limma or DESeq
+        packages. Supplying a simple list of gene identifiers, global
+        differential expression profiles or data from complete
+        experiments as input, users can use a unified set of several
+        well-known gene set enrichment analysis methods to retrieve
+        experiments with similar changes in gene expression. To take
+        into account the directionality of gene expression changes,
+        gCMAPQuery introduces the SignedGeneSet class, directly
+        extending GeneSet from the GSEABase package.  To increase
+        performance of large queries, multiple gene sets are stored as
+        sparse incidence matrices within CMAPCollection eSets. gCMAP
+        offers implementations of 1. Fisher's exact test (Fisher, J R
+        Stat Soc, 1922) 2. The "connectivity map" method (Lamb et al,
+        Science, 2006) 3. Parametric and non-parametric t-statistic
+        summaries (Jiang & Gentleman, Bioinformatics, 2007) and 4.
+        Wilcoxon / Mann-Whitney rank sum statistics (Wilcoxon,
+        Biometrics Bulletin, 1945) as well as wrappers for the 5.
+        camera (Wu & Smyth, Nucleic Acid Res, 2012) 6. mroast and romer
+        (Wu et al, Bioinformatics, 2010) functions from the limma
+        package and 7. wraps the gsea method from the mgsa package
+        (Bauer et al, NAR, 2010). All methods return CMAPResult
+        objects, an S4 class inheriting from AnnotatedDataFrame,
+        containing enrichment statistics as well as annotation data and
+        providing simple high-level summary plots.
 License: Artistic-2.0
 LazyLoad: yes
 ByteCompile: TRUE
-biocViews: Bioinformatics, Microarray, Software, Pathways, Annotation
 Collate: 'AllClasses.R' 'AllGenerics.R' 'SignedGeneSet-accessors.R'
         'utility-functions.R' 'camera_score-methods.R'
         'connectivity_score-methods.R' 'featureScore-methods.R'
         'fisher_score-methods.R' 'geneIndex-methods.R'
         'gsealm_jg_score-methods.R' 'gsealm_score-methods.R'
         'incidence-methods.R' 'mgsa_score-methods.R'
-        'mapIdentifiers-methods.R'
-        'minSetSize-methods.R' 'mroast_score-methods.R'
-        'romer_score-methods.R' 'wilcox_score-methods.R'
-        'CMAPCollection-accessors.R' 'CMAPResults-accessors.R'
+        'mapIdentifiers-methods.R' 'minSetSize-methods.R'
+        'mroast_score-methods.R' 'romer_score-methods.R'
+        'wilcox_score-methods.R' 'CMAPCollection-accessors.R'
+        'CMAPResults-accessors.R'
+biocViews: Microarray, Software, Pathways, Annotation
