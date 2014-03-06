@@ -1,6 +1,14 @@
 \name{NEWS}
 \title{NEWS file for the gCMAP}
 
+\section{Changes in version 1.7.2}{
+  \itemize{
+ \item{CHANGE: }{Helper functions KEGG2cmap, reactome2cmap, wiki2cmap and go2cmap have two additional parameters, min.size and max.size, restricting the output to gene sets containing members within the specified range.}
+ \item{CHANGE: }{Method camera_score now outputs correlations in column 'effect'.}
+ \item{BUGFIX: }{Correct numbers of annotated genes are now returned for each set.}
+}
+}
+
 \section{Changes in version 1.7.1}{
   \itemize{
  \item{CHANGE: }{Vignettes are now stored in vignettes directory.}

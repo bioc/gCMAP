@@ -109,7 +109,7 @@ setMethod(
                                    pval  = unlist(stats[[n]]["p.value",]),
                                    padj  = p.adjust( unlist( stats[[n]]["p.value",]), method="BH"),
                                    effect = unlist(stats[[n]]["effect",]),
-                                   nSet = Matrix::colSums( abs( members (sets) ) ),
+                                   nSet = Matrix::colSums( abs( members (sets)[,sampleNames(sets)] ) ),
                                    nFound = Matrix::colSums( abs( members (matched.sets) ) ),
                                    geneScores = geneScores,
                                    pData(sets))

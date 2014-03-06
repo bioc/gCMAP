@@ -55,7 +55,8 @@ setMethod(
                                  trend = scores$Direction,
                                  pval = scores$PValue,
                                  padj = scores$FDR,
-                                 nSet = Matrix::colSums( abs( members (sets) ) ),
+                                 effect = scores$Correlation,
+                                 nSet = Matrix::colSums( abs( members (sets)[,row.names(scores)] ) ),
                                  nFound = scores$NGenes,
                                  geneScores = I(gene.scores),
                                  pData(sets)[row.names(scores),, drop=FALSE]
@@ -67,6 +68,7 @@ setMethod(
                 "Direction",
                 "p-value",
                 "adjusted p-value (BH)",
+                "inter-gene correlation",
                 "Number of genes annotated in the query set",
                 "Number of query genes found in the dataset",
                 "Per-gene raw expression scores",                                               

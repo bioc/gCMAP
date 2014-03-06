@@ -11,10 +11,10 @@ Functions to generate species-specific CMAPCollections from Bioconductor KEGG.db
 These functions extract the gene sets defined for a species of interest from the KEGG,  Reactome or GO annotation packages or download the latest gene sets from the Wikipathways website and create a CMAPCollections. Wikipathways provides gene identifiers using different annotation sources; the wiki2cmap function only considers Entrez and Ensembl gene identifiers and return a CMAPCollection with Entrez ids. Please note that the GO graph structure will be used to associate every gene with all upstream annotation terms. The relationships between GO categories is not represented in the output CMAPCollection.
 }
 \usage{
-KEGG2cmap(species, annotation.package)
-reactome2cmap(species, annotation.package)
-wiki2cmap(species, annotation.package)
-go2cmap(annotation.package="org.Hs.eg.db", ontology="BP", evidence=NULL)
+KEGG2cmap(species, annotation.package, min.size=5, max.size=200)
+reactome2cmap(species, annotation.package, min.size=5, max.size=200)
+wiki2cmap(species, annotation.package, min.size=5, max.size=200 )
+go2cmap(annotation.package="org.Hs.eg.db", ontology="BP", evidence=NULL, min.size=5, max.size=200)
 }
 
 \arguments{
@@ -30,6 +30,13 @@ go2cmap(annotation.package="org.Hs.eg.db", ontology="BP", evidence=NULL)
   \item{evidence}{
   Character string identifying the evidence required for a GO annotation to be included in the result. If 'NULL' all annotated terms will be included.
   }
+  \item{min.size}{
+  Scalar integer, only gene sets with at least 'min.size' members will be returned.
+  }
+  \item{max.size}{
+  Scalar integer, only gene sets with no more than 'max.size' members will be returned.
+  }
+
 }
 
 \value{

@@ -52,7 +52,7 @@ setMethod(
                                  trend = scores$Direction,
                                  pval = scores$PValue,
                                  padj = scores$FDR,
-                                 nSet = Matrix::colSums( abs( members (sets) ) ),
+                                 nSet = Matrix::colSums( abs( members (sets)[,row.names(scores)] ) ),
                                  geneScores = I(gene.scores),
                                  pData(sets)[row.names(scores),, drop=FALSE]),
                                docs = "\n All results, including adjusted p-values, were obtained \n with the 'mroast' function from the 'limma' package.."

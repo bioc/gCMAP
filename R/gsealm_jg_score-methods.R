@@ -46,7 +46,7 @@ setMethod(
           pval = score[["pval"]][,n],
           padj =  p.adjust( score[["pval"]][,n], method="BH"),
           effect = score[["t"]][,n],
-          nSet = Matrix::colSums( abs( members (sets) ) ),
+          nSet = Matrix::colSums( abs( members (sets)[,sampleNames(sets)] ) ),
           nFound = score[["setSize"]][,n],
           geneScores = geneScores,
           pData(sets)),

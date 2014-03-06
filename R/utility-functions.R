@@ -1344,7 +1344,7 @@ center_eSet <- function( eset, channel, center="peak",
 }
 
 
-reactome2cmap <- function(species, annotation.package){ 
+reactome2cmap <- function(species, annotation.package, min.size=5, max.size=200){ 
   if( ! suppressWarnings(require("reactome.db", quietly=TRUE, character.only=TRUE))){
     stop("To run this function, please install the Bioconductor package 'reactome.db'.")
   }
@@ -1353,7 +1353,7 @@ reactome2cmap <- function(species, annotation.package){
     stop(sprintf("The specified annotation package %s is not installed on this system.", annotation.package))
   }
   
-  pathways <- as.list(reactomePATHID2EXTID)
+  pathways <- AnnotationDbi::as.list(reactomePATHID2EXTID)
   
   ## retrieve names
   pathway.names <- unlist(AnnotationDbi::mget(names(pathways), reactomePATHID2NAME))
@@ -1378,10 +1378,12 @@ reactome2cmap <- function(species, annotation.package){
                               phenoData=pheno.data,
                               annotation=annotation.package,
                               signed=rep( FALSE, ncol(i.matrix)) )
+  set.size <- setSizes(reactome)$n.total
+  reactome <- reactome[, set.size >= min.size & set.size <= max.size]
   return( reactome)
 }
 
-KEGG2cmap <- function( species, annotation.package ){
+KEGG2cmap <- function( species, annotation.package, min.size=5, max.size=200 ){
   if( ! suppressWarnings(require("KEGG.db", quietly=TRUE, character.only=TRUE))){
     stop("To run this function, please install the Bioconductor package 'KEGG.db'.")
   }
@@ -1391,7 +1393,7 @@ KEGG2cmap <- function( species, annotation.package ){
   }
   
   ## retrieve entrez ids of pathw ay members
-  pathways <- as.list(KEGGPATHID2EXTID)
+  pathways <- AnnotationDbi::as.list(KEGGPATHID2EXTID)
   
   ## retrieve names
   pathway.names <- unlist(AnnotationDbi::mget(sub("^...", "",names(pathways)), KEGGPATHID2NAME))
@@ -1409,10 +1411,12 @@ KEGG2cmap <- function( species, annotation.package ){
                           phenoData=pheno.data,
                           annotation=annotation.package,
                           signed=rep( FALSE, ncol(i.matrix)) )
+  set.size <- setSizes(kegg)$n.total
+  kegg <- kegg[, set.size >= min.size & set.size <= max.size]
   return( kegg )
 }
 
-wiki2cmap <- function( species, annotation.package ){  
+wiki2cmap <- function( species, annotation.package,min.size=5, max.size=200  ){  
   if( !suppressWarnings(require(annotation.package, quietly=TRUE, character.only=TRUE))){
     stop(sprintf("The specified annotation package %s is not installed on this system.", annotation.package))
   }
@@ -1446,10 +1450,12 @@ wiki2cmap <- function( species, annotation.package ){
   })
   
   wiki.sets <- as( pathways, "CMAPCollection")
+  set.size <- setSizes(wiki.sets)$n.total
+  wiki.sets <- wiki.sets[, set.size >= min.size & set.size <= max.size]
   return( wiki.sets )
 }
 
-go2cmap <- function( annotation.package="org.Hs.eg.db", ontology="BP", evidence=NULL){
+go2cmap <- function( annotation.package="org.Hs.eg.db", ontology="BP", evidence=NULL, min.size=5, max.size=200 ){
   GOBPANCESTOR <- GOMFANCESTOR <- GOCCANCESTOR <- NULL
   
   if( !suppressWarnings(require("GO.db", quietly=TRUE, character.only=TRUE))){
@@ -1527,5 +1533,7 @@ go2cmap <- function( annotation.package="org.Hs.eg.db", ontology="BP", evidence=
   ## add additional annotations
   experimentData( go.cmap)@title <- paste("GO", ontology, "ontology")
   experimentData( go.cmap)@abstract <- sprintf( "%s categories from the GO %s ontology", ncol( go.cmap), ontology)
+  set.size <- setSizes(go.cmap)$n.total
+  go.cmap <- go.cmap[, set.size >= min.size & set.size <= max.size]
   return( go.cmap )
 }
