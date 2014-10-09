@@ -1,7 +1,7 @@
 
 setMethod(
           "featureScores",
-          signature( query = "CMAPCollection", dat="matrix_or_big.matrix"),
+          signature( query = "CMAPCollection", dat="matrix"),
           function( query, dat, simplify=TRUE){
             common.genes <- intersect(featureNames(query), row.names(dat))
             if( length( common.genes ) == 0) {
@@ -44,7 +44,7 @@ setMethod(
 
 setMethod(
           "featureScores",
-          signature( query = "matrix_or_big.matrix", dat="CMAPCollection"),
+          signature( query = "matrix", dat="CMAPCollection"),
           function( query, dat ){    
 
             common.genes <- intersect(row.names(query), featureNames(dat))
@@ -82,14 +82,28 @@ setMethod(
           "featureScores",
           signature( query = "CMAPCollection", dat="BigMatrix"),
           function( query, dat, simplify=TRUE){
-            featureScores( query, dat$bigmat, simplify=simplify )
+            common.genes <- intersect(row.names(query), row.names(dat))
+            if( length( common.genes ) == 0) {
+              stop("None of CMAPCollection's featureNames found in row.names of BigMatrix dat.")
+            } else {
+              query <- query[common.genes,,drop=FALSE]
+              dat <- dat[common.genes,,drop=FALSE]
+            }      
+            featureScores( query, dat, simplify=simplify )
           })
 
 setMethod(
           "featureScores",
           signature( query = "BigMatrix", dat="CMAPCollection"),
           function( query, dat ){
-            featureScores( query$bigmat,  dat )
+            common.genes <- intersect(row.names(query), row.names(dat))
+            if( length( common.genes ) == 0) {
+              stop("None of the query's row.names (BigMatrix) overlap with row.names of dat (CMAPCollection).")
+            } else {
+              query <- query[common.genes,,drop=FALSE]
+              dat <- dat[common.genes,,drop=FALSE]
+            }      
+            featureScores( query,  dat )
           })
 
 setMethod(

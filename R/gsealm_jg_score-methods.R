@@ -354,7 +354,10 @@ setMethod(
   ## preprocess query matrix / BigMatrix
   ## extract big.matrix component
   if( inherits( query, "BigMatrix")){
+    options(bigmemory.allow.dimnames=TRUE)
+    dim.names <- dimnames( query )
     query <- query$bigmat
+    dimnames( query ) <- dim.names
   }
   
   if( inherits( query, "matrix")){

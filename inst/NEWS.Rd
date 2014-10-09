@@ -1,6 +1,13 @@
 \name{NEWS}
 \title{NEWS file for the gCMAP}
 
+\section{Changes in version 1.8.1}{
+\itemize{
+\item{BUGFIX: }{Updated extraction of big.max objects while maintaining row.names.}
+\item{BUGFIX: }{Updated geneIndex method to accept both symbols2indices and id2indices functions from limma.}
+}
+}
+
 \section{Changes in version 1.7.2}{
   \itemize{
  \item{CHANGE: }{Helper functions KEGG2cmap, reactome2cmap, wiki2cmap and go2cmap have two additional parameters, min.size and max.size, restricting the output to gene sets containing members within the specified range.}
