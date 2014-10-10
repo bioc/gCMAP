@@ -1,10 +1,16 @@
 \name{NEWS}
 \title{NEWS file for the gCMAP}
 
+\section{Changes in version 1.9.2}{
+\itemize{
+\item{BUGFIX: }{Updated geneIndex method to accept both symbols2indices
+  and id2indices functions from limma, depending on the limma version.}
+}
+}
+
 \section{Changes in version 1.8.1}{
 \itemize{
 \item{BUGFIX: }{Updated extraction of big.max objects while maintaining row.names.}
-\item{BUGFIX: }{Updated geneIndex method to accept both symbols2indices and id2indices functions from limma.}
 }
 }
 

@@ -277,7 +277,7 @@ setAs("CMAPResults", "data.frame",
 
 setAs("MgsaMcmcResults", "CMAPResults",
       function (from) {
-        res <- gCMAP:::CMAPResults(
+        res <- CMAPResults(
           data=data.frame( 
             set=row.names( from@setsResults),
             trend=sapply( from@setsResults$estimate,

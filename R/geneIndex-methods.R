@@ -23,9 +23,9 @@ setMethod(
 )
 
 .map2indices <- function(...){
-  if(exists("symbols2indices", mode = "function")){ ## old limma version
+  if( packageVersion("limma") >= "3.20.0"){
+    ids2indices(...)
+  } else {
     symbols2indices(...)
-  } else if(exists("id2indices", mode = "function")){ ## new limma version
-    id2indices(...)
   }
 }
