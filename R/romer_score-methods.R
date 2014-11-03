@@ -35,7 +35,7 @@ setMethod(
             indices <- geneIndex(sets, featureNames(experiment), remove.empty=FALSE)
 
             ## run romer
-            scores <- romer(indices, assayDataElement( experiment, element), design.matrix, ...)
+            scores <- romer(index=indices, y=assayDataElement( experiment, element), design=design.matrix, ...)
 
             ## store raw per-gene expression scores
             if( keep.scores == TRUE) {

@@ -1,6 +1,18 @@
 \name{NEWS}
 \title{NEWS file for the gCMAP}
 
+\section{Changes in version 1.10.1}{
+\itemize{
+\item{BUGFIX: }{Fixed the \code{romer_score method} to accomodate the change in argument order in limma's \code{romer} function.}
+}
+}
+
+\section{Changes in version 1.10.0}{
+\itemize{
+\item{CHANGE: }{Version bump for BioC update.}
+}
+}
+
 \section{Changes in version 1.9.2}{
 \itemize{
 \item{BUGFIX: }{Updated geneIndex method to accept both symbols2indices
