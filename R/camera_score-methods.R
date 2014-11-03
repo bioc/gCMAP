@@ -36,9 +36,9 @@ setMethod(
             indices <- geneIndex(sets, featureNames(experiment), remove=FALSE)
             
             ## run camera
-            scores <- camera(assayDataElement(experiment, element), 
-                             indices, 
-                             design.matrix,
+            scores <- camera(y=assayDataElement(experiment, element), 
+                             index=indices, 
+                             design=design.matrix,
                              ...)
   
             ## store raw per-gene expression scores as matrix

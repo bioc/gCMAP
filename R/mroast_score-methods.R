@@ -36,7 +36,7 @@ setMethod(
             indices <- geneIndex(sets, featureNames(experiment), remove.empty=FALSE)
 
             ## run mroast
-            scores <- mroast(assayDataElement(experiment, element), indices, design.matrix, ...)
+            scores <- mroast(y=assayDataElement(experiment, element), index=indices, design=esign.matrix, ...)
 
             ## store raw per-gene expression scores
             if( keep.scores == TRUE ) {
