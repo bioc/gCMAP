@@ -10,6 +10,10 @@ Functions to generate species-specific CMAPCollections from Bioconductor KEGG.db
 \description{
 These functions extract the gene sets defined for a species of interest from the KEGG,  Reactome or GO annotation packages or download the latest gene sets from the Wikipathways website and create a CMAPCollections. Wikipathways provides gene identifiers using different annotation sources; the wiki2cmap function only considers Entrez and Ensembl gene identifiers and return a CMAPCollection with Entrez ids. Please note that the GO graph structure will be used to associate every gene with all upstream annotation terms. The relationships between GO categories is not represented in the output CMAPCollection.
 }
+\note{
+The reactome.db package is currently \href{https://support.bioconductor.org/p/63024/#64379}{broken}. Unfortunately, the \code{reactome2cmap} function is defunct until the annotation package has been fixed.
+}
+
 \usage{
 KEGG2cmap(species, annotation.package, min.size=5, max.size=200)
 reactome2cmap(species, annotation.package, min.size=5, max.size=200)
@@ -54,9 +58,8 @@ Thomas Sandmann
 \dontrun{
 KEGG2.hs <- KEGG2cmap( species="hsa",
                        annotation.package="org.Hs.eg.db")
-
-reactome.hs <- reactome2cmap( species="Homo sapiens",
-                              annotation.package="org.Hs.eg.db")
+#reactome.hs <- reactome2cmap( species="Homo sapiens",
+#                              annotation.package="org.Hs.eg.db")
 wikipathways.hs <- wiki2cmap( species="Homo sapiens",
                               annotation.package="org.Hs.eg.db")
 }

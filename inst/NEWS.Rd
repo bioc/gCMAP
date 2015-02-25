@@ -1,6 +1,14 @@
 \name{NEWS}
 \title{NEWS file for the gCMAP}
 
+\section{Changes in version 1.10.2}{
+\itemize{
+\item{BUGFIX: }{The wiki2cmap function now excludes empty files downloaded from wikipathways from parsing instead of throwing an error.}
+\item{BUGFIX: }{The reactom2cmap function is currently defunct, because the reactome.db package is broken.}
+\item{BUGFIX: }{Added missing export for go2cmap function.}
+}
+}
+
 \section{Changes in version 1.10.1}{
 \itemize{
 \item{BUGFIX: }{Fixed the \code{romer_score method} to accomodate the change in argument order in limma's \code{romer} function.}
