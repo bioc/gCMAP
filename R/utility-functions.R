@@ -546,7 +546,7 @@ generate_gCMAP_NChannelSet <- function(
         x,
         control_perturb_col = control_perturb_col,
         control=control, perturb=perturb ) ,
-           silent=TRUE ) 
+        silent=TRUE ) 
     ) 
     
   } else { ## standard t-tests
@@ -555,7 +555,7 @@ generate_gCMAP_NChannelSet <- function(
         x,
         control_perturb_col = control_perturb_col,
         control=control, perturb=perturb ) ,
-           silent=TRUE ) 
+        silent=TRUE ) 
     ) 
   }
   
@@ -1010,9 +1010,9 @@ eset_instances <- function(instance.matrix,
     pData( instance.eset )[,control_perturb_col] <- c( rep( control, 
                                                             length(control.samples )
     ), 
-                                                       rep( perturb, 
-                                                            length(perturbation.samples )
-                                                       )
+    rep( perturb, 
+         length(perturbation.samples )
+    )
     )
     return( instance.eset )
   })
@@ -1345,45 +1345,54 @@ center_eSet <- function( eset, channel, center="peak",
 
 
 reactome2cmap <- function(species, annotation.package, min.size=5, max.size=200){ 
-  if( ! suppressWarnings(require("reactome.db", quietly=TRUE, character.only=TRUE))){
-    stop("To run this function, please install the Bioconductor package 'reactome.db'.")
-  }
-  
-  if( ! suppressWarnings(require(annotation.package, quietly=TRUE, character.only=TRUE))){
-    stop(sprintf("The specified annotation package %s is not installed on this system.", annotation.package))
-  }
-  
-  pathways <- AnnotationDbi::as.list(reactomePATHID2EXTID)
-  
-  ## retrieve names
-  pathway.names <- unlist(AnnotationDbi::mget(names(pathways), reactomePATHID2NAME))
-  pathway.names <- pathway.names[ match(names( pathways),
-                                        names( pathway.names )) ]
-  
-  ## remove categories with duplicated or missing names
-  filtered.names <- duplicated( names( pathway.names)) | is.na(pathway.names)
-  pathways <- pathways[ ! filtered.names ]
-  pathway.names <- pathway.names[ ! filtered.names]
-  
-  selected.species <- grepl( paste("^", species, sep=""), pathway.names)
-  
-  pheno.data <- as(
-    data.frame(name=pathway.names[ selected.species ],
-               row.names=names(pathways[ selected.species ])
-    ),
-    "AnnotatedDataFrame")
-  
-  i.matrix <- Matrix::t( incidence( pathways[ selected.species ] ) )
-  reactome <- CMAPCollection( i.matrix,
-                              phenoData=pheno.data,
-                              annotation=annotation.package,
-                              signed=rep( FALSE, ncol(i.matrix)) )
-  set.size <- setSizes(reactome)$n.total
-  reactome <- reactome[, set.size >= min.size & set.size <= max.size]
-  return( reactome)
+  .Defunct(
+    msg="The reactome.db package is currently broken. Unfortunately, this function is defunct until the annotation package has been fixed."
+  )
+#   
+#   if( ! suppressWarnings(require("reactome.db", quietly=TRUE, character.only=TRUE))){
+#     stop("To run this function, please install the Bioconductor package 'reactome.db'.")
+#   }
+#   
+#   if( ! suppressWarnings(require(annotation.package, quietly=TRUE, character.only=TRUE))){
+#     stop(sprintf("The specified annotation package %s is not installed on this system.", annotation.package))
+#   }
+#   
+#   pathways <- AnnotationDbi::as.list(reactomePATHID2EXTID)
+#   
+#   ## retrieve names
+#   pathway.names <- unlist(AnnotationDbi::mget(names(pathways), reactomePATHID2NAME))
+#   pathway.names <- pathway.names[ match(names( pathways),
+#                                         names( pathway.names )) ]
+#   
+#   ## remove categories with duplicated or missing names
+#   filtered.names <- duplicated( names( pathway.names)) | is.na(pathway.names)
+#   pathways <- pathways[ ! filtered.names ]
+#   pathway.names <- pathway.names[ ! filtered.names]
+#   
+#   selected.species <- grepl( paste("^", species, sep=""), pathway.names)
+#   
+#   pheno.data <- as(
+#     data.frame(name=pathway.names[ selected.species ],
+#                row.names=names(pathways[ selected.species ])
+#     ),
+#     "AnnotatedDataFrame")
+#   
+#   i.matrix <- Matrix::t( incidence( pathways[ selected.species ] ) )
+#   reactome <- CMAPCollection( i.matrix,
+#                               phenoData=pheno.data,
+#                               annotation=annotation.package,
+#                               signed=rep( FALSE, ncol(i.matrix)) )
+#   set.size <- setSizes(reactome)$n.total
+#   reactome <- reactome[, set.size >= min.size & set.size <= max.size]
+#   return( reactome)
 }
 
-KEGG2cmap <- function( species, annotation.package, min.size=5, max.size=200 ){
+KEGG2cmap <- function( 
+  species, 
+  annotation.package, 
+  min.size=5, 
+  max.size=200
+  ){
   if( ! suppressWarnings(require("KEGG.db", quietly=TRUE, character.only=TRUE))){
     stop("To run this function, please install the Bioconductor package 'KEGG.db'.")
   }
@@ -1420,18 +1429,20 @@ wiki2cmap <- function( species, annotation.package,min.size=5, max.size=200  ){
   if( !suppressWarnings(require(annotation.package, quietly=TRUE, character.only=TRUE))){
     stop(sprintf("The specified annotation package %s is not installed on this system.", annotation.package))
   }
-  
   ## Download wikipathways in plain text format
-  url <- sprintf( "http://www.wikipathways.org//wpi/batchDownload.php?species=%s&fileType=txt&tag=Curation:AnalysisCollection", URLencode( species))
+  url <- sprintf( 
+    "http://www.wikipathways.org//wpi/batchDownload.php?species=%s&fileType=txt&tag=Curation:AnalysisCollection",
+    URLencode( species))
   download.file(url, file.path(tempdir(),"wiki.zip" ))
   unzip( file.path(tempdir(),"wiki.zip" ), 
          exdir=file.path( tempdir(), "wiki")
   )
-  pathways <- lapply( list.files( file.path( tempdir(), "wiki"), 
-                                  full.names=TRUE, pattern=".txt"), 
-                      read.delim)
-  names( pathways ) <- sub(".txt", "",  list.files( file.path( tempdir(), "wiki"), 
-                                                    pattern=".txt" ))
+  wiki.files <- list.files( file.path( tempdir(), "wiki"), 
+                            full.names=TRUE, pattern=".txt")
+  ## exclude empty files
+  wiki.files <- wiki.files[file.info(wiki.files)$size > 1] 
+  pathways <- lapply( wiki.files, read.delim) 
+  names( pathways ) <- sub(".txt", "",   basename(wiki.files ))
   
   pathways <- lapply( pathways, function(x) {
     entrez <- as.character( x[which(x$Database == "Entrez Gene"), "Identifier"])
@@ -1455,15 +1466,21 @@ wiki2cmap <- function( species, annotation.package,min.size=5, max.size=200  ){
   return( wiki.sets )
 }
 
-go2cmap <- function( annotation.package="org.Hs.eg.db", ontology="BP", evidence=NULL, min.size=5, max.size=200 ){
+go2cmap <- function( 
+  annotation.package="org.Hs.eg.db", 
+  ontology="BP", 
+  evidence=NULL, 
+  min.size=5, 
+  max.size=200
+){
   GOBPANCESTOR <- GOMFANCESTOR <- GOCCANCESTOR <- NULL
   
   if( !suppressWarnings(require("GO.db", quietly=TRUE, character.only=TRUE))){
     stop("To use this function, please install the Bioconductor package 'GO.db'.")
   }
   
-  if( !suppressWarnings(require(annotation, quietly=TRUE, character.only=TRUE))){
-    stop(sprintf("The specified annotation page % was not found.", annotation))
+  if( !suppressWarnings(require(annotation.package, quietly=TRUE, character.only=TRUE))){
+    stop(sprintf("The specified annotation page % was not found.", annotation.package))
   }
   
   consolidate.gomap = function(gomap) {
@@ -1518,7 +1535,7 @@ go2cmap <- function( annotation.package="org.Hs.eg.db", ontology="BP", evidence=
     return(gomap)
   }
   
-  anno <- paste( sub(".db$", "", annotation),"GO", sep="")
+  anno <- paste( sub(".db$", "", annotation.package),"GO", sep="")
   go  <-build.gomaps( anno=anno, ontology=ontology )
   gene.sets <- split(go$gene, go$go)
   
