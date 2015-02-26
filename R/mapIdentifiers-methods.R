@@ -1,6 +1,8 @@
 setMethod(
           "mapIdentifiers",
-          signature( what = "SignedGeneSet", to="GeneIdentifierType", from="GeneIdentifierType"),
+          signature(what = "SignedGeneSet",
+                    to="GeneIdentifierType",
+                    from="GeneIdentifierType"),
           function (what, to, from, ... ) 
           {
             if( to@type == from@type) return( what )
@@ -38,7 +40,9 @@ setMethod(
 
 setMethod(
           "mapIdentifiers",
-          signature( what = "SignedGeneSet", to="GeneIdentifierType", from="missing"),
+          signature(what = "SignedGeneSet",
+                    to="GeneIdentifierType",
+                    from="missing"),
           function (what, to, ...) 
           {
             if ( annotation(geneIdType(what)) == "" )
@@ -52,7 +56,9 @@ setMethod(
 
 setMethod(
           "mapIdentifiers",
-          signature( what = "SignedGeneSet", to="missing", from="ANY"),
+          signature(what = "SignedGeneSet",
+                    to="missing",
+                    from="ANY"),
           function(what, ...)
           {
             stop("Please specify the 'to' parameter.")

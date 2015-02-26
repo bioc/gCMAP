@@ -17,7 +17,12 @@ For eSet-like object with multiple assayDataElements, each element is
 summarized separately.
 }
 \usage{
-mapNmerge(eset, translation.fun = NULL, get = "ENTREZID", verbose = FALSE, summary.fun = function(x) mean(x, na.rm = TRUE))
+mapNmerge(
+  eset,
+  translation.fun = NULL,
+  get = "ENTREZID",
+  verbose = FALSE,
+  summary.fun = function(x) mean(x, na.rm = TRUE))
 }
 
 \arguments{

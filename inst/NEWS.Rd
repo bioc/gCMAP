@@ -10,110 +10,117 @@
 }
 
 \section{Changes in version 1.11.2}{
-\itemize{
-\item{CHANGE: }{Fixed typo in mroast_score method.}
-}
+  \itemize{
+    \item{CHANGE: }{Fixed typo in mroast_score method.}
+  }
 }
 
+
 \section{Changes in version 1.11.1}{
-\itemize{
-\item{BUGFIX: }{Fixed the \code{romer_score method} to accomodate the change in argument order in limma's \code{romer} function.}
-}
+  \itemize{
+    \item{BUGFIX: }{Fixed the \code{romer_score method} to accomodate the change in argument order in limma's \code{romer} function.}
+  }
 }
 
 \section{Changes in version 1.11.0}{
-\itemize{
-\item{CHANGE: }{Version bump for BioC update.}
-}
+  \itemize{
+    \item{CHANGE: }{Version bump for BioC update.}
+  }
 }
 
 \section{Changes in version 1.10.0}{
-\itemize{
-\item{CHANGE: }{Version bump for BioC update.}
-}
+  \itemize{
+    \item{CHANGE: }{Version bump for BioC update.}
+  }
 }
 
 \section{Changes in version 1.9.2}{
-\itemize{
-\item{BUGFIX: }{Updated geneIndex method to accept both symbols2indices
-  and id2indices functions from limma, depending on the limma version.}
-}
+  \itemize{
+    \item{BUGFIX: }{Updated geneIndex method to accept both symbols2indices
+      and id2indices functions from limma, depending on the limma version.}
+  }
 }
 
 \section{Changes in version 1.8.1}{
-\itemize{
-\item{BUGFIX: }{Updated extraction of big.max objects while maintaining row.names.}
-}
+  \itemize{
+    \item{BUGFIX: }{Updated extraction of big.max objects while maintaining row.names.}
+  }
 }
 
 \section{Changes in version 1.7.2}{
   \itemize{
- \item{CHANGE: }{Helper functions KEGG2cmap, reactome2cmap, wiki2cmap and go2cmap have two additional parameters, min.size and max.size, restricting the output to gene sets containing members within the specified range.}
- \item{CHANGE: }{Method camera_score now outputs correlations in column 'effect'.}
- \item{BUGFIX: }{Correct numbers of annotated genes are now returned for each set.}
-}
+    \item{CHANGE: }{Helper functions KEGG2cmap, reactome2cmap, wiki2cmap and go2cmap have two additional parameters, min.size and max.size, restricting the output to gene sets containing members within the specified range.}
+    \item{CHANGE: }{Method camera_score now outputs correlations in column 'effect'.}
+    \item{BUGFIX: }{Correct numbers of annotated genes are now returned for each set.}
+  }
 }
 
 \section{Changes in version 1.7.1}{
   \itemize{
- \item{CHANGE: }{Vignettes are now stored in vignettes directory.}
-}
+    \item{CHANGE: }{Vignettes are now stored in vignettes directory.}
+  }
 }
 
 \section{Changes in version 1.5.4}{
   \itemize{
- \item{NEW: }{The bigmemory and bigmemoryExtras packages are not optional, enabling use of gCMAP on Windows}
+    \item{NEW: }{The bigmemory and bigmemoryExtras packages are not optional, enabling use of gCMAP on Windows}
+  }
 }
-}
+
 \section{Changes in version 1.5.3}{
   \itemize{
- \item{NEW: }{Updated titles of vignettes}
+    \item{NEW: }{Updated titles of vignettes}
+  }
 }
-}
+
 \section{Changes in version 1.5.2}{
   \itemize{
- \item{BUGFIX: }{Updated eSet construction in mapNmerge function}
+    \item{BUGFIX: }{Updated eSet construction in mapNmerge function}
+  }
 }
-}
+
 \section{Changes in version 1.5.1}{
-   \itemize{
-\item{BUGFIX: }{fixed incorrect varMetaData element definition in .process_counts}
+  \itemize{
+    \item{BUGFIX: }{fixed incorrect varMetaData element definition in .process_counts}
+  }
 }
-}
+
 \section{Changes in version 1.3.5}{
-   \itemize{
- \item{NEW: }{DESeq package is now listed as 'Suggested' instead of 'Depends'}
-}
+  \itemize{
+    \item{NEW: }{DESeq package is now listed as 'Suggested' instead of 'Depends'}
+  }
 }
 
 \section{Changes in version 1.3.4}{
   \itemize{
- \item{NEW: }{Removed lattice and reshape dependencies.}
- \item{NEW: }{Removed cmapQAPlot function.}
- \item{NEW: }{Added generate_gCMAP_NChannelSet's 'report.center' parameter.}
+    \item{NEW: }{Removed lattice and reshape dependencies.}
+    \item{NEW: }{Removed cmapQAPlot function.}
+    \item{NEW: }{Added generate_gCMAP_NChannelSet's 'report.center' parameter.}
+  }
 }
-}
+
 \section{Changes in version 1.3.3}{
   \itemize{
- \item{NEW: }{Experimented with cmapQAPlot function (removed again in version 1.3.4).}
+    \item{NEW: }{Experimented with cmapQAPlot function (removed again in version 1.3.4).}
+  }
 }
-}
+
 \section{Changes in version 1.3.2}{
-   \itemize{
-\item{NEW: }{mgsa_score method wrapping the model-based gene set analysis approach available in the mgsa package.}
-}
+  \itemize{
+    \item{NEW: }{mgsa_score method wrapping the model-based gene set analysis approach available in the mgsa package.}
+  }
 }
 
 \section{Changes in version 1.3.1}{
   \itemize{
- \item{NEW: }{KEGG2cmap, reactome2cmap, wiki2cmap and go2cmap to functions to generate CMAPCollections from public annotation databases}
-}
+    \item{NEW: }{KEGG2cmap, reactome2cmap, wiki2cmap and go2cmap to functions to generate CMAPCollections from public annotation databases}
+  }
 }
 
 \section{Changes in version 1.3.1}{
   \itemize{
- \item{NEW: }{upIds and downIds methods for CMAPCollection objects.}
-}
+    \item{NEW: }{upIds and downIds methods for CMAPCollection objects.}
+  }
 }
 
 \section{Changes in version 1.3.0}{
@@ -179,8 +186,9 @@
     \item{NEW: }{The BigMatrix package changed its name to bigmemoryExtras. Currently, bigmemoryExtras only supports Mac and Unix platforms, thus gCMAP does not support Windows, either.}
   }
 }	
+
 \section{Changes in version 0.99.1}{	
- \itemize{		
+  \itemize{		
     \item{NEW: }{First release of the gCMAP package to Bioconductor.}
   }
 }

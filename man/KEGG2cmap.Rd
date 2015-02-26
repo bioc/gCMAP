@@ -15,10 +15,23 @@ The reactome.db package is currently \href{https://support.bioconductor.org/p/63
 }
 
 \usage{
-KEGG2cmap(species, annotation.package, min.size=5, max.size=200)
-reactome2cmap(species, annotation.package, min.size=5, max.size=200)
-wiki2cmap(species, annotation.package, min.size=5, max.size=200 )
-go2cmap(annotation.package="org.Hs.eg.db", ontology="BP", evidence=NULL, min.size=5, max.size=200)
+KEGG2cmap(species,
+          annotation.package,
+          min.size=5,
+          max.size=200)
+reactome2cmap(species,
+              annotation.package,
+              min.size=5,
+              max.size=200)
+wiki2cmap(species,
+          annotation.package,
+          min.size=5,
+          max.size=200 )
+go2cmap(annotation.package="org.Hs.eg.db",
+        ontology="BP",
+        evidence=NULL,
+        min.size=5,
+        max.size=200)
 }
 
 \arguments{

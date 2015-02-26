@@ -83,7 +83,9 @@ If 'report.center' is TRUE, the pData slot of the NChannelSet contains columns r
 ## list of ExpressionSets
 data("sample.ExpressionSet") ## from Biobase
 
-es.list <- list( sample.ExpressionSet[,1:4], sample.ExpressionSet[,5:8], sample.ExpressionSet[,9:12])
+es.list <- list( sample.ExpressionSet[,1:4],
+                 sample.ExpressionSet[,5:8],
+                 sample.ExpressionSet[,9:12])
 names(es.list) <- paste( "Instance", 1:3, sep=".")
 
 de <- generate_gCMAP_NChannelSet(

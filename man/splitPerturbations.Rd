@@ -23,7 +23,14 @@ To consider all available annotation columns to match controls, the 'controlled.
 }
 
 \usage{
-splitPerturbations(eset, control = "none", controlled.factors = NULL, factor.of.interest = "Compound", ignore.factors = NULL, cmap.column ="cmap", prefix = NULL)
+splitPerturbations(
+  eset,
+  control = "none",
+  controlled.factors = NULL,
+  factor.of.interest = "Compound",
+  ignore.factors = NULL,
+  cmap.column ="cmap",
+  prefix = NULL)
 }
 
 \arguments{

@@ -21,7 +21,14 @@
 }
 
 \usage{
-\S4method{mroast_score}{eSet,CMAPCollection}(experiment,sets,predictor=NULL, design.matrix=NULL,element="exprs", keep.scores=FALSE,...)
+\S4method{mroast_score}{eSet,CMAPCollection}(
+  experiment,
+  sets,
+  predictor=NULL,
+  design.matrix=NULL,
+  element="exprs",
+  keep.scores=FALSE,
+  ...)
 
 \S4method{mroast_score}{matrix,CMAPCollection}(experiment, sets,...)
 
@@ -108,5 +115,8 @@ set1.expr <- geneScores(res)[["set1"]]
 heatmap(set1.expr, scale="none", Colv=NA, labCol=predictor,
         RowSideColors=ifelse( attr(set1.expr, "sign") == "up", "red", "blue"),
         margin=c(7,5))
-legend(0.35,0,legend=c("up", "down"), fill=c("red", "blue"), title="Annotated sign", horiz=TRUE, xpd=TRUE)
+legend(0.35,0,legend=c("up", "down"),
+  fill=c("red", "blue"),
+  title="Annotated sign",
+  horiz=TRUE, xpd=TRUE)
 }

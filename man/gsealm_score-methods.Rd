@@ -23,8 +23,17 @@
 
 \usage{
 
-\S4method{gsealm_score}{ExpressionSet,CMAPCollection}(query, set,
-removeShift=FALSE, predictor=NULL, formula=NULL, nPerm=1000, parametric=FALSE,respect.sign=TRUE, keep.scores=FALSE,...)
+\S4method{gsealm_score}{ExpressionSet,CMAPCollection}(
+  query,
+  set,
+  removeShift=FALSE,
+  predictor=NULL,
+  formula=NULL,
+  nPerm=1000,
+  parametric=FALSE,
+  respect.sign=TRUE,
+  keep.scores=FALSE,
+  ...)
 
 \S4method{gsealm_score}{eSet,CMAPCollection}(query, set, element="exprs", ... )
 
@@ -94,11 +103,16 @@ removeShift=FALSE, predictor=NULL, formula=NULL, nPerm=1000, parametric=FALSE,re
 data(gCMAPData)
 
 ## induce gene sets from a collection of z-scores
-gene.set.collection <- induceCMAPCollection(gCMAPData, "z", higher=2, lower=-2)
+gene.set.collection <- induceCMAPCollection(
+  gCMAPData,
+  "z",
+  higher=2,
+  lower=-2)
 sampleNames(gene.set.collection) <- c("set1", "set2", "set3")
 
 ## random score matrix
-y <- matrix(rnorm(1000*6),1000,6, dimnames=list(featureNames(gCMAPData), 1:6))
+y <- matrix(rnorm(1000*6),1000,6,
+            dimnames=list(featureNames(gCMAPData), 1:6))
 
 ## set1 is differentially regulated
 effect <- as.vector(members(gene.set.collection[,1]) * 2)
@@ -107,13 +121,22 @@ y[,4:6] <- y[,4:6] + effect
 predictor <- c( rep("Control", 3), rep("Case", 3))
 
 ## run analysis and keep gene-level expression scores
-res <- gsealm_score(y, gene.set.collection, predictor=predictor, nPerm=100, keep.scores=TRUE)
+res <- gsealm_score(
+  y,
+  gene.set.collection,
+  predictor=predictor,
+  nPerm=100,
+  keep.scores=TRUE)
 res
 
 ## heatmap of expression scores for set1
 set1.expr <- geneScores(res)[["set1"]]
 heatmap(set1.expr, scale="none", Colv=NA, labCol=predictor,
-        RowSideColors=ifelse( attr(set1.expr, "sign") == "up", "red", "blue"),
+        RowSideColors=ifelse(
+          attr(set1.expr, "sign") == "up", "red", "blue"),
         margin=c(7,5))
-legend(0.35,0,legend=c("up", "down"), fill=c("red", "blue"), title="Annotated sign", horiz=TRUE, xpd=TRUE)
+legend(0.35,0,legend=c("up", "down"),
+    fill=c("red", "blue"),
+    title="Annotated sign",
+    horiz=TRUE, xpd=TRUE)
 }

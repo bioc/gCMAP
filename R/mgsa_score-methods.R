@@ -14,7 +14,6 @@ setMethod(
                    min(0.3, 20/length(sets)), length.out=10),
             steps=1e6, restarts=5, 
             threads=getOption("mc.cores", default=0)) {
-    
     if(!suppressWarnings(require("mgsa", quietly=TRUE, character.only=TRUE))){
       stop("To use this method, please install the Bioconductor package 'mgsa'.")
     }
@@ -23,10 +22,15 @@ setMethod(
       stop("Query sets is empty.")
     }
     collection.ids <- geneIds( sets )
-    res <- mgsa::mgsa( geneIds( query), collection.ids, 
-                       population=universe, alpha=alpha,
-                       beta=beta, p=p, steps=steps,
-                       restarts=restarts, threads=threads)   
+    res <- mgsa::mgsa(o=geneIds( query),
+                      sets=collection.ids, 
+                      population=universe,
+                      alpha=alpha,
+                      beta=beta,
+                      p=p,
+                      steps=steps,
+                      restarts=restarts,
+                      threads=threads)   
     res <- as( res, "CMAPResults")
     res@data <- data.frame( res@data, pData( sets ), stringsAsFactors=FALSE)
     

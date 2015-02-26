@@ -9,9 +9,17 @@
 comparisons are made between control and perturbation samples. }
 
 \usage{ 
-pairwise_compare(eset, control_perturb_col = "cmap", control="control", perturb="perturbation")
-pairwise_compare_limma(eset, control_perturb_col = "cmap",
-control="control", perturb="perturbation", limma.index=2)
+pairwise_compare(
+  eset,
+  control_perturb_col = "cmap",
+  control="control",
+  perturb="perturbation")
+pairwise_compare_limma(
+ eset,
+  control_perturb_col = "cmap",
+  control="control",
+  perturb="perturbation",
+  limma.index=2)
 }
 
 \arguments{
