@@ -1,8 +1,42 @@
+import(
+  "GSEABase",
+  "Biobase",
+  "methods",
+  "Category",
+  "annotate",
+  "AnnotationDbi"
+)
+
+importFrom(
+    "limma",
+    "plotMA",
+    "ids2indices",
+    "eBayes",
+    "lmFit",
+    "topTable"
+)
+
+importMethodsFrom(
+    "DESeq",
+    "conditions",
+    "conditions<-",
+    "counts",
+    "estimateDispersions",
+    "estimateSizeFactors"
+)
+
+importFrom(
+  "DESeq",
+  "newCountDataSet",
+  "getVarianceStabilizedData"
+)
+
 importFrom(
   "Matrix",
   "sparseMatrix", 
   "Matrix",
-  "t")
+  "t"
+  )
 
 importFrom(
   "GSEAlm",
@@ -15,7 +49,8 @@ importFrom(
 
 importFrom(
   "genefilter", 
-  "rowttests")
+  "rowttests"
+  )
 
 export(
   "annotate_eset_list",

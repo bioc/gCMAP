@@ -1,6 +1,8 @@
 eSetOnDisk <- function(eset, out.file=NULL) {
-  if(! suppressWarnings(require("bigmemoryExtras", 
-                                quietly=TRUE, character.only=TRUE))){
+  BigMatrix <- NULL
+  if(! suppressWarnings(
+    require("bigmemoryExtras", 
+            quietly=TRUE, character.only=TRUE))){
     stop("Package 'bigmemoryExtras' is not installed, cannot create file-backed BigMatrix object")
   }
   
@@ -12,7 +14,7 @@ eSetOnDisk <- function(eset, out.file=NULL) {
   
   for ( element.name in assayDataElementNames( eset ) ) {
     element <- assayDataElement( eset, element.name )
-    bm <- BigMatrix(element,
+    bm <- bigmemoryExtras::BigMatrix(element,
                     backingfile = paste( out.file, element.name, sep="_"),
     )
     
@@ -255,7 +257,7 @@ pairwise_compare_limma <- function( eset,
     
   } else {
     design <- model.matrix( ~factor( pData( eset )[[control_perturb_col]], level=c( control, perturb ) ) )
-    fit <- eBayes( lmFit( eset, design ) )
+    fit <- limma::eBayes( limma::lmFit( eset, design ) )
     
     ## Check that the residual degress of freedom and stdev.unscaled do not vary.
     if ( !all( fit$df.residual == fit$df.residual[1] ) )
@@ -265,7 +267,7 @@ pairwise_compare_limma <- function( eset,
       stop( "Code assumes that 'stdev.unscaled' is the same for all genes. Was there missing data?" )
     
     ## Extract relevant columns from limma results
-    topT <- topTable( fit, coef=limma.index, sort.by="none", number=Inf )
+    topT <- limma::topTable( fit, coef=limma.index, sort.by="none", number=Inf )
     
     AveExpr = topT$AveExpr
     log_fc   = topT$logFC
@@ -292,10 +294,6 @@ pairwise_DESeq <- function( cds,
                             perturb="perturbation",
                             try.hard=FALSE)
 {
-  if( !suppressWarnings(require("DESeq", quietly=TRUE, character.only=TRUE))){
-    stop("To run this function, please install the Bioconductor package 'DESeq'.")
-  }
-  
   ## Immediately fail for cases that have no CountDataSet
   if(!is( cds, "CountDataSet" ))	
   {
@@ -398,15 +396,11 @@ pairwise_DESeq <- function( cds,
                           try.hard=FALSE,
                           control_perturb_col="cmap",
                           ...) {
-  if( !suppressWarnings(require("DESeq", quietly=TRUE, character.only=TRUE))){
-    stop("To use this function, please install the Bioconductor package 'DESeq'.")
-  }
-  
-  conditions(cds) <- pData(cds)[, control_perturb_col]
+  DESeq::conditions(cds) <- pData(cds)[, control_perturb_col]
   cds <- DESeq::estimateSizeFactors( cds )
   
   ## can we use replicates to estimate dispersions ?
-  if ( max( table( conditions(cds ) )[ c( control, perturb )] ) > 1 ) {
+  if ( max( table( DESeq::conditions(cds ) )[ c( control, perturb )] ) > 1 ) {
     
     ## yay, replicates for at least one condition !
     cds <- try( DESeq::estimateDispersions( cds ) )
@@ -496,12 +490,9 @@ generate_gCMAP_NChannelSet <- function(
     )
     
   } else if (data.classes == "CountDataSet") {
-    if( !suppressWarnings(require("DESeq", quietly=TRUE, character.only=TRUE))){
-      stop("To analyze RNAseq count data, please install the Bioconductor package 'DESeq'.")
-    }
     data.list <- lapply( data.list, function(x){
       if( ! identical(varLabels (x ), c("sizeFactor", "condition") )){
-        newCountDataSet( counts( x), conditions=pData( x)[,control_perturb_col])
+        DESeq::newCountDataSet( counts( x), conditions=pData( x)[,control_perturb_col])
       } else {
         return( x )
       }
@@ -644,10 +635,6 @@ generate_gCMAP_NChannelSet <- function(
                             center.log_fc
 )
 {
-  if( !suppressWarnings(require("DESeq", quietly=TRUE, character.only=TRUE))){
-    stop("To analyze RNAseq count data, please install the Bioconductor package 'DESeq'.")
-  }
-  
   stopifnot(center.z %in% c("none", "mean", "median", "peak") )
   stopifnot(center.log_fc %in% c("none", "mean", "median", "peak") )
   
@@ -749,12 +736,9 @@ generate_gCMAP_NChannelSet <- function(
 }
 
 .vst_transform <- function( cds.list ) {
-  if( !suppressWarnings(require("DESeq", quietly=TRUE, character.only=TRUE))){
-    stop("To perform variance stabilizing normalization, please install the Bioconductor package 'DESeq'.")
-  }
-  
+
   ## collect all counts in a single data matrix
-  list.of.counts <- lapply( cds.list, counts )
+  list.of.counts <- lapply( cds.list, DESeq::counts )
   counts.matrix <- do.call( cbind, list.of.counts ) ## contains duplicates of control samples
   counts.matrix <- counts.matrix[, ! duplicated( colnames( counts.matrix ) ) ]
   
@@ -1393,6 +1377,9 @@ KEGG2cmap <- function(
   min.size=5, 
   max.size=200
   ){
+  
+  KEGGPATHID2NAME <- KEGGPATHID2EXTID <- NULL
+  
   if( ! suppressWarnings(require("KEGG.db", quietly=TRUE, character.only=TRUE))){
     stop("To run this function, please install the Bioconductor package 'KEGG.db'.")
   }
@@ -1402,10 +1389,10 @@ KEGG2cmap <- function(
   }
   
   ## retrieve entrez ids of pathw ay members
-  pathways <- AnnotationDbi::as.list(KEGGPATHID2EXTID)
+  pathways <- AnnotationDbi::as.list(KEGG.db::KEGGPATHID2EXTID)
   
   ## retrieve names
-  pathway.names <- unlist(AnnotationDbi::mget(sub("^...", "",names(pathways)), KEGGPATHID2NAME))
+  pathway.names <- unlist(AnnotationDbi::mget(sub("^...", "",names(pathways)), KEGG.db::KEGGPATHID2NAME))
   
   ## species-specific CMAPCollections
   selected.species <- grepl( paste("^", species, sep=""), names( pathways ))

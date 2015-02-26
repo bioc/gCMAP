@@ -1,8 +1,12 @@
-signedRankSumTest <- function (statistics, index.up, index.down=NULL,
-                               input.is.ranks = FALSE,
-                               correlation = 0, df = Inf,
-                               adjust.ties=TRUE) {
-
+signedRankSumTest <- function(
+  statistics, 
+  index.up, 
+  index.down=NULL,
+  input.is.ranks = FALSE,
+  correlation = 0, 
+  df = Inf,
+  adjust.ties=TRUE) {
+  
   if( length( index.up   ) == 0 ) { index.up <- NULL }
   if( length( index.down ) == 0 ) { index.down <- NULL }
   if( is.null(index.up) & is.null(index.down) ) {

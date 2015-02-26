@@ -48,12 +48,14 @@ setMethod(
   setids <- unlist(gnmList) ## all sets
   signList <- mclapply( signList, ## all signs
                      function( x ) {
-                       ifelse(x == "up", 1, -1) } )
+                       ifelse(x == "up", 1, -1) 
+                       } )
   
   ## assign each geneId its index in the uids vector
   isIn <- lapply( seq( length( gidList ) ),
                  function(n) {
-                   isIn <- na.omit(match(gidList[[n]], uids))}
+                   isIn <- na.omit(match(gidList[[n]], uids))
+                   }
                  )
   
   ## create sparseMatrix with GeneSets in rows and genes in columns

@@ -48,7 +48,12 @@ setMethod(
           signature( "SignedGeneSet" ),
           function( object ) {
             ## Based on method for GeneColorSet
-            GSEABase:::.showGeneSet(object)
+            cat("setName:", setName(object), "\n")
+            cat("geneIds:", paste(selectSome(geneIds(object), maxToShow = 4), 
+                                  collapse = ", "), paste("(total: ", length(geneIds(object)), 
+                                                          ")\n", sep = ""), sep = " ")
+            show(geneIdType(object))
+            show(collectionType(object))
             cat(
                 "geneSign: ",
                 paste( selectSome( as.character( geneSign( object ) ), maxToShow = 4 ), collapse = ", " ),

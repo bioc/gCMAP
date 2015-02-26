@@ -5,12 +5,14 @@
 \itemize{
 \item{BUGFIX: }{The wiki2cmap function now excludes empty files downloaded from wikipathways from parsing.}
 \item{BUGFIX: }{The go2cmap function is now exported.}
-\item{CHANGE: }{The reactom2cmap function is currently defunct, because the reactome.db package is broken.}
+\item{BUGFIX: }{The reactom2cmap function is currently defunct, because the reactome.db package is broken.}
+}
 }
 
 \section{Changes in version 1.11.2}{
 \itemize{
 \item{CHANGE: }{Fixed typo in mroast_score method.}
+}
 }
 
 \section{Changes in version 1.11.1}{

@@ -61,7 +61,7 @@ test_mgsa <- function() {
 
 
 test_geneIndex <- function() {
-  data(gCMAPData)
+  data(gCMAPData, package="gCMAP")
   gene.set.collection <- induceCMAPCollection(gCMAPData, "z", higher=2, lower=-2)
   gene.ids <- geneIds(gene.set.collection[,2]) ## geneIds of the second set
   res <- geneIndex(gene.set.collection, gene.ids)
