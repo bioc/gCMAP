@@ -6,7 +6,7 @@ Date: 2015-02-25
 Depends: GSEABase, limma (>= 3.20.0)
 Imports: Biobase, methods, GSEAlm, Category, Matrix (>=
         1.0.9), parallel, annotate, genefilter, AnnotationDbi, DESeq
-Suggests: KEGG.db, reactome.db, RUnit, GO.db, mgsa
+Suggests: BiocGenerics, KEGG.db, reactome.db, RUnit, GO.db, mgsa
 Enhances: bigmemory, bigmemoryExtras (>= 1.1.2)
 Author: Thomas Sandmann <sandmann.thomas@gene.com>, Richard Bourgon
         <bourgon.richard@gene.com> and Sarah Kummerfeld
