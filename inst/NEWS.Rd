@@ -1,6 +1,12 @@
 \name{NEWS}
 \title{NEWS file for the gCMAP}
 
+\section{Changes in version 1.17.0}{
+\itemize{
+\item{BUGFIX: }{Added camera's newly introduced inter.gene.cor parameter in camera_score-methods.}
+}
+}
+
 \section{Changes in version 1.11.3}{
 \itemize{
 \item{BUGFIX: }{The wiki2cmap function now excludes empty files downloaded from wikipathways from parsing.}

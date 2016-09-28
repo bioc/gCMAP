@@ -39,6 +39,7 @@ setMethod(
             scores <- camera(y=assayDataElement(experiment, element), 
                              index=indices, 
                              design=design.matrix,
+			     inter.gene.cor=NA
                              ...)
   
             ## store raw per-gene expression scores as matrix
