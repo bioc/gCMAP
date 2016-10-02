@@ -4,7 +4,8 @@ import(
   "methods",
   "Category",
   "annotate",
-  "AnnotationDbi"
+  "AnnotationDbi",
+  "Matrix"
 )
 
 importFrom(

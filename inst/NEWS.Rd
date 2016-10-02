@@ -1,6 +1,12 @@
 \name{NEWS}
 \title{NEWS file for the gCMAP}
 
+\section{Changes in version 1.17.2}{
+\itemize{
+\item{BUGFIX: }{Added import of the Matrix package to NAMESPACE file.}
+}
+}
+
 \section{Changes in version 1.17.0}{
 \itemize{
 \item{BUGFIX: }{Added camera's newly introduced inter.gene.cor parameter in camera_score-methods.}

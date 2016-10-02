@@ -1,8 +1,8 @@
 Package: gCMAP
 Type: Package
 Title: Tools for Connectivity Map-like analyses
-Version: 1.17.1
-Date: 2016-09-30
+Version: 1.17.2
+Date: 2016-10-02
 Depends: GSEABase, limma (>= 3.20.0)
 Imports: Biobase, methods, GSEAlm, Category, Matrix (>=
         1.0.9), parallel, annotate, genefilter, AnnotationDbi, DESeq
@@ -11,7 +11,7 @@ Enhances: bigmemory, bigmemoryExtras (>= 1.1.2)
 Author: Thomas Sandmann <sandmann.t@gmail.com>, Richard Bourgon
         <bourgon.richard@gene.com> and Sarah Kummerfeld
         <kummerfeld.sarah@gene.com>
-Maintainer: Thomas Sandmann <sandmann.thomas@gene.com>
+Maintainer: Thomas Sandmann <sandmann.t@gmail.com>
 Description: The gCMAP package provides a toolkit for comparing
         differential gene expression profiles through gene set
         enrichment analysis. Starting from normalized microarray or
