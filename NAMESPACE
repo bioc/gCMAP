@@ -9,6 +9,41 @@ import(
 )
 
 importFrom(
+  "grDevices",
+  "colorRampPalette")
+
+importFrom(
+  "graphics",
+  "legend",
+  "lines",
+  "par",
+  "plot.new",
+  "polygon",
+  "rug")
+
+importFrom(
+  "stats",
+  "as.formula",
+  "ave",
+  "density",
+  "dhyper",
+  "dnorm",
+  "median",
+  "model.matrix",
+  "na.omit",
+  "p.adjust",
+  "pnorm",
+  "pt",
+  "qnorm")
+
+importFrom(
+  "utils",
+  "URLencode",
+  "download.file",
+  "read.delim",
+  "unzip")
+
+importFrom(
     "limma",
     "plotMA",
     "ids2indices",

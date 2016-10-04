@@ -1,6 +1,13 @@
 \name{NEWS}
 \title{NEWS file for the gCMAP}
 
+\section{Changes in version 1.17.3}{
+\itemize{
+\item{BUGFIX: }{Simpified the mergeCMAPs function.}
+\item{BUGFIX: }{Added additional imports to NAMESPACE, as recommended by R CMD check.}
+}
+}
+
 \section{Changes in version 1.17.2}{
 \itemize{
 \item{BUGFIX: }{Added import of the Matrix package to NAMESPACE file.}

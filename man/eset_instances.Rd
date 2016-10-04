@@ -8,7 +8,8 @@ A function to subset an eSet with expression data into smaller datasets, each co
 This function takes two parameters, an eSet object (e.g. an ExpressionSet or CountDataSet) containing muliple samples, and a numerical matrix defining how these samples should be compared to investigate perturbations of interest. For each perturbation, a separate eSet object is generated, ready for analysis with the \code{\link{generate_gCMAP_NChannelSet}} function. Samples can be used in multiple instances, e.g. common controls can be specified in each column of the 'instance.matrix'.
 }
 \usage{
-eset_instances(instance.matrix, eset, control_perturb_col = "cmap", control = "control", perturb = "perturbation")
+eset_instances(instance.matrix, eset, control_perturb_col = "cmap", 
+control = "control", perturb = "perturbation")
 }
 
 \arguments{
