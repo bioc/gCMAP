@@ -49,7 +49,10 @@ importFrom(
     "ids2indices",
     "eBayes",
     "lmFit",
-    "topTable"
+    "topTable",
+    "camera",
+    "mroast",
+    "romer"
 )
 
 importMethodsFrom(

@@ -96,6 +96,10 @@
 }
 \keyword{methods}
 
+\value{
+  A CMAPResult object 
+}
+
 \examples{
 data(gCMAPData)
 gene.set.collection <- induceCMAPCollection(gCMAPData, "z", higher=2, lower=-2)

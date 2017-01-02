@@ -1,3 +1,10 @@
+# Helper function authored by Brian Ripley, reproduced from
+# http://r.789695.n4.nabble.com/checking-if-a-package-is-installed-td2340534.html
+.f_checkpackage <- function(pkg) {
+  tryCatch(require(pkg, character.only = TRUE), 
+           error = function(e) FALSE) 
+}
+
 setClass("CMAPCollection",
          contains = "eSet",
          prototype = prototype(
@@ -35,14 +42,14 @@ setClass(
          )
 
 ## if bigmemory package is unavailable, create dummy Class big.matrix
-if( ! isClass("big.matrix")){
+if (!isClass("big.matrix")){
   setClass(
     "big.matrix", contains="matrix"
   )
 }
 
 ## if bigmemoryExtras package is unavailable, create dummy Class BigMatrix
-if( ! isClass("BigMatrix")){
+if (!isClass("BigMatrix")){
   setClass(
     "BigMatrix"
   )

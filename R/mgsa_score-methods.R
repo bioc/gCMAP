@@ -14,7 +14,7 @@ setMethod(
                    min(0.3, 20/length(sets)), length.out=10),
             steps=1e6, restarts=5, 
             threads=getOption("mc.cores", default=0)) {
-    if(!suppressWarnings(require("mgsa", quietly=TRUE, character.only=TRUE))){
+    if (!.f_checkpackage("mgsa")) {
       stop("To use this method, please install the Bioconductor package 'mgsa'.")
     }
     

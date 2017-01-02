@@ -37,7 +37,11 @@ object. (See example section).
     information about directionality, e.g. if it is a p-value.}
   \item{\dots}{ Any of the additional arguments detailed above.}
 }
-  
+
+\value{
+  A CMAPCollection object 
+}
+
 \keyword{methods}
 \seealso{\code{\link{CMAPCollection}}
 }

@@ -1,5 +1,13 @@
 \name{NEWS}
-\title{NEWS file for the gCMAP}
+\title{NEWS file for the gCMAP package}
+
+\section{Changes in version 1.19.1}{
+\itemize{
+\item{BUGFIX: }{Updated NAMESPACE file to conform with R CMD check.}
+\item{BUGFIX: }{reactome2cmap function is available again.}
+\item{NEW: }{Added citation information.}
+}
+}
 
 \section{Changes in version 1.17.3}{
 \itemize{

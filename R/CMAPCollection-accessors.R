@@ -320,27 +320,23 @@ setMethod(
     gss <- mclapply( 1:ncol( ade ),
                      function( n ) {
                        if (! is.null( lower )) {
-                         if( suppressWarnings( 
-                           require( "bigmemory", 
-                                    quietly = TRUE, 
-                                    character.only = TRUE) )
-                         ){
-                           down <- as.vector( mwhich( ade, n, lower, "lt" ))
+                         if (.f_checkpackage("bigmemory")) {
+                           down <- as.vector(
+                             bigmemory::mwhich( ade, n, lower, "lt" ))
                          } else {
-                           down <- as.vector( which( ade[,n] < lower ))
+                           down <- as.vector(
+                             bigmemory::mwhich( ade[,n] < lower ))
                          }
                        } else {
                          down <- NULL
                        }                            
                        if (! is.null( higher )) {
-                         if( suppressWarnings( 
-                           require( "bigmemory", 
-                                    quietly = TRUE, 
-                                    character.only = TRUE) )
-                         ){
-                           up <- as.vector( mwhich( ade, n, higher, "gt"))
+                         if (.f_checkpackage("bigmemory")) {
+                           up <- as.vector(
+                             bigmemory::mwhich( ade, n, higher, "gt"))
                          } else {
-                           up <- as.vector( which( ade[,n] > higher ))
+                           up <- as.vector(
+                             bigmemory::mwhich( ade[,n] > higher ))
                          }
                        } else {
                          up <- NULL
