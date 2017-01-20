@@ -1,8 +1,8 @@
 Package: gCMAP
 Type: Package
 Title: Tools for Connectivity Map-like analyses
-Version: 1.19.3
-Date: 2017-01-11
+Version: 1.19.4
+Date: 2017-01-19
 Depends: GSEABase, limma (>= 3.20.0)
 Imports: Biobase, methods, GSEAlm, Category, Matrix (>=
         1.0.9), parallel, annotate, genefilter, AnnotationDbi, DESeq, grDevices,
@@ -56,3 +56,4 @@ Collate: 'AllClasses.R' 'AllGenerics.R' 'SignedGeneSet-accessors.R'
         'wilcox_score-methods.R' 'CMAPCollection-accessors.R'
         'CMAPResults-accessors.R'
 biocViews: Microarray, Software, Pathways, Annotation
+OS_type: unix

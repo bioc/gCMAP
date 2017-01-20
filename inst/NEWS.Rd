@@ -1,6 +1,13 @@
 \name{NEWS}
 \title{NEWS file for the gCMAP package}
 
+\section{Changes in version 1.19.4}{
+\itemize{
+\item{CHANGE: }{As the bigmemory package is not available for Windows,
+only unix_type OS is supported.}
+}
+}
+
 \section{Changes in version 1.19.1}{
 \itemize{
 \item{BUGFIX: }{Updated NAMESPACE file to conform with R CMD check.}
