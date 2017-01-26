@@ -6,9 +6,8 @@ Date: 2017-01-19
 Depends: GSEABase, limma (>= 3.20.0)
 Imports: Biobase, methods, GSEAlm, Category, Matrix (>=
         1.0.9), parallel, annotate, genefilter, AnnotationDbi, DESeq, grDevices,
-        graphics, stats, utils
+        graphics, stats, utils, bigmemory, bigmemoryExtras (>= 1.1.2)
 Suggests: BiocGenerics, KEGG.db, reactome.db, RUnit, GO.db, mgsa
-Enhances: bigmemory, bigmemoryExtras (>= 1.1.2)
 Author: Thomas Sandmann <sandmann.t@gmail.com>, Richard Bourgon
         <bourgon.richard@gene.com> and Sarah Kummerfeld
         <kummerfeld.sarah@gene.com>
