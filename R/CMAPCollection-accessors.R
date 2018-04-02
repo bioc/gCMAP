@@ -462,7 +462,7 @@ setMethod(
   signature=signature( x="CMAPCollection", y="CMAPCollection" ),
   function( x, y ) {
     common.genes <- intersect( featureNames( x ), featureNames( y ) )
-    c.members <- Matrix::cBind( members( x[common.genes,] ), members( y[common.genes,] ) )
+    c.members <- cbind( members( x[common.genes,] ), members( y[common.genes,] ) )
     
     dupl.sets <- duplicated( colnames( c.members ) )
     if( any( dupl.sets) ){
