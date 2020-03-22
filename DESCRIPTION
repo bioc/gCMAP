@@ -2,7 +2,7 @@ Package: gCMAP
 Type: Package
 Title: Tools for Connectivity Map-like analyses
 Version: 1.31.1
-Date: 2017-01-26
+Date: 2020-03-22
 PackageStatus: Deprecated
 Depends: GSEABase, limma (>= 3.20.0)
 Imports: Biobase, methods, GSEAlm, Category, Matrix (>=
