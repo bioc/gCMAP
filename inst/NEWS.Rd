@@ -1,6 +1,13 @@
 \name{NEWS}
 \title{NEWS file for the gCMAP package}
 
+\section{Changes in version 1.31.1}{
+\itemize{
+\item{CHANGE: }{The gCMAP and gCMAPWeb packages are deprecated and will
+be removed from Bioconductor version 3.12.}
+}
+}
+
 \section{Changes in version 1.19.4}{
 \itemize{
 \item{CHANGE: }{As the bigmemory package is not available for Windows,
