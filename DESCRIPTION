@@ -1,7 +1,7 @@
 Package: gCMAP
 Type: Package
 Title: Tools for Connectivity Map-like analyses
-Version: 1.31.1
+Version: 1.31.2
 Date: 2020-03-22
 PackageStatus: Deprecated
 Depends: GSEABase, limma (>= 3.20.0)
@@ -54,6 +54,6 @@ Collate: 'AllClasses.R' 'AllGenerics.R' 'SignedGeneSet-accessors.R'
         'mapIdentifiers-methods.R' 'minSetSize-methods.R'
         'mroast_score-methods.R' 'romer_score-methods.R'
         'wilcox_score-methods.R' 'CMAPCollection-accessors.R'
-        'CMAPResults-accessors.R'
+        'CMAPResults-accessors.R' 'zzz.R'
 biocViews: Microarray, Software, Pathways, Annotation
 OS_type: unix
